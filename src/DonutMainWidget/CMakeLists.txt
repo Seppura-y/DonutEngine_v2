@@ -283,22 +283,24 @@ target_link_libraries(${PROJECT_NAME}
     libvlc.lib
     libvlccore.lib
     DonutAVLibrary
+    DonutEngine
     SDL2
     SDL2main
     avcodec
 )
 
-foreach(type IN LISTS CONFIG_TYPES)
+foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)
     if(type)
-        string(TOUPPER _${type} config)
-        message("config = ${config}")
+        string(TOUPPER ${type} config)
+        message("${PROJECT_NAME} config = ${config}")
+        set(CMAKE_CXX_FLAGS_${config} "${CMAKE_CXX_FLAGS_${config}} -D${config}")
     endif()
 
     set_target_properties(${PROJECT_NAME} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY${config} ${RUNTIME_DIR}   #dll exe 
-        LIBRARY_OUTPUT_DIRECTORY${config} ${LIBRARY_DIR}   #so dylib
-        ARCHIVE_OUTPUT_DIRECTORY${config} ${LIBRARY_DIR}   #lib a
-        PDB_OUTPUT_DIRECTORY${config}     ${RUNTIME_DIR}   #pdb
+        RUNTIME_OUTPUT_DIRECTORY_${config} ${RUNTIME_DIR}   #dll exe 
+        LIBRARY_OUTPUT_DIRECTORY_${config} ${LIBRARY_DIR}   #so dylib
+        ARCHIVE_OUTPUT_DIRECTORY_${config} ${LIBRARY_DIR}   #lib a
+        PDB_OUTPUT_DIRECTORY_${config}     ${RUNTIME_DIR}   #pdb
     )
 endforeach()
 
