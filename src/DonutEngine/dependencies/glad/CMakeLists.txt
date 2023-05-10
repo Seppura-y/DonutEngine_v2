@@ -57,27 +57,27 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     DEBUG_POSTFIX "d"
 )
 
-install(TARGETS ${PROJECT_NAME}
-    EXPORT ${PROJECT_NAME}
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-)
+# install(TARGETS ${PROJECT_NAME}
+#     EXPORT ${PROJECT_NAME}
+#     RUNTIME DESTINATION bin
+#     LIBRARY DESTINATION lib
+# )
 
-set(version 1.0)
-set(CONFIG_VERSION_FILE ${CMAKE_CURRENT_LIST_DIR}/../../../../lib/conf/${PROJECT_NAME}ConfigVersion.cmake)
+# set(version 1.0)
+# set(CONFIG_VERSION_FILE ${CMAKE_CURRENT_LIST_DIR}/../../../../lib/conf/${PROJECT_NAME}ConfigVersion.cmake)
 #config file
-install(EXPORT ${PROJECT_NAME} FILE ${PROJECT_NAME}Config.cmake 
-    DESTINATION ../../../../lib/config
-)
+# install(EXPORT ${PROJECT_NAME} FILE ${PROJECT_NAME}Config.cmake 
+#     DESTINATION ../../../../lib/config
+# )
 
 #版本文件
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    ${CONFIG_VERSION_FILE}
-    VERSION ${version}
-    COMPATIBILITY SameMajorVersion  #版本兼容问题
-)
+# include(CMakePackageConfigHelpers)
+# write_basic_package_version_file(
+#     ${CONFIG_VERSION_FILE}
+#     VERSION ${version}
+#     COMPATIBILITY SameMajorVersion  #版本兼容问题
+# )
 
-install(FILES ${CONFIG_VERSION_FILE}
-    DESTINATION ../../../../lib/config/${PROJECT_NAME}-${version}
-)
+# install(FILES ${CONFIG_VERSION_FILE}
+#     DESTINATION ../../../../lib/config/${PROJECT_NAME}-${version}
+# )

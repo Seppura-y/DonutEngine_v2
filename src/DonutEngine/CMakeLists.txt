@@ -197,6 +197,16 @@ if(USE_PCH)
     )
 endif()
 
+set(PUB_HEADERS         
+    ${CMAKE_CURRENT_LIST_DIR}/src/donut.h
+    ${CMAKE_CURRENT_LIST_DIR}/src/core/core.h
+    ${CMAKE_CURRENT_LIST_DIR}/src/core/application.h
+)
+set_target_properties(${PROJECT_NAME} PROPERTIES 
+    PUBLIC_HEADER "${PUB_HEADERS}"
+    # VERSION ${PROJECT_VERSION}
+)
+
 # set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "frontend")
 
 if( MSVC )
@@ -217,8 +227,9 @@ if( MSVC )
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
+    __STDC_CONSTANT_MACROS
     DN_PLATFORM_WINDOWS
-    DN_BUILD_STATIC
+    DN_BUILD_SHARED
     # if(DN_SHARED)
     #     DN_BUILD_SHARED
     # endif()
@@ -234,9 +245,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCES_DIR})
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${CMAKE_CURRENT_LIST_DIR}/../../src
-    ${CMAKE_CURRENT_LIST_DIR}/../../src/core
-    ${CMAKE_CURRENT_LIST_DIR}/../../src/renderer
+    ${CMAKE_CURRENT_LIST_DIR}/src
+    ${CMAKE_CURRENT_LIST_DIR}/src/core
+    ${CMAKE_CURRENT_LIST_DIR}/src/renderer
 
     ${CMAKE_CURRENT_LIST_DIR}/../../dependencies
     ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/spdlog/include
@@ -256,6 +267,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::OpenGL
     Qt5::OpenGLExtensions
     user32.lib
+    opengl32.lib
     dwmapi.lib
     libvlc.lib
     libvlccore.lib
@@ -302,11 +314,11 @@ install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
-    PUBLIC_HEADER DESTINATION include
+    PUBLIC_HEADER DESTINATION include/DonutEngine
     PRIVATE_HEADER DESTINATION inc
 )
 
-install(EXPORT ${PROJECT_NAME} FILE "${PROJECT_NAME}Config.cmake" DESTINATION config)
+# install(EXPORT ${PROJECT_NAME} FILE "${PROJECT_NAME}Config.cmake" DESTINATION config)
 
 install(DIRECTORY 
     $<TARGET_FILE_DIR:${PROJECT_NAME}>

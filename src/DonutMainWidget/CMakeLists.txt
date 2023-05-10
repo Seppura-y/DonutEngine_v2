@@ -128,6 +128,14 @@ FILE(GLOB ${PROJECT_NAME}_VIDEO_PLAYER_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/src/video_player/*.h
 )
 
+FILE(GLOB ${PROJECT_NAME}_GRAPHICS_WIDGET_SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/src/graphics_widget/*.cpp
+)
+
+FILE(GLOB ${PROJECT_NAME}_GRAPHICS_WIDGET_HEADERS
+    ${CMAKE_CURRENT_LIST_DIR}/src/graphics_widget/*.h
+)
+
 FILE(GLOB ${PROJECT_NAME}_CSS_FILES
     ${CMAKE_CURRENT_LIST_DIR}/forms/res/css/*.css
 )
@@ -171,7 +179,8 @@ source_group("Source Files//video_renderer" FILES ${${PROJECT_NAME}_VIDEO_RENDER
 source_group("Header Files//video_player" FILES ${${PROJECT_NAME}_VIDEO_PLAYER_HEADERS})
 source_group("Source Files//video_player" FILES ${${PROJECT_NAME}_VIDEO_PLAYER_SOURCES})
 
-
+source_group("Header Files//graphics_widget" FILES ${${PROJECT_NAME}_GRAPHICS_WIDGET_HEADERS})
+source_group("Source Files//graphics_widget" FILES ${${PROJECT_NAME}_GRAPHICS_WIDGET_SOURCES})
 
 #========================================= SETUP EXECTUABLE =========================================#
 # Enable debug logging on RELWITHDEBINFO configuration
@@ -212,6 +221,9 @@ if (WIN32)
         ${${PROJECT_NAME}_VIDEO_PLAYER_HEADERS}
         ${${PROJECT_NAME}_VIDEO_PLAYER_SOURCES}
 
+        ${${PROJECT_NAME}_GRAPHICS_WIDGET_HEADERS}
+        ${${PROJECT_NAME}_GRAPHICS_WIDGET_SOURCES}
+
         ${${PROJECT_NAME}_CSS_FILES}
 
         ${${PROJECT_NAME}_UI_HEADERS}
@@ -248,8 +260,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCES_DIR})
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/
+    ${CMAKE_CURRENT_LIST_DIR}/../../dependencies
     ${CMAKE_CURRENT_LIST_DIR}/../../include/DonutAVLibrary
+    ${CMAKE_CURRENT_LIST_DIR}/../../include/DonutEngine
     ${CMAKE_CURRENT_LIST_DIR}/../../include/ffmpeg
     ${CMAKE_CURRENT_LIST_DIR}/../../include
     ${CMAKE_CURRENT_LIST_DIR}/../../include/spdlog/include
