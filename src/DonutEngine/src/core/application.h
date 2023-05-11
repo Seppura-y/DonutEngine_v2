@@ -2,6 +2,7 @@
 #define APPLICATION_H
 
 #include "core.h"
+#include "events/event.h"
 
 namespace Donut
 {
@@ -12,6 +13,7 @@ namespace Donut
 		virtual ~Application();
 
 		void run();
+		virtual void windowUpdate() = 0;
 
 		inline static Application& getInstance() { return *s_instance_; }
 	private:

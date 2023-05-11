@@ -15,7 +15,6 @@
 #include <utility>
 #include <algorithm>
 
-//#include "Donut/log.h"
 
 #ifdef DN_PLATFORM_WINDOWS
 #include <Windows.h>

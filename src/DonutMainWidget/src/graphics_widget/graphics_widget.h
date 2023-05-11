@@ -2,6 +2,8 @@
 #define GRAPHICS_WIDGET_H
 
 #include <QWidget>
+#include <QTimerEvent>
+
 //#include "donut.h"
 #include "DonutEngine/donut.h"
 
@@ -12,8 +14,14 @@ class GraphicsWiget : public QWidget, public Donut::Application
 public:
 	GraphicsWiget(QWidget* parent = nullptr);
 	~GraphicsWiget();
-private:
 
+	virtual void windowUpdate() override;
+
+protected:
+	virtual void timerEvent(QTimerEvent* ev) override;
+private:
+	bool is_timeout_ = false;
+	int timer_id_ = -1;
 };
 
 
