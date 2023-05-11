@@ -1,5 +1,5 @@
 #include "application.h"
-
+#include "engine_log.h"
 namespace Donut
 {
 	Application* Application::s_instance_ = nullptr;
@@ -7,6 +7,7 @@ namespace Donut
 	Application::Application()
 	{
 		s_instance_ = this;
+		EngineLog::init();
 	}
 
 	Application::~Application()

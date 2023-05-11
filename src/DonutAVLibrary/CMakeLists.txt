@@ -8,6 +8,10 @@ set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../../bin)
 set(LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/../../lib)
 
 #===================================== CONFIGURATION TYPES OF THE PROJECT ==================================#
+
+set(DN_SHARED ON CACHE BOOL "Build shared library?")
+
+
 set(CONFIG_TYPE_DEBUG TRUE CACHE BOOL "Debug")
 set(CONFIG_TYPE_RELEASE FALSE CACHE BOOL "Release")
 set(CONFIG_TYPE_RELWITHDEBINFO FALSE CACHE BOOL "RelWithDebInfo")
@@ -130,9 +134,15 @@ source_group("Source Files//media_manager" FILES ${${PROJECT_NAME}_MEDIA_MANAGER
 # Set the startup project for visual studio
 set_property(DIRECTORY ${CMAKE_CURRENT_LIST_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
+if(DN_SHARED)
+    set(CONFIG_TYPE SHARED)
+else()
+    set(CONFIG_TYPE STATIC)
+endif()
+
 # Add the executable
 if (WIN32) 
-    add_library(${PROJECT_NAME} STATIC 
+    add_library(${PROJECT_NAME} STATIC
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_SOURCES}
 

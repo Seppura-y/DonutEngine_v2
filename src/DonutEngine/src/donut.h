@@ -3,5 +3,6 @@
 
 #include "core.h"
 #include "application.h"
+#include "engine_log.h"
 
 #endif

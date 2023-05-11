@@ -201,7 +201,7 @@ set(PUB_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/src/donut.h
     ${CMAKE_CURRENT_LIST_DIR}/src/core/core.h
     ${CMAKE_CURRENT_LIST_DIR}/src/core/application.h
-    ${CMAKE_CURRENT_LIST_DIR}/src/core/log.h
+    ${CMAKE_CURRENT_LIST_DIR}/src/core/engine_log.h
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES 
     PUBLIC_HEADER "${PUB_HEADERS}"
