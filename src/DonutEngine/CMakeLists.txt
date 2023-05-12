@@ -202,6 +202,7 @@ set(PUB_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/src/core/core.h
     ${CMAKE_CURRENT_LIST_DIR}/src/core/application.h
     ${CMAKE_CURRENT_LIST_DIR}/src/core/engine_log.h
+    ${CMAKE_CURRENT_LIST_DIR}/src/core/window.h
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES 
     PUBLIC_HEADER "${PUB_HEADERS}"
@@ -231,6 +232,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     __STDC_CONSTANT_MACROS
     DN_PLATFORM_WINDOWS
     DN_BUILD_SHARED
+    DN_USE_GLFW
+    GLFW_INCLUDE_NONE
     # if(DN_SHARED)
     #     DN_BUILD_SHARED
     # endif()
@@ -276,6 +279,8 @@ target_link_libraries(${PROJECT_NAME}
     SDL2
     SDL2main
     avcodec
+    glfw
+    glad
 )
 
 foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)

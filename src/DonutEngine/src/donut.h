@@ -2,7 +2,7 @@
 #define DONUT_H
 
 #include "core.h"
-#include "application.h"
-#include "engine_log.h"
+#include "core/application.h"
+#include "core/engine_log.h"
 
 #endif

@@ -1,6 +1,7 @@
-#pragma once
-
+#ifndef EVENT_H
+#define EVENT_H
 #include "pch.h"
+
 #include "core.h"
 
 namespace Donut {
@@ -9,7 +10,7 @@ namespace Donut {
 	// immediately gets dispatched and must be dealt with right then an there.
 	// For the future, a better strategy might be to buffer events in an event
 	// bus and process them during the "event" part of the update stage.
-
+#define BIT(x) (1 << x)
 	enum class EventType
 	{
 		None = 0,
@@ -86,3 +87,5 @@ namespace Donut {
 	}
 
 }
+
+#endif

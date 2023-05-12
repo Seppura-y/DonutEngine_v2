@@ -18,7 +18,6 @@ int main(int argc, char* argv[])
     GraphicsWiget wid;
     wid.show();
     wid.run();
-    wid.activateWindow();
 
     return a.exec();
 }

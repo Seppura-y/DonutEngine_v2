@@ -8,6 +8,7 @@ GraphicsWiget::GraphicsWiget(QWidget* parent) : QWidget(parent), Donut::Applicat
 	DN_ENGINE_INFO("{0}", "GraphicsWiget construct");
 
 	timer_id_ = startTimer(120);
+	WId id = winId();
 }
 
 GraphicsWiget::~GraphicsWiget()

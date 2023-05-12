@@ -5,7 +5,8 @@
 #include <QTimerEvent>
 
 //#include "donut.h"
-#include "DonutEngine/donut.h"
+#include "donut.h"
+#include "core/window.h"
 
 class GraphicsWiget : public QWidget, public Donut::Application
 {

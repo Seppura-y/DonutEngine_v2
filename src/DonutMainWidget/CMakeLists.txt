@@ -262,10 +262,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCES_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${CMAKE_CURRENT_LIST_DIR}/../../dependencies
     ${CMAKE_CURRENT_LIST_DIR}/../../include/DonutAVLibrary
-    ${CMAKE_CURRENT_LIST_DIR}/../../include/DonutEngine
+    #${CMAKE_CURRENT_LIST_DIR}/../../include/DonutEngine
     ${CMAKE_CURRENT_LIST_DIR}/../../include/ffmpeg
     ${CMAKE_CURRENT_LIST_DIR}/../../include
     ${CMAKE_CURRENT_LIST_DIR}/../../include/spdlog/include
+
+    ${CMAKE_CURRENT_LIST_DIR}/src/../../DonutEngine/src
+
 )
 
 #========================================= LINKING LIBRARIES =========================================#
