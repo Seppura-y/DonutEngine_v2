@@ -1,8 +1,11 @@
 #ifndef DONUT_H
 #define DONUT_H
 
-#include "core.h"
+#include "core/core.h"
 #include "core/application.h"
-#include "core/engine_log.h"
+#include "core/entry_point.h"
+#include "core/logger.h"
+#include "core/layer.h"
+
 
 #endif

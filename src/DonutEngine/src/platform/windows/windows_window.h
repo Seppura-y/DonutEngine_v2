@@ -1,6 +1,6 @@
 #pragma once
 #include "core/window.h"
-#include "engine_log.h"
+#include "logger.h"
 
 struct GLFWwindow;
 namespace Donut {

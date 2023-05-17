@@ -2,7 +2,7 @@
 #cmake --build build --config Release
 #cmake --install build --config Release
 cmake_minimum_required(VERSION 3.22)
-project(DonutQtGlfwTest_Build)
+project(DonutEngine_v2_Build)
 
 
 set(STARTUP_PROJ "DonutMainWidget" CACHE STRING "set the vs startup project")
@@ -27,6 +27,7 @@ set(PROJECT_DONUT_MAIN_WIDGET            TRUE CACHE BOOL "add project DonutMainW
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutEngine)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutAVLibrary)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutMainWidget)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutEditor)
 
 add_dependencies(DonutMainWidget DonutEngine DonutAVLibrary)
 

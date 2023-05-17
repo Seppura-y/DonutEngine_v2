@@ -4,6 +4,8 @@ project(DonutEngine LANGUAGES CXX)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glad)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui)
+set_property(TARGET glad glfw imgui PROPERTY FOLDER "Dependencies")
 
 set(DN_SHARED ON CACHE BOOL "Build shared library?")
 
@@ -136,10 +138,21 @@ FILE(GLOB ${PROJECT_NAME}_WINDOWS_SRC
 )
 
 #####################################################################################################
+# imgui
+FILE(GLOB ${PROJECT_NAME}_IMGUI_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/src/imgui/*.h
+)
+
+FILE(GLOB ${PROJECT_NAME}_IMGUI_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/src/imgui/*.cpp
+)
+
+#####################################################################################################
 source_group("src\\DonutEngine\\Global" FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
 source_group("src\\DonutEngine\\Core" FILES ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC})
 source_group("src\\DonutEngine\\Events" FILES ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC})
 source_group("src\\DonutEngine\\Renderer" FILES ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC})
+source_group("src\\DonutEngine\\ImGui" FILES ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC})
 
 source_group("src\\DonutEngine\\Platform\\OpenGL" FILES ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC})
 source_group("src\\DonutEngine\\Platform\\Windows" FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
@@ -175,6 +188,7 @@ if (WIN32)
         ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC}
         ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC}
         ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC}
+        ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC}
     )
 elseif(UNIX)
     add_library(${PROJECT_NAME} 
@@ -258,6 +272,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glfw/include
     ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glad/include
     ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glm
+    ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/imgui
 )
 
 #========================================= LINKING LIBRARIES =========================================#
@@ -281,6 +296,7 @@ target_link_libraries(${PROJECT_NAME}
     avcodec
     glfw
     glad
+    imgui
 )
 
 foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)

@@ -42,6 +42,7 @@ bin
 build
 lib
 include
+dependencies
 forms
 scripts/__pycache__
 

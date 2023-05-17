@@ -15,6 +15,7 @@
 #include <utility>
 #include <algorithm>
 
+#include "logger.h"
 
 #ifdef DN_PLATFORM_WINDOWS
 #include <Windows.h>

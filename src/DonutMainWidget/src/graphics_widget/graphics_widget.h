@@ -23,6 +23,8 @@ protected:
 private:
 	bool is_timeout_ = false;
 	int timer_id_ = -1;
+
+	QWidget* render_widget_ = nullptr;
 };
 
 
