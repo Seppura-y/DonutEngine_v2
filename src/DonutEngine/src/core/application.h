@@ -32,7 +32,7 @@ namespace Donut
 	private:
 		bool onWindowClose(WindowCloseEvent& ev);
 	private:
-		static inline Application* s_instance_ = nullptr;
+		static Application* s_instance_;
 		bool is_running_ = false;
 		std::unique_ptr<Window> window_;
 

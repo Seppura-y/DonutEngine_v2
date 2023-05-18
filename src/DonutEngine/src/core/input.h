@@ -20,7 +20,7 @@ namespace Donut
         virtual float getMouseXImpl() = 0;
         virtual float getMouseYImpl() = 0;
         virtual std::pair<float, float> getMousePositionImpl() = 0;
-    private:
+    protected:
         static Input* s_instance_;
     };
 }

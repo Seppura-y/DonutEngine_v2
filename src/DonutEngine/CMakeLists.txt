@@ -183,11 +183,11 @@ if (WIN32)
         ${GLOBAL_SRC}
 
         ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC}
+        ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC}
         ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC}
         ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC}
         ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC}
         ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC}
-        ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC}
         ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC}
     )
 elseif(UNIX)
@@ -196,11 +196,11 @@ elseif(UNIX)
         ${GLOBAL_SRC}
 
         ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC}
+        ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC}
         ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC}
         ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC}
         ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC}
         ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC}
-        ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC}
     )
 endif()
 
@@ -267,11 +267,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src/core
     ${CMAKE_CURRENT_LIST_DIR}/src/renderer
 
-    ${CMAKE_CURRENT_LIST_DIR}/../../dependencies
-    ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/spdlog/include
-    ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glfw/include
-    ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glad/include
-    ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glm
+    # ${CMAKE_CURRENT_LIST_DIR}/../../dependencies
+    # ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/spdlog/include
+    # ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glfw/include
+    # ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glad/include
+    # ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glm
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/spdlog/include
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw/include
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/glad/include
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/glm
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui
 )
 

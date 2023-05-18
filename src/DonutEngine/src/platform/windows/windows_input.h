@@ -8,7 +8,7 @@ namespace Donut
 	class WindowsInput : public Input
 	{
 	public:
-
+		WindowsInput();
 	protected:
 		virtual bool isKeyPressedImpl(int keycode) override;
 		virtual bool isMouseButtonPressedImpl(int button) override;

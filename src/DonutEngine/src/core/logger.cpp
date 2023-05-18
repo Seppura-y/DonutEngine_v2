@@ -16,8 +16,8 @@ namespace Donut {
 		log_sinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/Donut.log", true));
 
 		//log_sinks[0]->set_pattern("%^[%T] %n: %v%$");
-		log_sinks[0]->set_pattern("[%Y-%m-%d %H:%M:%S:%f %z] [%5t] [%^%=5l%$] %v");
-		log_sinks[1]->set_pattern("[%T] [%l] %n: %v");
+		log_sinks[1]->set_pattern("[%Y-%m-%d %H:%M:%S:%f %z] [%5t] [%^%=5l%$] %v");
+		log_sinks[0]->set_pattern("[%T] [%l] %n: %v");
 
 		sptr_core_logger_ = std::make_shared<spdlog::logger>("DONUT CORE", begin(log_sinks), end(log_sinks));
 		spdlog::register_logger(sptr_core_logger_);

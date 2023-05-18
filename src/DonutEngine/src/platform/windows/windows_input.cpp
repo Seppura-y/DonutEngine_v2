@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "input.h"
 #include "windows_input.h"
 
 #include "core/application.h"
@@ -8,11 +9,16 @@ namespace Donut
 {
 	Input* Input::s_instance_ = new WindowsInput();
 
+	WindowsInput::WindowsInput()
+	{
+		//Input::s_instance_ = this;
+	}
+
 	bool WindowsInput::isKeyPressedImpl(int keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::getInstance().getWindow().getNativeWindow());
 		auto state = glfwGetKey(window, keycode);
-		return state == GLFW_PRESS | GLFW_REPEAT;
+		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 	bool WindowsInput::isMouseButtonPressedImpl(int button)
 	{
