@@ -21,4 +21,6 @@
 #define DN_CORE_ASSERT(x, ...)
 #endif
 
+#define DN_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+
 #endif

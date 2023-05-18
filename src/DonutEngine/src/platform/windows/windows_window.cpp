@@ -142,6 +142,13 @@ namespace Donut {
 			MouseMovedEvent event((float)x_pos, (float)y_pos);
 			data.event_callback(event);
 		});
+
+		glfwSetCharCallback(glfw_window_, [](GLFWwindow* window, unsigned int keycode)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			KeyTypedEvent ev(keycode);
+			data.event_callback(ev);
+		});
 #endif
 	}
 
