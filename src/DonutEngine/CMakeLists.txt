@@ -5,6 +5,7 @@ project(DonutEngine LANGUAGES CXX)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glad)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui)
+# add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glm)
 set_property(TARGET glad glfw imgui PROPERTY FOLDER "Dependencies")
 
 set(DN_SHARED ON CACHE BOOL "Build shared library?")
@@ -148,14 +149,23 @@ FILE(GLOB ${PROJECT_NAME}_IMGUI_SRC
 )
 
 #####################################################################################################
-source_group("src\\DonutEngine\\Global" FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
-source_group("src\\DonutEngine\\Core" FILES ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC})
-source_group("src\\DonutEngine\\Events" FILES ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC})
-source_group("src\\DonutEngine\\Renderer" FILES ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC})
-source_group("src\\DonutEngine\\ImGui" FILES ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC})
+# glm
+FILE(GLOB ${PROJECT_NAME}_GLM_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/glm/glm/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/glm/glm/*.inl
+)
 
-source_group("src\\DonutEngine\\Platform\\OpenGL" FILES ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC})
-source_group("src\\DonutEngine\\Platform\\Windows" FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
+#####################################################################################################
+source_group("src\\Global" FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
+source_group("src\\Core" FILES ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC})
+source_group("src\\Events" FILES ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC})
+source_group("src\\Renderer" FILES ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC})
+source_group("src\\ImGui" FILES ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC})
+
+source_group("src\\Platform\\OpenGL" FILES ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC})
+source_group("src\\Platform\\Windows" FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
+
+source_group("src\\glm" FILES ${${PROJECT_NAME}_GLM_HEADER})
 
 #========================================= SETUP LIBRARY =========================================#
 # Enable debug logging on RELWITHDEBINFO configuration
@@ -189,6 +199,8 @@ if (WIN32)
         ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC}
         ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC}
         ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC}
+
+        ${${PROJECT_NAME}_GLM_HEADER}
     )
 elseif(UNIX)
     add_library(${PROJECT_NAME} 

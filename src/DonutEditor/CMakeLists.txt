@@ -90,6 +90,7 @@ target_compile_features(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/src
     ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies/spdlog/include
+    ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies/glm
 )
 
 #========================================= LINKING LIBRARIES =========================================#

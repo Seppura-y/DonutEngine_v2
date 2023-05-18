@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.22)
 project(DonutEngine_v2_Build)
 
 
-set(STARTUP_PROJ "DonuEditor" CACHE STRING "set the vs startup project")
+set(STARTUP_PROJ "DonutEditor" CACHE STRING "set the vs startup project")
 
 set(PROJECT_GLAD              TRUE CACHE BOOL "add project GLAD ?")
 set(PROJECT_GLFW            TRUE CACHE BOOL "add project GLFW ?")
