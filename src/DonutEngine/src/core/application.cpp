@@ -1,6 +1,7 @@
 #include "application.h"
 #include "logger.h"
 
+#include "core/input.h"
 #include <glfw/glfw3.h>
 #include <glad/glad.h>
 
@@ -47,6 +48,9 @@ namespace Donut
 			{
 				layer->onUpdate();
 			}
+
+			auto [x, y] = Input::getMousePostion();
+			DN_CORE_TRACE("{0}, {1}", x, y);
 
 			window_->onUpdate();
 
