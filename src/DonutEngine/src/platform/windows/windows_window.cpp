@@ -51,10 +51,10 @@ namespace Donut {
 			s_GLFWInitialized = true;
 		}
 
-		glfw_window_ = glfwCreateWindow((int)props.width, (int)props.height, win_data_.title.c_str(), nullptr, (GLFWwindow*)(&(props.window)));
+		glfw_window_ = glfwCreateWindow((int)props.width, (int)props.height, win_data_.title.c_str(), nullptr, nullptr);
 		//glfw_window_ = glfwCreateWindow((int)props.width, (int)props.height, win_data_.title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(glfw_window_);
-
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		//graphics_ctx_ = new OpenGLContext(glfw_window_);
 		//graphics_ctx_->init();
 
@@ -156,6 +156,7 @@ namespace Donut {
 	{
 #ifdef DN_USE_GLFW
 		glfwPollEvents();
+		glfwSwapBuffers(glfw_window_);
 		//graphics_ctx_->swapBuffers();
 #endif
 	}

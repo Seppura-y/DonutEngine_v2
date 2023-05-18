@@ -272,7 +272,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glfw/include
     ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glad/include
     ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/glm
-    ${CMAKE_CURRENT_LIST_DIR}/../../dependencies/imgui
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui
 )
 
 #========================================= LINKING LIBRARIES =========================================#
@@ -288,12 +288,12 @@ target_link_libraries(${PROJECT_NAME}
     user32.lib
     opengl32.lib
     dwmapi.lib
-    libvlc.lib
-    libvlccore.lib
-    DonutAVLibrary
-    SDL2
-    SDL2main
-    avcodec
+    # libvlc.lib
+    # libvlccore.lib
+    # DonutAVLibrary
+    # SDL2
+    # SDL2main
+    # avcodec
     glfw
     glad
     imgui

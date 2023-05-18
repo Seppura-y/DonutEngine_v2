@@ -26,8 +26,9 @@ namespace Donut
 		void pushOverlay(Layer* layer);
 
 		inline static Application& getInstance() { return *s_instance_; }
+		inline Window& getWindow() { return *window_; }
 
-		void initWindow(WindowProps props);
+		void initWindow(WindowProps props = WindowProps());
 	private:
 		bool onWindowClose(WindowCloseEvent& ev);
 	private:

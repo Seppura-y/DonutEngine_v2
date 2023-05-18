@@ -17,6 +17,8 @@ namespace Donut
 	Application::Application()
 	{
 		s_instance_ = this;
+		window_ = std::unique_ptr<Window>(Window::create(WindowProps()));
+		window_->setEventCallback(BIND_EVENT_FN(onEvent));
 		is_running_ = true;
 	}
 
@@ -27,8 +29,7 @@ namespace Donut
 
 	void Application::initWindow(WindowProps props)
 	{
-		window_ = std::unique_ptr<Window>(Window::create(props));
-		window_->setEventCallback(BIND_EVENT_FN(onEvent));
+
 	}
 
 	void Application::run()
@@ -41,13 +42,19 @@ namespace Donut
 			glClearColor(1, 0, 1, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 
+
 			for (Layer* layer : layer_stack_)
 			{
 				layer->onUpdate();
 			}
-			std::this_thread::sleep_for(std::chrono::microseconds(10));
-			windowUpdate();
+
+			window_->onUpdate();
+
+			//std::this_thread::sleep_for(std::chrono::microseconds(10));
+			//windowUpdate();
 		}
+
+		DN_CORE_INFO("{0}", "application end");
 	}
 
 	void Application::onEvent(Event& ev)
@@ -70,11 +77,13 @@ namespace Donut
 	void Application::pushLayer(Layer* layer)
 	{
 		layer_stack_.pushLayer(layer);
+		layer->onAttach();
 	}
 
 	void Application::pushOverlay(Layer* layer)
 	{
 		layer_stack_.pushOverlay(layer);
+		layer->onAttach();
 	}
 
 	bool Application::onWindowClose(WindowCloseEvent& ev)

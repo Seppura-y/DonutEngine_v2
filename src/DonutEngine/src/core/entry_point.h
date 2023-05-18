@@ -13,6 +13,7 @@ int main(int argc, char** argv)
 	DN_CORE_TRACE("log init");
 	DN_CLIENT_TRACE("client init");
 	auto app = Donut::createApplication();
+	app->initWindow();
 	app->run();
 	delete app;
 }
