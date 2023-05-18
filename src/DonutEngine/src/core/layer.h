@@ -17,6 +17,8 @@ namespace Donut
 		virtual void onUpdate() {}
 		virtual void onEvent(Event& event) {}
 
+		virtual void onImGuiRender() {}
+
 		inline const std::string& getName() const { return debug_name_; }
 
 	protected:

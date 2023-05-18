@@ -8,6 +8,7 @@
 #include "events/event.h"
 #include "events/application_event.h"
 
+#include "imgui/imgui_layer.h"
 
 namespace Donut
 {
@@ -35,6 +36,7 @@ namespace Donut
 		static Application* s_instance_;
 		bool is_running_ = false;
 		std::unique_ptr<Window> window_;
+		ImGuiLayer* imgui_layer_;
 
 		LayerStack layer_stack_;
 	};

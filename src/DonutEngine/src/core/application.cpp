@@ -20,6 +20,10 @@ namespace Donut
 		s_instance_ = this;
 		window_ = std::unique_ptr<Window>(Window::create(WindowProps()));
 		window_->setEventCallback(BIND_EVENT_FN(onEvent));
+
+		imgui_layer_ = new ImGuiLayer();
+		pushOverlay(imgui_layer_);
+
 		is_running_ = true;
 	}
 
@@ -40,22 +44,22 @@ namespace Donut
 		DN_CORE_INFO("{0}, {1}", "app",std::this_thread::get_id());
 		while (is_running_)
 		{
-			glClearColor(1, 0, 1, 1);
+			glClearColor(0.2, 0.2, 0.8, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
-
 
 			for (Layer* layer : layer_stack_)
 			{
 				layer->onUpdate();
 			}
 
-			auto [x, y] = Input::getMousePostion();
-			DN_CORE_TRACE("{0}, {1}", x, y);
+			imgui_layer_->begin();
+			for (Layer* layer : layer_stack_)
+			{
+				layer->onImGuiRender();
+			}
+			imgui_layer_->end();
 
 			window_->onUpdate();
-
-			//std::this_thread::sleep_for(std::chrono::microseconds(10));
-			//windowUpdate();
 		}
 
 		DN_CORE_INFO("{0}", "application end");
