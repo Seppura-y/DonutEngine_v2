@@ -30,6 +30,6 @@ namespace Donut {
 		sptr_client_logger_->flush_on(spdlog::level::trace);
 	}
 
-	std::shared_ptr<spdlog::logger>& Logger::getCoreLogger() { return sptr_core_logger_; }
-	std::shared_ptr<spdlog::logger>& Logger::getClientLogger() { return sptr_client_logger_; }
+	//std::shared_ptr<spdlog::logger>& Logger::getCoreLogger() { return sptr_core_logger_; }
+	//std::shared_ptr<spdlog::logger>& Logger::getClientLogger() { return sptr_client_logger_; }
 }

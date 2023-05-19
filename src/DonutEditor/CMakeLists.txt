@@ -8,23 +8,6 @@ set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../../bin)
 set(LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/../../lib)
 
 #===================================== CONFIGURATION TYPES OF THE PROJECT ==================================#
-
-if(CONFIG_TYPE_DEBUG)
-    list(APPEND CONFIG_TYPES "Debug;")
-endif()
-
-if(CONFIG_TYPE_RELEASE)
-    list(APPEND CONFIG_TYPES "Release;")
-endif()
-
-if(CONFIG_TYPE_RELEASE)
-    list(APPEND CONFIG_TYPES "RelWithDebInfo;")
-endif()
-
-if(CONFIG_TYPE_RELEASE)
-    list(APPEND CONFIG_TYPES "MinSizeRel")
-endif()
-
 list(APPEND CONFIG_TYPES "Debug;")
 list(APPEND CONFIG_TYPES "Release;")
 list(APPEND CONFIG_TYPES "RelWithDebInfo;")
@@ -91,7 +74,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/src
     ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies
     ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies/spdlog/include
-    ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies/glm
+    # ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies/glm
+    # ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies/glfw/include
+    # ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies/glad/include
 )
 
 #========================================= LINKING LIBRARIES =========================================#
@@ -99,10 +84,19 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/../../lib
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME} PRIVATE
     user32.lib
     dwmapi.lib
-    DonutEngined
+    DonutEngine.lib
+    glfw3.lib   #为什么这些库不能从DonutEngine流转过来，实际上在DonutEngine中通过PUBLIC链接的库会流转到引用它的目标中
+    glad.lib
+    imgui.lib
+    spdlogd.lib
+)
+
+set_property(TARGET ${PROJECT_NAME}
+	PROPERTY
+	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
 foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)

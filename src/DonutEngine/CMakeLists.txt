@@ -5,10 +5,11 @@ project(DonutEngine LANGUAGES CXX)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glad)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/spdlog)
 # add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glm)
 set_property(TARGET glad glfw imgui PROPERTY FOLDER "Dependencies")
 
-set(DN_SHARED ON CACHE BOOL "Build shared library?")
+set(DN_SHARED OFF CACHE BOOL "Build shared library?")
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only")
 set(GLFW_INSTALL OFF CACHE BOOL "GLFW lib only")
@@ -19,29 +20,13 @@ set(LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/../../lib)
 set(USE_PCH true)
 
 #===================================== CONFIGURATION TYPES OF THE PROJECT ==================================#
-set(CONFIG_TYPE_DEBUG TRUE CACHE BOOL "Debug" )
-set(CONFIG_TYPE_RELEASE FALSE CACHE BOOL "Release" )
-set(CONFIG_TYPE_RELWITHDEBINFO FALSE CACHE BOOL "RelWithDebInfo" )
-set(CONFIG_TYPE_MINSIZEREL FALSE CACHE BOOL "MinSizeRel")
 
-if(${CONFIG_TYPE_DEBUG})
-    list(APPEND CONFIG_TYPES "Debug;")
-endif()
-
-if(${CONFIG_TYPE_RELEASE})
-    list(APPEND CONFIG_TYPES "Release;")
-endif()
-
-if(${CONFIG_TYPE_RELWITHDEBINFO})
-    list(APPEND CONFIG_TYPES "RelWithDebInfo;")
-endif()
-
-if(${CONFIG_TYPE_MINSIZEREL})
-    list(APPEND CONFIG_TYPES "MinSizeRel")
-endif()
+list(APPEND CONFIG_TYPES "Debug;")
+list(APPEND CONFIG_TYPES "Release;")
+list(APPEND CONFIG_TYPES "RelWithDebInfo;")
+list(APPEND CONFIG_TYPES "MinSizeRel")
 
 set(CMAKE_CONFIGURATION_TYPES ${CONFIG_TYPES})
-
 
 #============================================== INCLUSION OF Qt ==============================================#
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -240,11 +225,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 if( MSVC )
 
     if(DN_SHARED)
-        target_compile_definitions(${PROJECT_NAME} PRIVATE
+        target_compile_definitions(${PROJECT_NAME} PUBLIC
             DN_BUILD_SHARED
         )
     else()
-        target_compile_definitions(${PROJECT_NAME} PRIVATE
+        target_compile_definitions(${PROJECT_NAME} PUBLIC
             DN_BUILD_STATIC
         )
     endif()
@@ -254,11 +239,13 @@ if( MSVC )
     )
 endif()
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC
     __STDC_CONSTANT_MACROS
+    _CRT_SRCURE_NO_WARNINGS
     DN_PLATFORM_WINDOWS
-    DN_BUILD_SHARED
     DN_USE_GLFW
+    DN_ENGINE
     GLFW_INCLUDE_NONE
     # if(DN_SHARED)
     #     DN_BUILD_SHARED
@@ -271,10 +258,10 @@ target_compile_features(${PROJECT_NAME} PRIVATE
 
 # Add the target includes for the project 
 target_include_directories(${PROJECT_NAME} PRIVATE ${FORMS_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCES_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${SOURCES_DIR})
 
-target_include_directories(${PROJECT_NAME} PRIVATE 
+target_include_directories(${PROJECT_NAME} PUBLIC 
     ${CMAKE_CURRENT_LIST_DIR}/src
     ${CMAKE_CURRENT_LIST_DIR}/src/core
     ${CMAKE_CURRENT_LIST_DIR}/src/renderer
@@ -287,34 +274,31 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 #========================================= LINKING LIBRARIES =========================================#
-target_link_directories(${PROJECT_NAME} PRIVATE
+target_link_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/../../lib
 )
 
-target_link_libraries(${PROJECT_NAME} 
-    Qt5::Core
-    Qt5::Widgets
-    Qt5::OpenGL
-    Qt5::OpenGLExtensions
+target_link_libraries(${PROJECT_NAME} PUBLIC
     user32.lib
     opengl32.lib
     dwmapi.lib
-    # libvlc.lib
-    # libvlccore.lib
-    # DonutAVLibrary
-    # SDL2
-    # SDL2main
-    # avcodec
-    glfw
-    glad
+    glfw3.lib
+    glad.lib
     imgui.lib
+    spdlogd.lib
+)
+set_property(TARGET ${PROJECT_NAME}
+	PROPERTY
+	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)
     if(type)
         string(TOUPPER ${type} config)
         message("${PROJECT_NAME} config = ${config}")
-        set(CMAKE_CXX_FLAGS_${config} "${CMAKE_CXX_FLAGS_${config}} -D${config}")
+        # set(CMAKE_CXX_FLAGS_${config} "${CMAKE_CXX_FLAGS_${config}} $<$<STREQUAL:${config},"Debug">:"/MTd">")
+        # set(CMAKE_CXX_FLAGS_${config} "${CMAKE_CXX_FLAGS_${config}} -D${config}")
     endif()
 
     set_target_properties(${PROJECT_NAME} PROPERTIES

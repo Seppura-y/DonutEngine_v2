@@ -15,7 +15,7 @@ namespace Donut {
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
-		DN_ENGINE_ERROR("GLFW Error ({0}): {1}", error, description);
+		DN_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
 	Window* Window::create(const WindowProps& props)
@@ -39,7 +39,7 @@ namespace Donut {
 		win_data_.width = props.width;
 		win_data_.height = props.height;
 
-		DN_ENGINE_INFO("Creating window {0} ({1}, {2})", props.title, props.width, props.height);
+		DN_CORE_INFO("Creating window {0} ({1}, {2})", props.title, props.width, props.height);
 #ifdef DN_USE_GLFW
 		if (!s_GLFWInitialized)
 		{

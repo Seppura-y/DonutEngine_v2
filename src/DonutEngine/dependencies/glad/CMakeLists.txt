@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 project(glad)
 
+set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../../bin)
+set(LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../../lib)
+
 FILE(GLOB ${PROJECT_NAME}_HEADER 
     ${CMAKE_CURRENT_LIST_DIR}/include/glad/glad.h
     ${CMAKE_CURRENT_LIST_DIR}/include/KHR/khrplatform.h
@@ -54,7 +57,7 @@ endforeach()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	VS_DEBUG_WORKING_DIRECTORY $<IF:$<CONFIG:Debug>,Debug,Release>
-    DEBUG_POSTFIX "d"
+    #DEBUG_POSTFIX "d"
 )
 
 # install(TARGETS ${PROJECT_NAME}

@@ -62,7 +62,7 @@ namespace Donut
 			window_->onUpdate();
 		}
 
-		DN_CORE_INFO("{0}", "application end");
+		//DN_CORE_INFO("{0}", "application end");
 	}
 
 	void Application::onEvent(Event& ev)

@@ -7,11 +7,10 @@ project(DonutEngine_v2_Build)
 
 set(STARTUP_PROJ "DonutEditor" CACHE STRING "set the vs startup project")
 
-set(PROJECT_GLAD              TRUE CACHE BOOL "add project GLAD ?")
-set(PROJECT_GLFW            TRUE CACHE BOOL "add project GLFW ?")
+set(PROJECT_GLAD                    TRUE CACHE BOOL "add project GLAD ?")
+set(PROJECT_GLFW                    TRUE CACHE BOOL "add project GLFW ?")
 set(PROJECT_DONUT_ENGINE            TRUE CACHE BOOL "add project DonutEngine ?")
-set(PROJECT_DONUT_AV_LIBRARY            TRUE CACHE BOOL "add project DonutAVLibrary ?")
-set(PROJECT_DONUT_MAIN_WIDGET            TRUE CACHE BOOL "add project DonutMainWidget ?")
+set(PROJECT_DONUT_EDITOR            TRUE CACHE BOOL "add project DonutEditor ?")
 
 
 # if(PROJECT_DONUT_AV_LIBRARY)
@@ -30,7 +29,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutEngine)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutEditor)
 
 # add_dependencies(DonutMainWidget DonutEngine DonutAVLibrary)
-add_dependencies(DonutEditor DonutEngine )
+add_dependencies(DonutEditor DonutEngine)
 
 if(STARTUP_PROJ)
     set_property(DIRECTORY ${CMAKE_CURRENT_LIST_DIR} PROPERTY VS_STARTUP_PROJECT ${STARTUP_PROJ})

@@ -1,40 +1,30 @@
 project "glad"
-	kind "StaticLib"
-	language "C"
-	staticruntime "on"
-
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    kind "StaticLib"
+    language "C"
+    staticruntime "on"
+    
+	targetdir ("bin-premake/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 	files
 	{
-		"include/glad/glad.h",
-		"include/KHR/khrplatform.h",
-		"src/glad.c"
-	}
+        "include/glad/glad.h",
+        "include/KHR/khrplatform.h",
+        "src/glad.c"
+    }
 
-	includedirs
-	{
-		"include"
-	}
-
-
+    includedirs
+    {
+        "include"
+    }
+    
 	filter "system:windows"
-		systemversion "latest"
-		-- staticruntime "On"
+        systemversion "latest"
 
-	filter "configurations:Debug"
-		runtime "Debug"
-		symbols "on"
-		buildoptions "/MDd"
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
 
-	filter "configurations:Release"
-		runtime "Release"
-		optimize "on"
-		buildoptions "/MD"
-
-	filter "configurations:Dist"
-		runtime "Release"
-		optimize "on"
-        symbols "off"
-		buildoptions "/MD"
+    filter "configurations:Release"
+        runtime "Release"
+        optimize "on"

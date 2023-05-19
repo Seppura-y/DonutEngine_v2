@@ -3,9 +3,13 @@
 
 #ifdef DN_PLATFORM_WINDOWS
 	#ifdef DN_BUILD_SHARED
-		#define DONUT_API __declspec(dllexport)
+		#ifdef DN_ENGINE
+			#define DONUT_API __declspec(dllexport)
+		#else
+			#define DONUT_API __declspec(dllimport)
+		#endif
 	#else
-		#define DONUT_API __declspec(dllimport)
+		#define DONUT_API 
 	#endif
 #else
 	#error Only support Windows!

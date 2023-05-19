@@ -19,6 +19,9 @@ namespace Donut
 		static std::shared_ptr<spdlog::logger> sptr_core_logger_;
 		static std::shared_ptr<spdlog::logger> sptr_client_logger_;
 	};
+
+	std::shared_ptr<spdlog::logger>& Logger::getCoreLogger() { return sptr_core_logger_; }
+	std::shared_ptr<spdlog::logger>& Logger::getClientLogger() { return sptr_client_logger_; }
 }
 
 
