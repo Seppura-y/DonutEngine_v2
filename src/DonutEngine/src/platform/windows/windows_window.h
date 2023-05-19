@@ -2,6 +2,8 @@
 #include "core/window.h"
 #include "logger.h"
 
+#include "renderer/graphics_context.h"
+
 struct GLFWwindow;
 namespace Donut {
 
@@ -26,9 +28,8 @@ namespace Donut {
 		virtual void init(const WindowProps& props);
 		virtual void shutdown();
 	private:
-#ifdef DN_USE_GLFW
 		GLFWwindow* glfw_window_;
-#endif
+		GraphicsContext* graphics_ctx_;
 		struct WindowData
 		{
 			std::string title;

@@ -5,8 +5,9 @@
 #include "events/mouse_event.h"
 #include "events/key_event.h"
 
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
+#include "platform/opengl/opengl_context.h"
+
+#include <glfw/glfw3.h>
 
 
 namespace Donut {
@@ -40,7 +41,6 @@ namespace Donut {
 		win_data_.height = props.height;
 
 		DN_CORE_INFO("Creating window {0} ({1}, {2})", props.title, props.width, props.height);
-#ifdef DN_USE_GLFW
 		if (!s_GLFWInitialized)
 		{
 			// TODO: glfwTerminate on system shutdown
@@ -52,11 +52,12 @@ namespace Donut {
 		}
 
 		glfw_window_ = glfwCreateWindow((int)props.width, (int)props.height, win_data_.title.c_str(), nullptr, nullptr);
-		//glfw_window_ = glfwCreateWindow((int)props.width, (int)props.height, win_data_.title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(glfw_window_);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		//graphics_ctx_ = new OpenGLContext(glfw_window_);
-		//graphics_ctx_->init();
+		
+		graphics_ctx_ = new OpenGLContext(glfw_window_);
+		graphics_ctx_->init();
+
+		//glfwMakeContextCurrent(glfw_window_);
+		//int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
 		glfwSetWindowUserPointer(glfw_window_, &win_data_);
 		setVSync(true);
@@ -149,35 +150,28 @@ namespace Donut {
 			KeyTypedEvent ev(keycode);
 			data.event_callback(ev);
 		});
-#endif
+
 	}
 
 	void WindowsWindow::shutdown()
 	{
-#ifdef DN_USE_GLFW
 		glfwDestroyWindow(glfw_window_);
-#endif
 	}
 
 	void WindowsWindow::onUpdate()
 	{
-#ifdef DN_USE_GLFW
 		glfwPollEvents();
-		glfwSwapBuffers(glfw_window_);
-		//graphics_ctx_->swapBuffers();
-#endif
+		graphics_ctx_->swapBuffers();
 	}
 
 	void WindowsWindow::setVSync(bool enabled)
 	{
-#ifdef DN_USE_GLFW
 		if (enabled)
 			glfwSwapInterval(1);
 		else
 			glfwSwapInterval(0);
 
 		win_data_.is_vsync = enabled;
-#endif
 	}
 
 	bool WindowsWindow::isVSync() const
