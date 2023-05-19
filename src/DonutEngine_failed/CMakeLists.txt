@@ -28,7 +28,20 @@ list(APPEND CONFIG_TYPES "MinSizeRel")
 
 set(CMAKE_CONFIGURATION_TYPES ${CONFIG_TYPES})
 
+#============================================== INCLUSION OF Qt ==============================================#
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_PREFIX_PATH $ENV{Qt515_64})
+# set(AUTOGEN_BUILD_DIR ${CMAKE_CURRENT_LIST_DIR}/gens)
 
+find_package(Qt5 COMPONENTS 
+    Core
+    Widgets 
+    OpenGL
+    OpenGLExtensions
+    REQUIRED
+)
 
 #========================================= INCLUSION OF Project Files =========================================#
 set(FORMS_DIR ${CMAKE_CURRENT_LIST_DIR}/forms)
@@ -141,7 +154,12 @@ source_group("src\\glm" FILES ${${PROJECT_NAME}_GLM_HEADER})
 
 #========================================= SETUP LIBRARY =========================================#
 # Enable debug logging on RELWITHDEBINFO configuration
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
+    $<$<CONFIG:RELWITHDEBINFO>:QT_MESSAGELOGCONTEXT>
+)
 
+# Add the forms directory to the AUTOUIC search paths
+# set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_AUTOUIC_SEARCH_PATHS} ${FORMS_DIR})
 
 # Set the startup project for visual studio
 set_property(DIRECTORY ${CMAKE_CURRENT_LIST_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
@@ -299,8 +317,14 @@ set(INSTALL_PATH
 ${CMAKE_INSTALL_PREFIX}/${CMAKE_VS_PLATFORM_NAME})
 
 
+set(windeployqt "$ENV{Qt515_64}/bin/windeployqt")
 
-
+install( CODE 
+        "execute_process(COMMAND 
+        ${windeployqt} $<TARGET_FILE:${PROJECT_NAME}>
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )"
+)
 
 install(TARGETS ${PROJECT_NAME}
     EXPORT ${PROJECT_NAME}

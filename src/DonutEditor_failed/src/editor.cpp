@@ -1,6 +1,11 @@
 #include "donut.h"
 
 #include "imgui/imgui.h"
+#include "renderer/graphics_context.h"
+#include "platform/windows/windows_window.h"
+#include "platform/opengl/opengl_context.h"
+
+//#pragma comment(lib, "DonutEngine2.lib")
 
 class ExampleLayer : public Donut::Layer
 {
@@ -37,7 +42,7 @@ public:
 	}
 };
 
-class Sandbox : public Donut::Application 
+class Sandbox : public Donut::Application
 {
 public:
 	Sandbox()
@@ -61,3 +66,27 @@ Donut::Application* Donut::createApplication()
 {
 	return new Sandbox();
 }
+
+
+
+#include "core/application.h"
+
+#include <iostream>
+
+#ifdef DN_PLATFORM_WINDOWS
+
+extern Donut::Application* Donut::createApplication();	//Defined at client
+
+int main(int argc, char** argv)
+{
+	Donut::Logger::init();
+	//DN_CORE_TRACE("log init");
+	//DN_CLIENT_TRACE("client init");
+	auto app = Donut::createApplication();
+	app->initWindow();
+	app->run();
+	delete app;
+}
+
+#endif // DN_PLATFORM_WINDOWS
+

@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "core/input.h"
-#include "platform/windows/windows_input.h"
+#include "input.h"
+#include "windows_input.h"
 
 #include "core/application.h"
 #include <glfw/glfw3.h>

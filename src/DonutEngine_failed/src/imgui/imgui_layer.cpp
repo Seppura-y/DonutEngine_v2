@@ -5,7 +5,7 @@
 #include "platform/opengl/imgui_impl_glfw.h"
 #include "platform/opengl/imgui_impl_opengl3.h"
 
-#include "core/application.h"
+#include "application.h"
 //#include "events/mouse_event.h"
 
 

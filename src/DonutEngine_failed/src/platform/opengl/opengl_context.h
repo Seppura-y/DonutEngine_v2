@@ -3,11 +3,10 @@
 
 #include "renderer/graphics_context.h"
 
-struct GLFWwindow;
-
+class GLFWwindow;
 namespace Donut
 {
-	class OpenGLContext : public GraphicsContext
+	class DONUT_API OpenGLContext : public GraphicsContext
 	{
 	public:
 		OpenGLContext(GLFWwindow* win_handle);
