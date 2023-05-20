@@ -50,6 +50,36 @@ namespace Donut
 
 		unsigned int indices[3] = { 0, 1, 2 };
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+		std::string vertex_string = R"(
+			#version 450 core
+			
+			layout(location = 0) in vec3 a_Position;
+			//layout(location = 1) in vec4 a_Color;
+			out vec3 v_Position;
+			out vec4 v_Color;
+			void main()
+			{
+				v_Position = a_Position;
+				v_Color = vec4(0.2, 0.8, 0.3, 1.0);
+				gl_Position = vec4(a_Position, 1.0);	
+			}
+		)";
+
+		std::string fragment_string = R"(
+			#version 330 core
+
+			layout(location = 0) out vec4 color;
+			in vec3 v_Position;
+			in vec4 v_Color;
+			void main()
+			{
+				color = vec4(v_Position * 0.5 + 0.5, 1.0);
+				//color = v_Color;
+			}
+		)";
+
+		shader_.reset(new Shader(vertex_string, fragment_string));
 	}
 
 	Application::~Application()
@@ -72,22 +102,26 @@ namespace Donut
 			glClearColor(0.2, 0.2, 0.2, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 
+			shader_->bind();
+
 			glBindVertexArray(vao_);
 			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 
-			//for (Layer* layer : layer_stack_)
-			//{
-			//	layer->onUpdate();
-			//}
+			for (Layer* layer : layer_stack_)
+			{
+				layer->onUpdate();
+			}
 
-			//imgui_layer_->begin();
-			//for (Layer* layer : layer_stack_)
-			//{
-			//	layer->onImGuiRender();
-			//}
-			//imgui_layer_->end();
+			imgui_layer_->begin();
+			for (Layer* layer : layer_stack_)
+			{
+				layer->onImGuiRender();
+			}
+			imgui_layer_->end();
 
 			window_->onUpdate();
+
+			shader_->unBind();
 		}
 
 		//DN_CORE_INFO("{0}", "application end");

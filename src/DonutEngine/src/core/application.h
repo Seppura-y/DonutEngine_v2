@@ -10,6 +10,8 @@
 
 #include "imgui/imgui_layer.h"
 
+#include "renderer/shader.h"
+
 namespace Donut
 {
 	class DONUT_API Application
@@ -43,6 +45,9 @@ namespace Donut
 		unsigned int vao_;
 		unsigned int vbo_;
 		unsigned int ebo_;
+
+		std::unique_ptr<Shader> shader_;
+
 	};
 
 	// To be defined in client
