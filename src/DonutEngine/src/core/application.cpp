@@ -30,8 +30,6 @@ namespace Donut
 		glGenVertexArrays(1, &vao_);
 		glBindVertexArray(vao_);
 
-		glGenBuffers(1, &vbo_);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 
 		float vertices[3 * 3] =
 		{
@@ -40,16 +38,13 @@ namespace Donut
 			 0.0f,  0.5f, 0.0f
 		};
 
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+		vertex_buffer_.reset(VertexBuffer::create(vertices, sizeof(vertices)));
+		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
-		glGenBuffers(1, &ebo_);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-
 		unsigned int indices[3] = { 0, 1, 2 };
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		index_buffer_.reset(IndexBuffer::create(indices, sizeof(indices) / sizeof(uint32_t)));
 
 		std::string vertex_string = R"(
 			#version 450 core
@@ -67,7 +62,7 @@ namespace Donut
 		)";
 
 		std::string fragment_string = R"(
-			#version 330 core
+			#version 450 core
 
 			layout(location = 0) out vec4 color;
 			in vec3 v_Position;
@@ -105,19 +100,19 @@ namespace Donut
 			shader_->bind();
 
 			glBindVertexArray(vao_);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, index_buffer_->getIndicesCount() , GL_UNSIGNED_INT, nullptr);
 
-			for (Layer* layer : layer_stack_)
-			{
-				layer->onUpdate();
-			}
+			//for (Layer* layer : layer_stack_)
+			//{
+			//	layer->onUpdate();
+			//}
 
-			imgui_layer_->begin();
-			for (Layer* layer : layer_stack_)
-			{
-				layer->onImGuiRender();
-			}
-			imgui_layer_->end();
+			//imgui_layer_->begin();
+			//for (Layer* layer : layer_stack_)
+			//{
+			//	layer->onImGuiRender();
+			//}
+			//imgui_layer_->end();
 
 			window_->onUpdate();
 
