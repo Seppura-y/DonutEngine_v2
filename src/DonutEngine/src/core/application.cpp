@@ -46,8 +46,9 @@ namespace Donut
 
 		is_running_ = true;
 
-		glGenVertexArrays(1, &vao_);
-		glBindVertexArray(vao_);
+		vertex_array_.reset(VertexArray::create());
+		//glGenVertexArrays(1, &vao_);
+		//glBindVertexArray(vao_);
 
 		float vertices[3 * 7] =
 		{
@@ -56,31 +57,23 @@ namespace Donut
 			 0.0f,  0.5f, 0.0f, 0.8f, 0.5f, 0.3f, 1.0f
 		};
 
-		vertex_buffer_.reset(VertexBuffer::create(vertices, sizeof(vertices)));
+		std::shared_ptr<VertexBuffer> vertex_buffer;
+		vertex_buffer.reset(VertexBuffer::create(vertices, sizeof(vertices)));
 		{
 			BufferLayout layout = {
 				{ ShaderDataType::Float3, "a_Position" },
-				{ ShaderDataType::Float4, "a_Color" }
+				{ ShaderDataType::Float4, "a_Color"}
 			};
-			vertex_buffer_->setLayout(layout);
-		}
-		uint32_t index = 0;
-		const auto& layout = vertex_buffer_->getLayout();
-		for (const auto& element : layout)
-		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index,
-				element.getComponentCount(),
-				shaderDataTypeToGLenumType(element.type_),
-				element.normalized_ ? GL_TRUE : GL_FALSE,
-				layout.getStride(),
-				(const void *)element.offset_
-			);
-			index++;
+			vertex_buffer->setLayout(layout);
 		}
 
 		unsigned int indices[3] = { 0, 1, 2 };
-		index_buffer_.reset(IndexBuffer::create(indices, sizeof(indices) / sizeof(uint32_t)));
+		std::shared_ptr<IndexBuffer> index_buffer;
+		index_buffer.reset(IndexBuffer::create(indices, sizeof(indices) / sizeof(uint32_t)));
+
+		vertex_array_->addVertexBuffer(vertex_buffer);
+		vertex_array_->setIndexBuffer(index_buffer);
+
 
 		std::string vertex_string = R"(
 			#version 450 core
@@ -139,9 +132,9 @@ namespace Donut
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			shader_->bind();
+			vertex_array_->bind();
 
-			glBindVertexArray(vao_);
-			glDrawElements(GL_TRIANGLES, index_buffer_->getIndicesCount() , GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, vertex_array_->getIndexBuffer()->getIndicesCount(), GL_UNSIGNED_INT, nullptr);
 
 			for (Layer* layer : layer_stack_)
 			{

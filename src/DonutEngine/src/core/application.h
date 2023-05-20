@@ -12,6 +12,7 @@
 
 #include "renderer/shader.h"
 #include "renderer/buffers.h"
+#include "renderer/vertex_array.h"
 
 namespace Donut
 {
@@ -48,8 +49,7 @@ namespace Donut
 		unsigned int ebo_;
 
 		std::unique_ptr<Shader> shader_;
-		std::unique_ptr<VertexBuffer> vertex_buffer_;
-		std::unique_ptr<IndexBuffer> index_buffer_;
+		std::unique_ptr<VertexArray> vertex_array_;
 	};
 
 	// To be defined in client
