@@ -13,11 +13,15 @@ namespace Donut
 		OpenGLVertexBuffer(float* vertices, uint32_t size);
 		virtual ~OpenGLVertexBuffer();
 
+		virtual void setLayout(const BufferLayout& layout) override;
+		virtual const BufferLayout& getLayout() const override;
+
 		virtual void bind() const override;
 		virtual void unBind() const override;
 
 	private:
 		uint32_t object_id_;
+		BufferLayout layout_;
 	};
 
 	class OpenGLIndexBuffer : public IndexBuffer

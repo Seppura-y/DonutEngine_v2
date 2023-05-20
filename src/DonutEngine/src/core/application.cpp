@@ -16,6 +16,25 @@ namespace Donut
 
 	Application* Application::s_instance_ = nullptr;
 
+	static GLenum shaderDataTypeToGLenumType(const ShaderDataType& type)
+	{
+		switch (type)
+		{
+			case ShaderDataType::Float:		return GL_FLOAT;
+			case ShaderDataType::Float2:	return GL_FLOAT;
+			case ShaderDataType::Float3:	return GL_FLOAT;
+			case ShaderDataType::Float4:	return GL_FLOAT;
+			case ShaderDataType::Int:		return GL_INT;
+			case ShaderDataType::Int2:		return GL_INT;
+			case ShaderDataType::Int3:		return GL_INT;
+			case ShaderDataType::Int4:		return GL_INT;
+			case ShaderDataType::Bool:		return GL_BOOL;
+		}
+
+		DN_CORE_ASSERT(false, "Unknown shader data type!");
+		return 0;
+	}
+
 	Application::Application()
 	{
 		s_instance_ = this;
@@ -26,22 +45,39 @@ namespace Donut
 		pushOverlay(imgui_layer_);
 
 		is_running_ = true;
-		
+
 		glGenVertexArrays(1, &vao_);
 		glBindVertexArray(vao_);
 
-
-		float vertices[3 * 3] =
+		float vertices[3 * 7] =
 		{
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.0f,  0.5f, 0.0f
+			-0.5f, -0.5f, 0.0f, 0.8f, 0.5f, 0.3f, 1.0f,
+			 0.5f, -0.5f, 0.0f, 0.8f, 0.5f, 0.3f, 1.0f,
+			 0.0f,  0.5f, 0.0f, 0.8f, 0.5f, 0.3f, 1.0f
 		};
 
 		vertex_buffer_.reset(VertexBuffer::create(vertices, sizeof(vertices)));
-		
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+		{
+			BufferLayout layout = {
+				{ ShaderDataType::Float3, "a_Position" },
+				{ ShaderDataType::Float4, "a_Color" }
+			};
+			vertex_buffer_->setLayout(layout);
+		}
+		uint32_t index = 0;
+		const auto& layout = vertex_buffer_->getLayout();
+		for (const auto& element : layout)
+		{
+			glEnableVertexAttribArray(index);
+			glVertexAttribPointer(index,
+				element.getComponentCount(),
+				shaderDataTypeToGLenumType(element.type_),
+				element.normalized_ ? GL_TRUE : GL_FALSE,
+				layout.getStride(),
+				(const void *)element.offset_
+			);
+			index++;
+		}
 
 		unsigned int indices[3] = { 0, 1, 2 };
 		index_buffer_.reset(IndexBuffer::create(indices, sizeof(indices) / sizeof(uint32_t)));
@@ -50,13 +86,16 @@ namespace Donut
 			#version 450 core
 			
 			layout(location = 0) in vec3 a_Position;
-			//layout(location = 1) in vec4 a_Color;
+			layout(location = 1) in vec4 a_Color;
+
 			out vec3 v_Position;
 			out vec4 v_Color;
+
 			void main()
 			{
 				v_Position = a_Position;
-				v_Color = vec4(0.2, 0.8, 0.3, 1.0);
+				//v_Color = vec4(0.2, 0.8, 0.3, 1.0);
+				v_Color = a_Color;
 				gl_Position = vec4(a_Position, 1.0);	
 			}
 		)";
@@ -65,12 +104,14 @@ namespace Donut
 			#version 450 core
 
 			layout(location = 0) out vec4 color;
+
 			in vec3 v_Position;
 			in vec4 v_Color;
+
 			void main()
 			{
-				color = vec4(v_Position * 0.5 + 0.5, 1.0);
-				//color = v_Color;
+				//color = vec4(v_Position * 0.5 + 0.5, 1.0);
+				color = v_Color;
 			}
 		)";
 
@@ -102,17 +143,17 @@ namespace Donut
 			glBindVertexArray(vao_);
 			glDrawElements(GL_TRIANGLES, index_buffer_->getIndicesCount() , GL_UNSIGNED_INT, nullptr);
 
-			//for (Layer* layer : layer_stack_)
-			//{
-			//	layer->onUpdate();
-			//}
+			for (Layer* layer : layer_stack_)
+			{
+				layer->onUpdate();
+			}
 
-			//imgui_layer_->begin();
-			//for (Layer* layer : layer_stack_)
-			//{
-			//	layer->onImGuiRender();
-			//}
-			//imgui_layer_->end();
+			imgui_layer_->begin();
+			for (Layer* layer : layer_stack_)
+			{
+				layer->onImGuiRender();
+			}
+			imgui_layer_->end();
 
 			window_->onUpdate();
 

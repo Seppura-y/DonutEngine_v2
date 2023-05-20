@@ -19,6 +19,16 @@ namespace Donut
 		glDeleteBuffers(1, &object_id_);
 	}
 
+	void OpenGLVertexBuffer::setLayout(const BufferLayout& layout)
+	{
+		layout_ = layout;
+	}
+
+	const BufferLayout& OpenGLVertexBuffer::getLayout() const
+	{
+		return layout_;
+	}
+
 	void OpenGLVertexBuffer::bind() const
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, object_id_);
