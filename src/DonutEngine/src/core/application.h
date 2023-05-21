@@ -48,8 +48,11 @@ namespace Donut
 		unsigned int vbo_;
 		unsigned int ebo_;
 
-		std::unique_ptr<Shader> shader_;
-		std::unique_ptr<VertexArray> vertex_array_;
+		std::shared_ptr<Shader> triangle_shader_;
+		std::shared_ptr<VertexArray> triangle_va_;
+
+		std::shared_ptr<Shader> rectangle_shader_;
+		std::shared_ptr<VertexArray> rectangle_va_;
 	};
 
 	// To be defined in client
