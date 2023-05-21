@@ -10,11 +10,6 @@
 
 #include "imgui/imgui_layer.h"
 
-#include "renderer/shader.h"
-#include "renderer/buffers.h"
-#include "renderer/vertex_array.h"
-#include "renderer/orthographic_camera.h"
-
 namespace Donut
 {
 	class DONUT_API Application
@@ -44,18 +39,6 @@ namespace Donut
 		ImGuiLayer* imgui_layer_;
 
 		LayerStack layer_stack_;
-
-		unsigned int vao_;
-		unsigned int vbo_;
-		unsigned int ebo_;
-
-		std::shared_ptr<Shader> triangle_shader_;
-		std::shared_ptr<VertexArray> triangle_va_;
-
-		std::shared_ptr<Shader> rectangle_shader_;
-		std::shared_ptr<VertexArray> rectangle_va_;
-
-		OrthographicCamera camera_;
 	};
 
 	// To be defined in client

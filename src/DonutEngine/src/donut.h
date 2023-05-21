@@ -3,7 +3,6 @@
 
 #include "core/core.h"
 #include "core/application.h"
-#include "core/entry_point.h"
 #include "core/logger.h"
 #include "core/layer.h"
 
@@ -13,10 +12,20 @@
 
 #include "core/window.h"
 
-#include "platform/windows/windows_window.h"
+#include "renderer/renderer.h"
+#include "renderer/render_command.h"
 
+#include "renderer/buffers.h"
+#include "renderer/shader.h"
+#include "renderer/vertex_array.h"
+
+#include "renderer/orthographic_camera.h"
+
+#include "platform/windows/windows_window.h"
 #include "platform/opengl/opengl_context.h"
 
 #include "imgui/imgui_layer.h"
+
+#include "core/entry_point.h"
 
 #endif
