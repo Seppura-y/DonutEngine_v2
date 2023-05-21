@@ -38,6 +38,7 @@ namespace Donut
 	}
 
 	Application::Application()
+		: camera_(-1.6f, 1.6f, -0.9f, 0.9f)
 	{
 		s_instance_ = this;
 		window_ = std::unique_ptr<Window>(Window::create(WindowProps()));
@@ -83,15 +84,16 @@ namespace Donut
 			layout(location = 0) in vec3 a_Position;
 			layout(location = 1) in vec4 a_Color;
 
+			uniform mat4 u_viewProjectionMatrix;
+
 			out vec3 v_Position;
 			out vec4 v_Color;
 
 			void main()
 			{
 				v_Position = a_Position;
-				//v_Color = vec4(0.2, 0.8, 0.3, 1.0);
 				v_Color = a_Color;
-				gl_Position = vec4(a_Position, 1.0);	
+				gl_Position = u_viewProjectionMatrix * vec4(a_Position, 1.0f);
 			}
 		)";
 
@@ -144,10 +146,13 @@ namespace Donut
 			#version 450 core
 			
 			layout(location = 0) in vec3 a_Position;
+
+			uniform mat4 u_viewProjectionMatrix;
+
 			out vec3 v_Position;
 			void main()
 			{
-				gl_Position = vec4(a_Position, 1.0);	
+				gl_Position = u_viewProjectionMatrix * vec4(a_Position, 1.0);	
 			}
 		)";
 
@@ -185,14 +190,13 @@ namespace Donut
 			RenderCommand::setClearColor({ 0.2, 0.2, 0.2, 1 });
 			RenderCommand::clear();
 
-			Renderer::beginScene();
+			camera_.setPosition({ 0.4f, 0.2f, 0.0f });
+			camera_.setRotation(30.0f);
 
-			rectangle_shader_->bind();
-			Renderer::submit(rectangle_va_);
+			Renderer::beginScene(camera_);
 
-			triangle_shader_->bind();
-			Renderer::submit(triangle_va_);
-
+			Renderer::submit(rectangle_shader_, rectangle_va_);
+			Renderer::submit(triangle_shader_, triangle_va_);
 
 			Renderer::endScene();
 

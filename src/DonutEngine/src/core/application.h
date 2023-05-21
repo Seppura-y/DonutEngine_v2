@@ -13,6 +13,7 @@
 #include "renderer/shader.h"
 #include "renderer/buffers.h"
 #include "renderer/vertex_array.h"
+#include "renderer/orthographic_camera.h"
 
 namespace Donut
 {
@@ -53,6 +54,8 @@ namespace Donut
 
 		std::shared_ptr<Shader> rectangle_shader_;
 		std::shared_ptr<VertexArray> rectangle_va_;
+
+		OrthographicCamera camera_;
 	};
 
 	// To be defined in client

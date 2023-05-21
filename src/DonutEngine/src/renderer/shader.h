@@ -2,6 +2,9 @@
 #define SHADER_H
 
 #include <string>
+
+#include <glm/glm.hpp>
+
 namespace Donut
 {
 	class Shader
@@ -12,6 +15,8 @@ namespace Donut
 
 		void bind() const;
 		void unBind() const;
+
+		void uploadUniformMat4v(const std::string& name, const glm::mat4& matrix);
 	private:
 		unsigned int shader_id_;
 	};
