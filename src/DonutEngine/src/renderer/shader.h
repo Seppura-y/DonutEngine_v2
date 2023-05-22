@@ -3,20 +3,18 @@
 
 #include <string>
 
-#include <glm/glm.hpp>
-
 namespace Donut
 {
 	class Shader
 	{
 	public:
-		Shader(const std::string& vertex_string, const std::string& frag_string);
-		~Shader();
+		Shader() = default;
+		static Shader* createShader(const std::string& vertex_string, const std::string& frag_string);
+		virtual ~Shader() {}
 
-		void bind() const;
-		void unBind() const;
+		virtual void bind() const = 0;
+		virtual void unBind() const = 0;
 
-		void uploadUniformMat4v(const std::string& name, const glm::mat4& matrix);
 	private:
 		unsigned int shader_id_;
 	};

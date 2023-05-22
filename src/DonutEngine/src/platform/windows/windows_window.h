@@ -1,4 +1,6 @@
-#pragma once
+#ifndef WINDOWS_WINDOW_H
+#define WINDOWS_WINDOW_H
+
 #include "core/window.h"
 #include "core/logger.h"
 
@@ -43,3 +45,5 @@ namespace Donut {
 	};
 
 }
+
+#endif

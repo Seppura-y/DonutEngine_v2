@@ -2,21 +2,28 @@
 
 #include "imgui/imgui.h"
 #include "renderer/graphics_context.h"
+#include "renderer/shader.h"
+
 #include "platform/windows/windows_window.h"
 #include "platform/opengl/opengl_context.h"
+#include "platform/opengl/opengl_shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 //#pragma comment(lib, "DonutEngine2.lib")
 
 class ExampleLayer : public Donut::Layer
 {
 public:
-	ExampleLayer() : Layer("Example"), camera_(-1.6f, 1.6f, -0.9f, 0.9f), camera_pos_(0.0f), rect_position_(0.0f)
+	ExampleLayer()
+		:	Layer("Example"),
+			camera_(-1.6f, 1.6f, -0.9f, 0.9f),
+			camera_pos_(0.0f),
+			rect_position_(0.0f)
 	{
 		triangle_va_.reset(Donut::VertexArray::create());
-		//glGenVertexArrays(1, &vao_);
-		//glBindVertexArray(vao_);
+
 
 		float vertices[3 * 7] =
 		{
@@ -77,7 +84,7 @@ public:
 			}
 		)";
 
-		triangle_shader_.reset(new Donut::Shader(vertex_string, fragment_string));
+		triangle_shader_.reset(Donut::Shader::createShader(vertex_string, fragment_string));
 
 
 
@@ -88,10 +95,10 @@ public:
 		rectangle_va_.reset(Donut::VertexArray::create());
 		float rect_vertices[3 * 4] =
 		{
-			-0.75f, -0.75f, 0.0f,
-			 0.75f, -0.75f, 0.0f,
-			 0.75f,  0.75f, 0.0f,
-			-0.75f,  0.75f, 0.0f
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.5f,  0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f
 		};
 		std::shared_ptr<Donut::VertexBuffer> rect_vb;
 		rect_vb.reset(Donut::VertexBuffer::create(rect_vertices, sizeof(rect_vertices)));
@@ -126,13 +133,16 @@ public:
 			#version 450 core
 
 			layout(location = 0) out vec4 color;
+
+			uniform vec4 u_Color;
+
 			void main()
 			{
-				color = vec4(0.3,0.3,0.5,1.0);
+				color = u_Color;
 			}
 		)";
 
-		rectangle_shader_.reset(new Donut::Shader(rect_v_src, rect_f_src));
+		rectangle_shader_.reset(Donut::Shader::createShader(rect_v_src, rect_f_src));
 	}
 
 	void onUpdate(Donut::Timestep ts) override
@@ -199,9 +209,9 @@ public:
 			rect_rotation_ += rect_rotate_speed_ * ts;
 		}
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), rect_position_);
-		transform = glm::rotate(transform, glm::radians(rect_rotation_), glm::vec3(0, 0, 1));
-		transform = glm::scale(transform, glm::vec3(0.1f));
+		glm::mat4 main_transform = glm::translate(glm::mat4(1.0f), rect_position_);
+		main_transform = glm::rotate(main_transform, glm::radians(rect_rotation_), glm::vec3(0, 0, 1));
+		main_transform = glm::scale(main_transform, glm::vec3(0.1f));
 
 		Donut::RenderCommand::setClearColor({ 0.2, 0.2, 0.2, 1 });
 		Donut::RenderCommand::clear();
@@ -211,8 +221,48 @@ public:
 
 		Donut::Renderer::beginScene(camera_);
 
-		Donut::Renderer::submit(rectangle_shader_, rectangle_va_, transform);
-		Donut::Renderer::submit(triangle_shader_, triangle_va_);
+		glm::vec4 red_color(0.8f, 0.3f, 0.2f, 1.0f);
+		glm::vec4 blue_color(0.2f, 0.3f, 0.8f, 1.0f);
+
+		for (int x = 0; x < 20; x++)
+		{
+			for (int y = 0; y < 20; y++)
+			{
+				if (x % 2)
+				{
+					if (y % 2)
+					{
+						//std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", blue_color);
+						std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", rect_color_);
+					}
+					else
+					{
+						std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", red_color);
+					}
+				}
+				else
+				{
+					if (y % 2)
+					{
+						std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", red_color);
+					}
+					else
+					{
+						std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", rect_color_);
+						//std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", blue_color);
+					}
+				}
+
+				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos);
+				transform = transform * main_transform;
+				//std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->bind();
+				//std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", rect_color_);
+				Donut::Renderer::submit(rectangle_shader_, rectangle_va_, transform);
+			}
+		}
+
+		Donut::Renderer::submit(triangle_shader_, triangle_va_, glm::mat4(1.0f));
 
 		Donut::Renderer::endScene();
 
@@ -220,39 +270,15 @@ public:
 
 	virtual void onImGuiRender() override
 	{
-
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit3("rect color", glm::value_ptr(rect_color_));
+		ImGui::End();
 	}
 
 	void onEvent(Donut::Event& ev) override
 	{
-		//Donut::EventDispatcher dispatcher(ev);
-		//dispatcher.dispatch<Donut::KeyPressedEvent>(DN_BIND_EVENT_FN(ExampleLayer::onKeyPressedEvent));
+
 	}
-
-	//bool onKeyPressedEvent(Donut::KeyPressedEvent& ev)
-	//{
-	//	if (ev.getKeyCode() == DN_KEY_LEFT)
-	//	{
-	//		camera_pos_.x += camera_speed_;
-	//	}
-
-	//	if (ev.getKeyCode() == DN_KEY_RIGHT)
-	//	{
-	//		camera_pos_.x -= camera_speed_;
-	//	}
-
-	//	if (ev.getKeyCode() == DN_KEY_UP)
-	//	{
-	//		camera_pos_.y += camera_speed_;
-	//	}
-
-	//	if (ev.getKeyCode() == DN_KEY_DOWN)
-	//	{
-	//		camera_pos_.y -= camera_speed_;
-	//	}
-
-	//	return false;
-	//}
 
 private:
 	std::shared_ptr<Donut::Shader> triangle_shader_;
@@ -271,6 +297,7 @@ private:
 	float rect_rotate_speed_ = 50.0f;
 	float rect_rotation_ = 0.0f;
 	glm::vec3 rect_position_{ 0.0f, 0.0f, 0.0f };
+	glm::vec4 rect_color_{ 0.2f, 0.3f, 0.8f, 1.0f };
 };
 
 class Sandbox : public Donut::Application
@@ -279,7 +306,6 @@ public:
 	Sandbox()
 	{
 		pushLayer(new ExampleLayer());
-		//pushOverlay(new Donut::ImGuiLayer());
 	}
 
 	~Sandbox()
