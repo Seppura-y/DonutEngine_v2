@@ -1,6 +1,8 @@
 #ifndef CORE_H
 #define CORE_H
 
+#include <memory>
+
 #ifdef DN_PLATFORM_WINDOWS
 	#ifdef DN_BUILD_SHARED
 		#ifdef DN_ENGINE
@@ -30,5 +32,16 @@
 #endif
 
 #define DN_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+
+
+namespace Donut
+{
+	template<typename T>
+	using Scope = std::unique_ptr<T>;
+
+	template<typename T>
+	using Ref = std::shared_ptr<T>;
+}
+
 
 #endif

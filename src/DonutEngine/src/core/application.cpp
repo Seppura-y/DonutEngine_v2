@@ -62,7 +62,7 @@ namespace Donut
 
 	void Application::run()
 	{
-		WindowResizeEvent ev(1280, 720);
+		WindowResizeEvent ev(1600, 900);
 		DN_CORE_INFO(ev);
 		DN_CORE_INFO("{0}, {1}", "app",std::this_thread::get_id());
 		while (is_running_)

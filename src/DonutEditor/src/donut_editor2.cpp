@@ -32,7 +32,7 @@ public:
 			 0.0f,  0.5f, 0.0f, 0.8f, 0.5f, 0.3f, 1.0f
 		};
 
-		std::shared_ptr<Donut::VertexBuffer> vertex_buffer;
+		Donut::Ref<Donut::VertexBuffer> vertex_buffer;
 		vertex_buffer.reset(Donut::VertexBuffer::create(vertices, sizeof(vertices)));
 		{
 			Donut::BufferLayout layout = {
@@ -43,7 +43,7 @@ public:
 		}
 
 		unsigned int indices[3] = { 0, 1, 2 };
-		std::shared_ptr<Donut::IndexBuffer> index_buffer;
+		Donut::Ref<Donut::IndexBuffer> index_buffer;
 		index_buffer.reset(Donut::IndexBuffer::create(indices, sizeof(indices) / sizeof(uint32_t)));
 
 		triangle_va_->addVertexBuffer(vertex_buffer);
@@ -100,7 +100,7 @@ public:
 			 0.5f,  0.5f, 0.0f,
 			-0.5f,  0.5f, 0.0f
 		};
-		std::shared_ptr<Donut::VertexBuffer> rect_vb;
+		Donut::Ref<Donut::VertexBuffer> rect_vb;
 		rect_vb.reset(Donut::VertexBuffer::create(rect_vertices, sizeof(rect_vertices)));
 		Donut::BufferLayout rectangle_layout =
 		{
@@ -110,7 +110,7 @@ public:
 		rectangle_va_->addVertexBuffer(rect_vb);
 
 		uint32_t rect_indices[] = { 0,1,2,2,3,0 };
-		std::shared_ptr<Donut::IndexBuffer> rect_ib;
+		Donut::Ref<Donut::IndexBuffer> rect_ib;
 		rect_ib.reset(Donut::IndexBuffer::create(rect_indices, sizeof(rect_indices)));
 		rectangle_va_->setIndexBuffer(rect_ib);
 
@@ -281,11 +281,11 @@ public:
 	}
 
 private:
-	std::shared_ptr<Donut::Shader> triangle_shader_;
-	std::shared_ptr<Donut::VertexArray> triangle_va_;
+	Donut::Ref<Donut::Shader> triangle_shader_;
+	Donut::Ref<Donut::VertexArray> triangle_va_;
 
-	std::shared_ptr<Donut::Shader> rectangle_shader_;
-	std::shared_ptr<Donut::VertexArray> rectangle_va_;
+	Donut::Ref<Donut::Shader> rectangle_shader_;
+	Donut::Ref<Donut::VertexArray> rectangle_va_;
 
 	Donut::OrthographicCamera camera_;
 	glm::vec3 camera_pos_;

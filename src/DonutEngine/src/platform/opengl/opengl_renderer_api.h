@@ -10,7 +10,7 @@ namespace Donut
 	public:
 		virtual void setClearColor(const glm::vec4& color) override;
 		virtual void clear() override;
-		virtual void drawIndices(const std::shared_ptr<VertexArray>& va) override;
+		virtual void drawIndices(const Donut::Ref<VertexArray>& va) override;
 	private:
 
 	};

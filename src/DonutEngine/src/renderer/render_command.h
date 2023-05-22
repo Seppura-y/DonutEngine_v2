@@ -18,7 +18,7 @@ namespace Donut
 			renderer_api_->clear();
 		}
 
-		inline static void drawIndices(const std::shared_ptr<VertexArray>& va)
+		inline static void drawIndices(const Donut::Ref<VertexArray>& va)
 		{
 			renderer_api_->drawIndices(va);
 		}

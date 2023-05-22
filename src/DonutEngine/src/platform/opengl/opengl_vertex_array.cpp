@@ -33,7 +33,7 @@ namespace Donut
 		glDeleteVertexArrays(1, &object_id_);
 	}
 
-	void OpenGLVertexArray::addVertexBuffer(const std::shared_ptr<VertexBuffer>& buffer)
+	void OpenGLVertexArray::addVertexBuffer(const Donut::Ref<VertexBuffer>& buffer)
 	{
 		DN_CORE_ASSERT(buffer->getLayout().getBufferElements().size(), "vertex buffer is empty!");
 
@@ -59,7 +59,7 @@ namespace Donut
 		vertex_buffers_.push_back(buffer);
 	}
 
-	void OpenGLVertexArray::setIndexBuffer(const std::shared_ptr<IndexBuffer>& buffer)
+	void OpenGLVertexArray::setIndexBuffer(const Donut::Ref<IndexBuffer>& buffer)
 	{
 		glBindVertexArray(object_id_);
 		index_buffer_ = buffer;

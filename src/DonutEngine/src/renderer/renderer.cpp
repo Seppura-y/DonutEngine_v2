@@ -15,7 +15,7 @@ namespace Donut
 
     }
 
-    void Renderer::submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& va)
+    void Renderer::submit(const Donut::Ref<Shader>& shader, const Donut::Ref<VertexArray>& va)
     {
         shader->bind();
         std::dynamic_pointer_cast<Donut::OpenGLShader>(shader)->uploadUniformMat4fv("u_viewProjectionMatrix", scene_data_->view_projection_matrix_);
@@ -24,7 +24,7 @@ namespace Donut
         RenderCommand::drawIndices(va);
     }
 
-    void Renderer::submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& va, const glm::mat4& transform)
+    void Renderer::submit(const Donut::Ref<Shader>& shader, const Donut::Ref<VertexArray>& va, const glm::mat4& transform)
     {
         shader->bind();
         std::dynamic_pointer_cast<Donut::OpenGLShader>(shader)->uploadUniformMat4fv("u_viewProjectionMatrix", scene_data_->view_projection_matrix_);

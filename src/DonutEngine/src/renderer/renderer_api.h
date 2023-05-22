@@ -20,7 +20,7 @@ namespace Donut
 
 		virtual void setClearColor(const glm::vec4& color) = 0;
 		virtual void clear() = 0;
-		virtual void drawIndices(const std::shared_ptr<VertexArray>& vertex_array) = 0;
+		virtual void drawIndices(const Donut::Ref<VertexArray>& vertex_array) = 0;
 
 		inline static RendererAPIType getApiType() { return type_; }
 	private:
