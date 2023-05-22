@@ -15,7 +15,8 @@ namespace Donut
 	public:
 		static void beginScene(OrthographicCamera& camera);
 		static void endScene();
-		static void submit(const std::shared_ptr<Shader>& shader,const std::shared_ptr<VertexArray>& va);
+		static void submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& va);
+		static void submit(const std::shared_ptr<Shader>& shader,const std::shared_ptr<VertexArray>& va, const glm::mat4& transform);
 		inline static RendererAPI::RendererAPIType getRendererApi() { return s_type_; }
 	private:
 

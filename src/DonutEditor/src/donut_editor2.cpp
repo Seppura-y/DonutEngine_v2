@@ -5,12 +5,14 @@
 #include "platform/windows/windows_window.h"
 #include "platform/opengl/opengl_context.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 //#pragma comment(lib, "DonutEngine2.lib")
 
 class ExampleLayer : public Donut::Layer
 {
 public:
-	ExampleLayer() : Layer("Example"), camera_(-1.6f, 1.6f, -0.9f, 0.9f), camera_pos_(0.0f)
+	ExampleLayer() : Layer("Example"), camera_(-1.6f, 1.6f, -0.9f, 0.9f), camera_pos_(0.0f), rect_position_(0.0f)
 	{
 		triangle_va_.reset(Donut::VertexArray::create());
 		//glGenVertexArrays(1, &vao_);
@@ -111,11 +113,12 @@ public:
 			layout(location = 0) in vec3 a_Position;
 
 			uniform mat4 u_viewProjectionMatrix;
+			uniform mat4 u_transformMatrix;
 
 			out vec3 v_Position;
 			void main()
 			{
-				gl_Position = u_viewProjectionMatrix * vec4(a_Position, 1.0);	
+				gl_Position = u_viewProjectionMatrix * u_transformMatrix * vec4(a_Position, 1.0);	
 			}
 		)";
 
@@ -134,7 +137,7 @@ public:
 
 	void onUpdate(Donut::Timestep ts) override
 	{
-		DN_CLIENT_TRACE("Delta Time: {0} s  {1} ms", ts.getSeconds(), ts.getMilliseconds());
+		//DN_CLIENT_TRACE("Delta Time: {0} s  {1} ms", ts.getSeconds(), ts.getMilliseconds());
 
 		if (Donut::Input::isKeyPressed(DN_KEY_LEFT))
 		{
@@ -166,6 +169,39 @@ public:
 			camera_rotation_ += camera_move_speed_ * ts;
 		}
 
+		if (Donut::Input::isKeyPressed(DN_KEY_A))
+		{
+			rect_position_.x -= rect_move_speed_ * ts;
+		}
+
+		if (Donut::Input::isKeyPressed(DN_KEY_D))
+		{
+			rect_position_.x += rect_move_speed_ * ts;
+		}
+
+		if (Donut::Input::isKeyPressed(DN_KEY_W))
+		{
+			rect_position_.y -= rect_move_speed_ * ts;
+		}
+
+		if (Donut::Input::isKeyPressed(DN_KEY_S))
+		{
+			rect_position_.y += rect_move_speed_ * ts;
+		}
+
+		if (Donut::Input::isKeyPressed(DN_KEY_R))
+		{
+			rect_rotation_ -= rect_rotate_speed_ * ts;
+		}
+
+		if (Donut::Input::isKeyPressed(DN_KEY_T))
+		{
+			rect_rotation_ += rect_rotate_speed_ * ts;
+		}
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), rect_position_);
+		transform = glm::rotate(transform, glm::radians(rect_rotation_), glm::vec3(0, 0, 1));
+		transform = glm::scale(transform, glm::vec3(0.1f));
 
 		Donut::RenderCommand::setClearColor({ 0.2, 0.2, 0.2, 1 });
 		Donut::RenderCommand::clear();
@@ -175,7 +211,7 @@ public:
 
 		Donut::Renderer::beginScene(camera_);
 
-		Donut::Renderer::submit(rectangle_shader_, rectangle_va_);
+		Donut::Renderer::submit(rectangle_shader_, rectangle_va_, transform);
 		Donut::Renderer::submit(triangle_shader_, triangle_va_);
 
 		Donut::Renderer::endScene();
@@ -230,6 +266,11 @@ private:
 	float camera_rotation_ = 0.0f;
 	float camera_move_speed_ = 1.0f;
 	float camera_rotate_speed_ = 10.0f;
+
+	float rect_move_speed_ = 5.0f;
+	float rect_rotate_speed_ = 50.0f;
+	float rect_rotation_ = 0.0f;
+	glm::vec3 rect_position_{ 0.0f, 0.0f, 0.0f };
 };
 
 class Sandbox : public Donut::Application
