@@ -42,6 +42,7 @@ namespace Donut
 		s_instance_ = this;
 		window_ = std::unique_ptr<Window>(Window::create(WindowProps()));
 		window_->setEventCallback(BIND_EVENT_FN(onEvent));
+		//window_->setVSync(false);
 
 		imgui_layer_ = new ImGuiLayer();
 		pushOverlay(imgui_layer_);
@@ -66,10 +67,13 @@ namespace Donut
 		DN_CORE_INFO("{0}, {1}", "app",std::this_thread::get_id());
 		while (is_running_)
 		{
+			float time = (float)glfwGetTime();
+			Timestep timestep = time - last_frame_time_;
+			last_frame_time_ = time;
 
 			for (Layer* layer : layer_stack_)
 			{
-				layer->onUpdate();
+				layer->onUpdate(timestep);
 			}
 
 			imgui_layer_->begin();

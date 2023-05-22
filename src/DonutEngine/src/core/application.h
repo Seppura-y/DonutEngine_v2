@@ -4,6 +4,7 @@
 #include "core/core.h"
 #include "core/window.h"
 #include "core/layer_stack.h"
+#include "core/timestep.h"
 
 #include "events/event.h"
 #include "events/application_event.h"
@@ -39,6 +40,8 @@ namespace Donut
 		ImGuiLayer* imgui_layer_;
 
 		LayerStack layer_stack_;
+		float last_frame_time_ = 0.0f;
+
 	};
 
 	// To be defined in client

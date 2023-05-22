@@ -2,6 +2,7 @@
 #define LAYER_H
 
 #include "core/core.h"
+#include "core/timestep.h"
 #include "events/event.h"
 
 namespace Donut
@@ -14,7 +15,7 @@ namespace Donut
 
 		virtual void onAttach() {}
 		virtual void onDetach() {}
-		virtual void onUpdate() {}
+		virtual void onUpdate(Timestep ts) {}
 		virtual void onEvent(Event& event) {}
 
 		virtual void onImGuiRender() {}

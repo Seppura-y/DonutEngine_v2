@@ -132,36 +132,38 @@ public:
 		rectangle_shader_.reset(new Donut::Shader(rect_v_src, rect_f_src));
 	}
 
-	void onUpdate() override
+	void onUpdate(Donut::Timestep ts) override
 	{
+		DN_CLIENT_TRACE("Delta Time: {0} s  {1} ms", ts.getSeconds(), ts.getMilliseconds());
+
 		if (Donut::Input::isKeyPressed(DN_KEY_LEFT))
 		{
-			camera_pos_.x += camera_move_speed_;
+			camera_pos_.x += camera_move_speed_ * ts;
 		}
 
 		if (Donut::Input::isKeyPressed(DN_KEY_RIGHT))
 		{
-			camera_pos_.x -= camera_move_speed_;
+			camera_pos_.x -= camera_move_speed_ * ts;
 		}
 
 		if (Donut::Input::isKeyPressed(DN_KEY_UP))
 		{
-			camera_pos_.y -= camera_move_speed_;
+			camera_pos_.y -= camera_move_speed_ * ts;
 		}
 
 		if (Donut::Input::isKeyPressed(DN_KEY_DOWN))
 		{
-			camera_pos_.y += camera_move_speed_;
+			camera_pos_.y += camera_move_speed_ * ts;
 		}
 
 		if (Donut::Input::isKeyPressed(DN_KEY_Q))
 		{
-			camera_rotation_ -= camera_move_speed_;
+			camera_rotation_ -= camera_move_speed_ * ts;
 		}
 
 		if (Donut::Input::isKeyPressed(DN_KEY_E))
 		{
-			camera_rotation_ += camera_move_speed_;
+			camera_rotation_ += camera_move_speed_ * ts;
 		}
 
 
@@ -226,8 +228,8 @@ private:
 	Donut::OrthographicCamera camera_;
 	glm::vec3 camera_pos_;
 	float camera_rotation_ = 0.0f;
-	float camera_move_speed_ = 0.1f;
-	float camera_rotate_speed_ = 5.0f;
+	float camera_move_speed_ = 1.0f;
+	float camera_rotate_speed_ = 10.0f;
 };
 
 class Sandbox : public Donut::Application

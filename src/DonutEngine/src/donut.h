@@ -12,6 +12,8 @@
 
 #include "core/window.h"
 
+#include "core/timestep.h"
+
 #include "renderer/renderer.h"
 #include "renderer/render_command.h"
 
