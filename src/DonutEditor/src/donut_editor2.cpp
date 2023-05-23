@@ -8,6 +8,8 @@
 #include "platform/opengl/opengl_context.h"
 #include "platform/opengl/opengl_shader.h"
 
+#include "platform/opengl/opengl_texture.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -93,18 +95,19 @@ public:
 
 
 		rectangle_va_.reset(Donut::VertexArray::create());
-		float rect_vertices[3 * 4] =
+		float rect_vertices[5 * 4] =
 		{
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.5f,  0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 		};
 		Donut::Ref<Donut::VertexBuffer> rect_vb;
 		rect_vb.reset(Donut::VertexBuffer::create(rect_vertices, sizeof(rect_vertices)));
 		Donut::BufferLayout rectangle_layout =
 		{
-			{Donut::ShaderDataType::Float3,"a_Position"}
+			{Donut::ShaderDataType::Float3,"a_Position"},
+			{Donut::ShaderDataType::Float2,"a_TexCoord"}
 		};
 		rect_vb->setLayout(rectangle_layout);
 		rectangle_va_->addVertexBuffer(rect_vb);
@@ -118,13 +121,16 @@ public:
 			#version 450 core
 			
 			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec2 a_TexCoord;
 
 			uniform mat4 u_viewProjectionMatrix;
 			uniform mat4 u_transformMatrix;
 
 			out vec3 v_Position;
+			out vec2 v_TexCoord;
 			void main()
 			{
+				v_TexCoord = a_TexCoord;
 				gl_Position = u_viewProjectionMatrix * u_transformMatrix * vec4(a_Position, 1.0);	
 			}
 		)";
@@ -134,15 +140,23 @@ public:
 
 			layout(location = 0) out vec4 color;
 
+			in vec2 v_TexCoord;
+
 			uniform vec4 u_Color;
+			uniform sampler2D u_Texture;
 
 			void main()
 			{
-				color = u_Color;
+				color = texture(u_Texture, v_TexCoord);
 			}
 		)";
 
 		rectangle_shader_.reset(Donut::Shader::createShader(rect_v_src, rect_f_src));
+
+		texture_ = Donut::Texture2D::createTexture("G:/2023/Code/Project/DonutEngine_v2/src/DonutEngine/assets/textures/cat.jpg");
+		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->bind();
+		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformInt("u_Texture", 0);
+
 	}
 
 	void onUpdate(Donut::Timestep ts) override
@@ -262,6 +276,8 @@ public:
 			}
 		}
 
+		texture_->bind();
+
 		Donut::Renderer::submit(triangle_shader_, triangle_va_, glm::mat4(1.0f));
 
 		Donut::Renderer::endScene();
@@ -286,6 +302,8 @@ private:
 
 	Donut::Ref<Donut::Shader> rectangle_shader_;
 	Donut::Ref<Donut::VertexArray> rectangle_va_;
+
+	Donut::Ref<Donut::Texture2D> texture_;
 
 	Donut::OrthographicCamera camera_;
 	glm::vec3 camera_pos_;

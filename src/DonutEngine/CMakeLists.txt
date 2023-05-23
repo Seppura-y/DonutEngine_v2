@@ -128,6 +128,26 @@ FILE(GLOB ${PROJECT_NAME}_GLM_HEADER
 )
 
 #####################################################################################################
+# stb_image
+FILE(GLOB ${PROJECT_NAME}_STB_IMAGE_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/stb_image/stb_image.h
+)
+
+FILE(GLOB ${PROJECT_NAME}_STB_IMAGE_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/src/renderer/stb_image.cpp
+)
+
+#####################################################################################################
+# assets
+FILE(GLOB ${PROJECT_NAME}_TEXTURES
+    ${CMAKE_CURRENT_LIST_DIR}/assets/textures/*.*
+)
+
+FILE(GLOB ${PROJECT_NAME}_SHADERS
+    ${CMAKE_CURRENT_LIST_DIR}/assets/shaders/*.*
+)
+
+#####################################################################################################
 source_group("src\\DonutEngine\\Global" FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
 source_group("src\\DonutEngine\\Core" FILES ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC})
 source_group("src\\DonutEngine\\Events" FILES ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC})
@@ -138,6 +158,11 @@ source_group("src\\DonutEngine\\Platform\\OpenGL" FILES ${${PROJECT_NAME}_OPENGL
 source_group("src\\DonutEngine\\Platform\\Windows" FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
 
 source_group("src\\glm" FILES ${${PROJECT_NAME}_GLM_HEADER})
+
+source_group("src\\stb_image" FILES ${${PROJECT_NAME}_STB_IMAGE_HEADER} ${${PROJECT_NAME}_STB_IMAGE_SRC})
+
+source_group("assets\\shaders"  FILES ${${PROJECT_NAME}_SHADERS} )
+source_group("assets\\textures" FILES ${${PROJECT_NAME}_TEXTURES} )
 
 #========================================= SETUP LIBRARY =========================================#
 # Enable debug logging on RELWITHDEBINFO configuration
@@ -168,6 +193,11 @@ if (WIN32)
         ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC}
 
         ${${PROJECT_NAME}_GLM_HEADER}
+        ${${PROJECT_NAME}_STB_IMAGE_HEADER} ${${PROJECT_NAME}_STB_IMAGE_SRC}
+
+
+        ${${PROJECT_NAME}_SHADERS}
+        ${${PROJECT_NAME}_TEXTURES}
     )
 elseif(UNIX)
     add_library(${PROJECT_NAME} 
@@ -228,6 +258,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
     DN_PLATFORM_WINDOWS
     DN_USE_GLFW
     DN_ENGINE
+    DN_DEBUG
     GLFW_INCLUDE_NONE
     # if(DN_SHARED)
     #     DN_BUILD_SHARED
@@ -253,6 +284,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/glad/include
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/glm
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/stb_image
+
+    ${CMAKE_CURRENT_LIST_DIR}/assets/textures
+    ${CMAKE_CURRENT_LIST_DIR}/assets/shaders
 )
 
 #========================================= LINKING LIBRARIES =========================================#

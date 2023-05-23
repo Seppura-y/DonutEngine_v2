@@ -35,7 +35,7 @@ namespace Donut
 
 	void OpenGLVertexArray::addVertexBuffer(const Donut::Ref<VertexBuffer>& buffer)
 	{
-		DN_CORE_ASSERT(buffer->getLayout().getBufferElements().size(), "vertex buffer is empty!");
+		//DN_CORE_ASSERT(buffer->getLayout().getBufferElements().size(), "vertex buffer is empty!");
 
 		glBindVertexArray(object_id_);
 		buffer->bind();

@@ -19,6 +19,7 @@
 
 #include "renderer/buffers.h"
 #include "renderer/shader.h"
+#include "renderer/texture.h"
 #include "renderer/vertex_array.h"
 
 #include "renderer/orthographic_camera.h"
