@@ -36,7 +36,7 @@ namespace Donut
 		glTextureStorage2D(object_id_, 1, internal_format, width_, height_);
 
 		glTextureParameteri(object_id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format, GL_UNSIGNED_BYTE, data);
 
