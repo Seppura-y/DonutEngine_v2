@@ -140,11 +140,11 @@ FILE(GLOB ${PROJECT_NAME}_STB_IMAGE_SRC
 #####################################################################################################
 # assets
 FILE(GLOB ${PROJECT_NAME}_TEXTURES
-    ${CMAKE_CURRENT_LIST_DIR}/assets/textures/*.*
+    ${CMAKE_CURRENT_LIST_DIR}/../../bin/assets/textures/*.*
 )
 
 FILE(GLOB ${PROJECT_NAME}_SHADERS
-    ${CMAKE_CURRENT_LIST_DIR}/assets/shaders/*.*
+    ${CMAKE_CURRENT_LIST_DIR}/../../bin/assets/shaders/*.*
 )
 
 #####################################################################################################
@@ -286,8 +286,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/stb_image
 
-    ${CMAKE_CURRENT_LIST_DIR}/assets/textures
-    ${CMAKE_CURRENT_LIST_DIR}/assets/shaders
 )
 
 #========================================= LINKING LIBRARIES =========================================#

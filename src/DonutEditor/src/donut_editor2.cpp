@@ -153,7 +153,9 @@ public:
 
 		rectangle_shader_.reset(Donut::Shader::createShader(rect_v_src, rect_f_src));
 
-		texture_ = Donut::Texture2D::createTexture("G:/2023/Code/Project/DonutEngine_v2/src/DonutEngine/assets/textures/cat.jpg");
+		texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
+		texture2_ = Donut::Texture2D::createTexture("assets/textures/cherno_logo.png");
+		//texture_ = Donut::Texture2D::createTexture("G:/2023/Code/Project/DonutEngine_v2/src/DonutEngine/assets/textures/cat.jpg");
 		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->bind();
 		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformInt("u_Texture", 0);
 
@@ -278,7 +280,20 @@ public:
 
 		texture_->bind();
 
-		Donut::Renderer::submit(triangle_shader_, triangle_va_, glm::mat4(1.0f));
+		//int width = texture_->getWidth();
+		//int height = texture_->getHeight();
+		//float ar = (float)width / (float)height;
+		//glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -ar, ar, -1.0f, 1.0f);
+		Donut::Renderer::submit(triangle_shader_, triangle_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));
+		//Donut::Renderer::submit(triangle_shader_, triangle_va_, glm::mat4(1.0f));
+
+		
+		texture2_->bind();
+		//width = texture2_->getWidth();
+		//height = texture2_->getHeight();
+		//ar = (float)width / (float)height;
+		//proj = glm::ortho(-1.0f, 1.0f, -ar, ar, -1.0f, 1.0f);
+		Donut::Renderer::submit(triangle_shader_, triangle_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));
 
 		Donut::Renderer::endScene();
 
@@ -304,6 +319,7 @@ private:
 	Donut::Ref<Donut::VertexArray> rectangle_va_;
 
 	Donut::Ref<Donut::Texture2D> texture_;
+	Donut::Ref<Donut::Texture2D> texture2_;
 
 	Donut::OrthographicCamera camera_;
 	glm::vec3 camera_pos_;

@@ -8,6 +8,7 @@ namespace Donut
 	class OpenGLRendererAPI : public RendererAPI
 	{
 	public:
+		virtual void init() override;
 		virtual void setClearColor(const glm::vec4& color) override;
 		virtual void clear() override;
 		virtual void drawIndices(const Donut::Ref<VertexArray>& va) override;

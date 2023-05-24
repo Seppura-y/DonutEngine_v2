@@ -18,6 +18,7 @@ namespace Donut
 	private:
 		uint32_t width_;
 		uint32_t height_;
+		uint32_t channels_;
 
 		uint32_t object_id_;
 

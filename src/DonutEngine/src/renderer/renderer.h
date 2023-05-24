@@ -13,6 +13,7 @@ namespace Donut
 	class Renderer
 	{
 	public:
+		static void init();
 		static void beginScene(OrthographicCamera& camera);
 		static void endScene();
 		static void submit(const Donut::Ref<Shader>& shader, const Donut::Ref<VertexArray>& va);

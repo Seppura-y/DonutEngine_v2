@@ -5,6 +5,12 @@
 namespace Donut
 {
     Renderer::SceneData* Renderer::scene_data_ = new SceneData();
+
+    void Renderer::init()
+    {
+        RenderCommand::init();
+    }
+
     void Renderer::beginScene(OrthographicCamera& camera)
     {
         scene_data_->view_projection_matrix_ = camera.getViewProjectionMatrix();

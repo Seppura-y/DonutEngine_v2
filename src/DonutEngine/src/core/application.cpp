@@ -44,6 +44,8 @@ namespace Donut
 		window_->setEventCallback(BIND_EVENT_FN(onEvent));
 		//window_->setVSync(false);
 
+		Renderer::init();
+
 		imgui_layer_ = new ImGuiLayer();
 		pushOverlay(imgui_layer_);
 
