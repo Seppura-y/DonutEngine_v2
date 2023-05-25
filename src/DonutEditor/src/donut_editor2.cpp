@@ -207,7 +207,8 @@ public:
 			}
 		)";
 
-		texture_shader_.reset(Donut::Shader::createShader(textureShaderVertexSrc, textureShaderFragmentSrc));
+		texture_shader_.reset(Donut::Shader::createShader("assets/shaders/texture.glsl"));
+		//texture_shader_.reset(Donut::Shader::createShader(textureShaderVertexSrc, textureShaderFragmentSrc));
 
 
 		texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");

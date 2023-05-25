@@ -9,6 +9,20 @@
 
 namespace Donut
 {
+	Shader* Shader::createShader(const std::string& filepath)
+	{
+
+		switch (RendererAPI::getApiType())
+		{
+		case RendererAPI::RendererAPIType::None:    DN_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+		case RendererAPI::RendererAPIType::OpenGL:  return new OpenGLShader(filepath);
+		}
+
+		DN_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+	
+
 	Shader* Shader::createShader(const std::string& vertex_shader, const std::string& fragment_shader)
 	{
 		switch (RendererAPI::getApiType())

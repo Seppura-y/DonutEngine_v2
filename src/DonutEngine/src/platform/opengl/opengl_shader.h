@@ -3,14 +3,19 @@
 #include "renderer/shader.h"
 #include "glm/glm.hpp"
 
+
+typedef unsigned int GLenum;
+
 namespace Donut
 {
 	class OpenGLShader : public Shader
 	{
 	public:
 		OpenGLShader() = default;
+		OpenGLShader(const std::string& filepath);
 		OpenGLShader(const std::string& vertex_shader, const std::string& fragment_shader);
 		virtual ~OpenGLShader();
+
 		virtual void bind() const override;
 		virtual void unBind() const override;
 
@@ -23,6 +28,11 @@ namespace Donut
 
 		void uploadUniformMat3fv(const std::string& name, const glm::mat3& matrix);
 		void uploadUniformMat4fv(const std::string& name, const glm::mat4& matrix);
+
+	private:
+		std::string readFile(const std::string& filepath);
+		std::unordered_map<GLenum, std::string> preProcess(const std::string& source);
+		void compileShaders(const std::unordered_map<GLenum, std::string>& shader_sources);
 	private:
 		unsigned int shader_id_;
 	};

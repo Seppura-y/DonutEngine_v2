@@ -96,7 +96,7 @@ namespace Donut
 		EventDispatcher dispatcher(ev);
 		dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(onWindowClose));
 
-		DN_CORE_TRACE("{0}", ev);
+		//DN_CORE_TRACE("{0}", ev);
 
 		for (auto it = layer_stack_.end(); it != layer_stack_.begin();)
 		{
