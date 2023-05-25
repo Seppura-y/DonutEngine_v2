@@ -13,8 +13,10 @@ namespace Donut
 	public:
 		OpenGLShader() = default;
 		OpenGLShader(const std::string& filepath);
-		OpenGLShader(const std::string& vertex_shader, const std::string& fragment_shader);
+		OpenGLShader(const std::string& name, const std::string& vertex_shader, const std::string& fragment_shader);
 		virtual ~OpenGLShader();
+
+		virtual const std::string& getName() override { return name_; }
 
 		virtual void bind() const override;
 		virtual void unBind() const override;
@@ -35,6 +37,7 @@ namespace Donut
 		void compileShaders(const std::unordered_map<GLenum, std::string>& shader_sources);
 	private:
 		unsigned int shader_id_;
+		std::string name_;
 	};
 }
 #endif

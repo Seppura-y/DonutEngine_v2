@@ -86,7 +86,7 @@ public:
 			}
 		)";
 
-		triangle_shader_.reset(Donut::Shader::createShader(vertex_string, fragment_string));
+		triangle_shader_ = Donut::Shader::createShader("triangle shader", vertex_string, fragment_string);
 
 
 
@@ -145,7 +145,7 @@ public:
 			}
 		)";
 
-		rectangle_shader_.reset(Donut::Shader::createShader(rect_v_src, rect_f_src));
+		rectangle_shader_ = Donut::Shader::createShader("rectangle shader", rect_v_src, rect_f_src);
 
 
 
@@ -207,7 +207,7 @@ public:
 			}
 		)";
 
-		texture_shader_.reset(Donut::Shader::createShader("assets/shaders/texture.glsl"));
+		shader_library_.load("assets/shaders/texture.glsl");
 		//texture_shader_.reset(Donut::Shader::createShader(textureShaderVertexSrc, textureShaderFragmentSrc));
 
 
@@ -334,11 +334,13 @@ public:
 			}
 		}
 
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(texture_shader_)->bind();
+		auto texture_shader = shader_library_.get("texture");
+
+		std::dynamic_pointer_cast<Donut::OpenGLShader>(texture_shader)->bind();
 		texture_->bind();
-		Donut::Renderer::submit(texture_shader_, texture_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Donut::Renderer::submit(texture_shader, texture_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 		texture2_->bind();
-		Donut::Renderer::submit(texture_shader_, texture_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Donut::Renderer::submit(texture_shader, texture_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		Donut::Renderer::endScene();
 
@@ -357,13 +359,14 @@ public:
 	}
 
 private:
+	Donut::ShaderLibrary shader_library_;
 	Donut::Ref<Donut::Shader> triangle_shader_;
 	Donut::Ref<Donut::VertexArray> triangle_va_;
 
 	Donut::Ref<Donut::Shader> rectangle_shader_;
 	Donut::Ref<Donut::VertexArray> rectangle_va_;
 
-	Donut::Ref<Donut::Shader> texture_shader_;
+	//Donut::Ref<Donut::Shader> texture_shader_;
 	Donut::Ref<Donut::VertexArray> texture_va_;
 
 	Donut::Ref<Donut::Texture2D> texture_;

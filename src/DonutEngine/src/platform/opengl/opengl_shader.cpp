@@ -23,9 +23,16 @@ namespace Donut
 		std::string source = readFile(filepath);
 		auto shader_sources = preProcess(source);
 		compileShaders(shader_sources);
+	
+		auto last_slash = filepath.find_last_of("/\\");
+		last_slash = last_slash == std::string::npos ? 0 : last_slash + 1;
+		auto last_dot = filepath.rfind(".");
+		auto count = last_dot == std::string::npos ? filepath.size() - last_slash : last_dot - last_slash;
+		name_ = filepath.substr(last_slash, count);
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& vertex_shader, const std::string& fragment_shader)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertex_shader, const std::string& fragment_shader)
+		: name_(name)
 	{
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertex_shader;
@@ -41,7 +48,7 @@ namespace Donut
 	std::string OpenGLShader::readFile(const std::string& filepath)
 	{
 		std::string result;
-		std::ifstream ifs(filepath, std::ios::in, std::ios::binary);
+		std::ifstream ifs(filepath, std::ios::in | std::ios::binary);
 		if (ifs)
 		{
 			ifs.seekg(0, std::ios::end);
@@ -86,7 +93,10 @@ namespace Donut
 	void OpenGLShader::compileShaders(const std::unordered_map<GLenum, std::string>& shader_sources)
 	{
 		GLuint program = glCreateProgram();
-		std::vector<GLenum> glShaderIDs(shader_sources.size());
+		DN_CORE_ASSERT(shader_sources.size() <= 2, "we only support 2 shaders for now");
+		std::array<GLenum, 2> glShaderIDs;
+		int shader_index = 0;
+		//std::vector<GLenum> glShaderIDs(shader_sources.size());
 		for (auto& kv : shader_sources)
 		{
 			GLenum type = kv.first;
@@ -117,7 +127,7 @@ namespace Donut
 			}
 
 			glAttachShader(program, shader);
-			glShaderIDs.push_back(shader);
+			glShaderIDs[shader_index++] = shader;
 		}
 
 		shader_id_ = program;
