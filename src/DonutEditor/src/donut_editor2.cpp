@@ -95,19 +95,18 @@ public:
 
 
 		rectangle_va_.reset(Donut::VertexArray::create());
-		float rect_vertices[5 * 4] =
+		float rect_vertices[3 * 4] =
 		{
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.5f,  0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f
 		};
 		Donut::Ref<Donut::VertexBuffer> rect_vb;
 		rect_vb.reset(Donut::VertexBuffer::create(rect_vertices, sizeof(rect_vertices)));
 		Donut::BufferLayout rectangle_layout =
 		{
-			{Donut::ShaderDataType::Float3,"a_Position"},
-			{Donut::ShaderDataType::Float2,"a_TexCoord"}
+			{Donut::ShaderDataType::Float3,"a_Position"}
 		};
 		rect_vb->setLayout(rectangle_layout);
 		rectangle_va_->addVertexBuffer(rect_vb);
@@ -121,15 +120,12 @@ public:
 			#version 450 core
 			
 			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec2 a_TexCoord;
 
 			uniform mat4 u_viewProjectionMatrix;
 			uniform mat4 u_transformMatrix;
 
-			out vec2 v_TexCoord;
 			void main()
 			{
-				v_TexCoord = a_TexCoord;
 				gl_Position = u_viewProjectionMatrix * u_transformMatrix * vec4(a_Position, 1.0);	
 			}
 		)";
@@ -139,31 +135,45 @@ public:
 
 			layout(location = 0) out vec4 color;
 
-			in vec2 v_TexCoord;
+			in vec4 v_Color;
 
-			out vec4 out_color;
-
-			uniform sampler2D u_Texture;
-			uniform sampler2D u_Texture2;
+			uniform vec4 u_Color;
 
 			void main()
 			{
-				out_color = texture(u_Texture2, v_TexCoord);
-				out_color *= texture(u_Texture, v_TexCoord);
+				color = u_Color;
 			}
 		)";
 
 		rectangle_shader_.reset(Donut::Shader::createShader(rect_v_src, rect_f_src));
 
-		texture_ = Donut::Texture2D::createTexture("assets/textures/cherno_logo.png");
-		texture2_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
-		//texture2_ = Donut::Texture2D::createTexture("assets/textures/blending_transparent_window.png");
-		//texture_ = Donut::Texture2D::createTexture("G:/2023/Code/Project/DonutEngine_v2/src/DonutEngine/assets/textures/cat.jpg");
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->bind();
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformInt("u_Texture", 0);
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformInt("u_Texture2", 1);
 
 
+
+
+
+		texture_va_.reset(Donut::VertexArray::create());
+		float texture_vertices[5 * 4] =
+		{
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+		};
+		Donut::Ref<Donut::VertexBuffer> texture_vb;
+		texture_vb.reset(Donut::VertexBuffer::create(texture_vertices, sizeof(texture_vertices)));
+		Donut::BufferLayout texture_layout =
+		{
+			{Donut::ShaderDataType::Float3,"a_Position"},
+			{Donut::ShaderDataType::Float2,"a_TexCoord"}
+		};
+		texture_vb->setLayout(texture_layout);
+		texture_va_->addVertexBuffer(texture_vb);
+
+		uint32_t texture_indices[] = { 0,1,2,2,3,0 };
+		Donut::Ref<Donut::IndexBuffer> texture_ib;
+		texture_ib.reset(Donut::IndexBuffer::create(texture_indices, sizeof(texture_indices)));
+		texture_va_->setIndexBuffer(texture_ib);
 
 		std::string textureShaderVertexSrc = R"(
 			#version 450 core
@@ -189,8 +199,6 @@ public:
 
 			in vec2 v_TexCoord;
 
-			out vec4 out_color;
-
 			uniform sampler2D u_Texture;
 
 			void main()
@@ -202,8 +210,9 @@ public:
 		texture_shader_.reset(Donut::Shader::createShader(textureShaderVertexSrc, textureShaderFragmentSrc));
 
 
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(texture_shader_)->bind();
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(texture_shader_)->uploadUniformInt("u_Texture", 0);
+		texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
+		texture2_ = Donut::Texture2D::createTexture("assets/textures/cherno_logo.png");
+		//texture2_ = Donut::Texture2D::createTexture("assets/textures/blending_transparent_window.png");
 
 	}
 
@@ -286,55 +295,49 @@ public:
 		glm::vec4 red_color(0.8f, 0.3f, 0.2f, 1.0f);
 		glm::vec4 blue_color(0.2f, 0.3f, 0.8f, 1.0f);
 
-		//for (int x = 0; x < 20; x++)
-		//{
-		//	for (int y = 0; y < 20; y++)
-		//	{
-		//		if (x % 2)
-		//		{
-		//			if (y % 2)
-		//			{
-		//				//std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", blue_color);
-		//				std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", rect_color_);
-		//			}
-		//			else
-		//			{
-		//				std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", red_color);
-		//			}
-		//		}
-		//		else
-		//		{
-		//			if (y % 2)
-		//			{
-		//				std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", red_color);
-		//			}
-		//			else
-		//			{
-		//				std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", rect_color_);
-		//				//std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", blue_color);
-		//			}
-		//		}
+		for (int x = 0; x < 20; x++)
+		{
+			for (int y = 0; y < 20; y++)
+			{
+				//if (x % 2)
+				//{
+				//	if (y % 2)
+				//	{
+				//		//std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", blue_color);
+				//		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", rect_color_);
+				//	}
+				//	else
+				//	{
+				//		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", red_color);
+				//	}
+				//}
+				//else
+				//{
+				//	if (y % 2)
+				//	{
+				//		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", red_color);
+				//	}
+				//	else
+				//	{
+				//		std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", rect_color_);
+				//		//std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", blue_color);
+				//	}
+				//}
 
-		//		glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
-		//		glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos);
-		//		transform = transform * main_transform;
-		//		//std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->bind();
-		//		//std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", rect_color_);
-		//		Donut::Renderer::submit(rectangle_shader_, rectangle_va_, transform);
-		//	}
-		//}
+				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos);
+				transform = transform * main_transform;
+				std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->bind();
+				std::dynamic_pointer_cast<Donut::OpenGLShader>(rectangle_shader_)->uploadUniformFloat4("u_Color", rect_color_);
+				Donut::Renderer::submit(rectangle_shader_, rectangle_va_, transform);
+			}
+		}
 
-		//texture2_->bind(0);
-		//Donut::Renderer::submit(triangle_shader_, triangle_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
-		//texture_->bind(1);
-
-		//
-		//Donut::Renderer::submit(triangle_shader_, triangle_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
-
-		texture2_->bind();
-		Donut::Renderer::submit(texture_shader_, rectangle_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		std::dynamic_pointer_cast<Donut::OpenGLShader>(texture_shader_)->bind();
 		texture_->bind();
-		Donut::Renderer::submit(texture_shader_, rectangle_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Donut::Renderer::submit(texture_shader_, texture_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		texture2_->bind();
+		Donut::Renderer::submit(texture_shader_, texture_va_, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		Donut::Renderer::endScene();
 
