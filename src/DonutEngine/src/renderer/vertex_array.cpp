@@ -7,12 +7,12 @@
 
 namespace Donut
 {
-	VertexArray* VertexArray::create()
+	Ref<VertexArray> VertexArray::create()
 	{
 		switch (RendererAPI::getCurrentAPIType())
 		{
-		case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
-		case RendererAPI::RendererAPIType::OpenGL: return new OpenGLVertexArray();
+			case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
+			case RendererAPI::RendererAPIType::OpenGL: return std::make_shared<OpenGLVertexArray>();
 		}
 		DN_CORE_ASSERT(false, "unknown renderer api");
 

@@ -18,7 +18,7 @@ namespace Donut
 		virtual const std::vector<Donut::Ref<VertexBuffer>>& getVertexBuffers() const = 0;
 		virtual const Donut::Ref<IndexBuffer>& getIndexBuffer() const = 0;
 
-		static VertexArray* create();
+		static Ref<VertexArray> create();
 	private:
 
 	};

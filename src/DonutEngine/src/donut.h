@@ -30,6 +30,4 @@
 
 #include "imgui/imgui_layer.h"
 
-#include "core/entry_point.h"
-
 #endif

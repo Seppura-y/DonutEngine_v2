@@ -13,6 +13,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "sandbox_2d.h"
+
+#include "core/entry_point.h"
+
 //#pragma comment(lib, "DonutEngine2.lib")
 
 class ExampleLayer : public Donut::Layer
@@ -23,7 +27,7 @@ public:
 			camera_controller_((float)1600 / (float)900, true),
 			rect_position_(0.0f)
 	{
-		triangle_va_.reset(Donut::VertexArray::create());
+		triangle_va_ = Donut::VertexArray::create();
 
 
 		float vertices[3 * 7] =
@@ -93,7 +97,7 @@ public:
 
 
 
-		rectangle_va_.reset(Donut::VertexArray::create());
+		rectangle_va_ = Donut::VertexArray::create();
 		float rect_vertices[3 * 4] =
 		{
 			-0.5f, -0.5f, 0.0f,
@@ -151,7 +155,7 @@ public:
 
 
 
-		texture_va_.reset(Donut::VertexArray::create());
+		texture_va_ = Donut::VertexArray::create();
 		float texture_vertices[5 * 4] =
 		{
 			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
@@ -338,7 +342,8 @@ class Sandbox : public Donut::Application
 public:
 	Sandbox()
 	{
-		pushLayer(new ExampleLayer());
+		//pushLayer(new ExampleLayer());
+		pushLayer(new Sandbox2D());
 	}
 
 	~Sandbox()
