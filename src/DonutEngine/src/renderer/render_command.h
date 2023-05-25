@@ -12,7 +12,10 @@ namespace Donut
 		{
 			renderer_api_->init();
 		}
-
+		inline static void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+		{
+			renderer_api_->setViewport(x, y, width, height);
+		}
 		inline static void setClearColor(const glm::vec4& color)
 		{
 			renderer_api_->setClearColor(color);

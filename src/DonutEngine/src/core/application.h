@@ -33,6 +33,7 @@ namespace Donut
 		void initWindow(WindowProps props = WindowProps());
 	private:
 		bool onWindowClose(WindowCloseEvent& ev);
+		bool onWindowResize(WindowResizeEvent& ev);
 	private:
 		static Application* s_instance_;
 		bool is_running_ = false;
@@ -42,6 +43,7 @@ namespace Donut
 		LayerStack layer_stack_;
 		float last_frame_time_ = 0.0f;
 
+		bool is_minimized_ = false;
 	};
 
 	// To be defined in client

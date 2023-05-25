@@ -73,10 +73,15 @@ namespace Donut
 			Timestep timestep = time - last_frame_time_;
 			last_frame_time_ = time;
 
-			for (Layer* layer : layer_stack_)
+			// when the window is minimized, then we don't need to render anything in the viewport.
+			if (!is_minimized_)
 			{
-				layer->onUpdate(timestep);
+				for (Layer* layer : layer_stack_)
+				{
+					layer->onUpdate(timestep);
+				}
 			}
+
 
 			imgui_layer_->begin();
 			for (Layer* layer : layer_stack_)
@@ -95,6 +100,7 @@ namespace Donut
 	{
 		EventDispatcher dispatcher(ev);
 		dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(onWindowClose));
+		dispatcher.dispatch<WindowResizeEvent>(BIND_EVENT_FN(onWindowResize));
 
 		//DN_CORE_TRACE("{0}", ev);
 
@@ -124,6 +130,22 @@ namespace Donut
 	{
 		is_running_ = false;
 		return true;
+	}
+
+	bool Application::onWindowResize(WindowResizeEvent& ev)
+	{
+		if (ev.getWidth() == 0 || ev.getHeight() == 0)
+		{
+			is_minimized_ = true;
+
+		}
+		else
+		{
+			is_minimized_ = false;
+			Renderer::onWindowResize(ev.getWidth(), ev.getHeight());
+		}
+
+		return false;
 	}
 }
 
