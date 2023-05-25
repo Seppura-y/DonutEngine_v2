@@ -10,6 +10,8 @@ namespace Donut
 	public:
 		OrthographicCamera(float left, float right, float bottom, float top);
 
+		void setProjection(float left, float right, float bottom, float top);
+
 		const glm::vec3& getPosition() const { return position_; }
 		float getRotation() const { return rotation_; }
 

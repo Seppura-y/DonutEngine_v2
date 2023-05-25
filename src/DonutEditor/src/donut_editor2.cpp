@@ -20,8 +20,7 @@ class ExampleLayer : public Donut::Layer
 public:
 	ExampleLayer()
 		:	Layer("Example"),
-			camera_(-1.6f, 1.6f, -0.9f, 0.9f),
-			camera_pos_(0.0f),
+			camera_controller_((float)1600 / (float)900, true),
 			rect_position_(0.0f)
 	{
 		triangle_va_.reset(Donut::VertexArray::create());
@@ -221,55 +220,8 @@ public:
 	{
 		//DN_CLIENT_TRACE("Delta Time: {0} s  {1} ms", ts.getSeconds(), ts.getMilliseconds());
 
-		if (Donut::Input::isKeyPressed(DN_KEY_LEFT))
-		{
-			camera_pos_.x += camera_move_speed_ * ts;
-		}
+		camera_controller_.onUpdate(ts);
 
-		if (Donut::Input::isKeyPressed(DN_KEY_RIGHT))
-		{
-			camera_pos_.x -= camera_move_speed_ * ts;
-		}
-
-		if (Donut::Input::isKeyPressed(DN_KEY_UP))
-		{
-			camera_pos_.y -= camera_move_speed_ * ts;
-		}
-
-		if (Donut::Input::isKeyPressed(DN_KEY_DOWN))
-		{
-			camera_pos_.y += camera_move_speed_ * ts;
-		}
-
-		if (Donut::Input::isKeyPressed(DN_KEY_Q))
-		{
-			camera_rotation_ -= camera_move_speed_ * ts;
-		}
-
-		if (Donut::Input::isKeyPressed(DN_KEY_E))
-		{
-			camera_rotation_ += camera_move_speed_ * ts;
-		}
-
-		if (Donut::Input::isKeyPressed(DN_KEY_A))
-		{
-			rect_position_.x -= rect_move_speed_ * ts;
-		}
-
-		if (Donut::Input::isKeyPressed(DN_KEY_D))
-		{
-			rect_position_.x += rect_move_speed_ * ts;
-		}
-
-		if (Donut::Input::isKeyPressed(DN_KEY_W))
-		{
-			rect_position_.y -= rect_move_speed_ * ts;
-		}
-
-		if (Donut::Input::isKeyPressed(DN_KEY_S))
-		{
-			rect_position_.y += rect_move_speed_ * ts;
-		}
 
 		if (Donut::Input::isKeyPressed(DN_KEY_R))
 		{
@@ -288,10 +240,10 @@ public:
 		Donut::RenderCommand::setClearColor({ 0.2, 0.2, 0.2, 1 });
 		Donut::RenderCommand::clear();
 
-		camera_.setPosition(camera_pos_);
-		camera_.setRotation(camera_rotation_);
+		//camera_.setPosition(camera_pos_);
+		//camera_.setRotation(camera_rotation_);
 
-		Donut::Renderer::beginScene(camera_);
+		Donut::Renderer::beginScene(camera_controller_.getCamera());
 
 		glm::vec4 red_color(0.8f, 0.3f, 0.2f, 1.0f);
 		glm::vec4 blue_color(0.2f, 0.3f, 0.8f, 1.0f);
@@ -355,7 +307,7 @@ public:
 
 	void onEvent(Donut::Event& ev) override
 	{
-
+		camera_controller_.onEvent(ev);
 	}
 
 private:
@@ -372,11 +324,7 @@ private:
 	Donut::Ref<Donut::Texture2D> texture_;
 	Donut::Ref<Donut::Texture2D> texture2_;
 
-	Donut::OrthographicCamera camera_;
-	glm::vec3 camera_pos_;
-	float camera_rotation_ = 0.0f;
-	float camera_move_speed_ = 1.0f;
-	float camera_rotate_speed_ = 10.0f;
+	Donut::OrthographicCameraController camera_controller_;
 
 	float rect_move_speed_ = 5.0f;
 	float rect_rotate_speed_ = 50.0f;

@@ -23,6 +23,7 @@
 #include "renderer/vertex_array.h"
 
 #include "renderer/orthographic_camera.h"
+#include "renderer/orthographic_camera_controller.h"
 
 #include "platform/windows/windows_window.h"
 #include "platform/opengl/opengl_context.h"
