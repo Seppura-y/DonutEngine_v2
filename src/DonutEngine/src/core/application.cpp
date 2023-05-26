@@ -11,6 +11,7 @@
 #include "core/input.h"
 
 #include "renderer/renderer.h"
+#include "renderer/renderer_2d.h"
 
 namespace Donut
 {
@@ -45,6 +46,7 @@ namespace Donut
 		//window_->setVSync(false);
 
 		Renderer::init();
+		Renderer2D::init();
 
 		imgui_layer_ = new ImGuiLayer();
 		pushOverlay(imgui_layer_);

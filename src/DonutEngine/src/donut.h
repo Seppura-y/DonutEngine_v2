@@ -16,6 +16,7 @@
 
 #include "renderer/renderer.h"
 #include "renderer/render_command.h"
+#include "renderer/renderer_2d.h"
 
 #include "renderer/buffers.h"
 #include "renderer/shader.h"

@@ -172,6 +172,21 @@ namespace Donut
 		glUseProgram(0);
 	}
 
+	void OpenGLShader::setFloat3(const std::string& name, const glm::vec3& value)
+	{
+		uploadUniformFloat3(name, value);
+	}
+
+	void OpenGLShader::setFloat4(const std::string& name, const glm::vec4& value)
+	{
+		uploadUniformFloat4(name, value);
+	}
+
+	void OpenGLShader::setMat4(const std::string& name, const glm::mat4& value)
+	{
+		uploadUniformMat4fv(name, value);
+	}
+
 	void OpenGLShader::uploadUniformInt(const std::string& name, const int value)
 	{
 		GLint location = glGetUniformLocation(shader_id_, name.c_str());
