@@ -2,6 +2,7 @@
 #include "imgui/imgui.h"
 
 #include "platform/opengl/opengl_shader.h"
+#include "platform/opengl/opengl_texture.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -15,7 +16,7 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::onAttach()
 {
-
+	rectangle_texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
 }
 
 void Sandbox2D::onDetach()
@@ -32,8 +33,10 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 
 	Donut::Renderer2D::beginScene(camera_controller_.getCamera());
 
-	Donut::Renderer2D::drawRectangle(glm::vec2{ 0.5f, 0.8f }, glm::vec2{ 1.2f, 1.0f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
-	Donut::Renderer2D::drawRectangle(glm::vec2{ -1.0f, 0.0f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{0.2f, 0.3f, 0.8f, 1.0f});
+	rectangle_texture_->bind();
+	Donut::Renderer2D::drawRectangle(glm::vec3{ 0.5f, 0.8f, 0.1f }, glm::vec2{ 0.5f, 0.5f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
+	Donut::Renderer2D::drawRectangle(glm::vec3{ 1.0f, 0.5f, 0.2f }, glm::vec2{ 0.8f, 0.6f }, glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
+	Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, -0.1f }, glm::vec2{ 10.0f, 10.0f }, rectangle_texture_);
 	
 	Donut::Renderer2D::endScene();
 }

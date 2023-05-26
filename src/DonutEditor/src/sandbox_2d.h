@@ -20,6 +20,7 @@ private:
 
 	Donut::Ref<Donut::VertexArray> rectangle_va_;
 	Donut::Ref<Donut::Shader> rectangle_shader_;
+	Donut::Ref<Donut::Texture2D> rectangle_texture_;
 
 	glm::vec4 rectangle_color_{ 0.2f, 0.3f, 0.8f, 1.0f };
 };
