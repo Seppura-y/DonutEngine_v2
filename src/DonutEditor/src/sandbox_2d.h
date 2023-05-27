@@ -23,6 +23,14 @@ private:
 	Donut::Ref<Donut::Texture2D> rectangle_texture_;
 
 	glm::vec4 rectangle_color_{ 0.2f, 0.3f, 0.8f, 1.0f };
+
+	struct ProfileResult
+	{
+		const char* name_;
+		float time_;
+	};
+
+	std::vector<ProfileResult> profile_results_;
 };
 
 #endif
