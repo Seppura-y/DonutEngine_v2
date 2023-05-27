@@ -17,8 +17,10 @@ namespace Donut
 	struct Renderer2DStorage
 	{
 		Ref<VertexArray> rectangle_va_;
-		Ref<Shader> rectangle_shader_;
-		Ref<Shader> texture_shader_;
+		//Ref<Shader> rectangle_shader_;
+		//Ref<Shader> texture_shader_;
+		Ref<Shader> single_shader_;
+		Ref<Texture2D> white_texture_;
 	};
 
 	static Renderer2DStorage* s_data;
@@ -49,10 +51,13 @@ namespace Donut
 		rectangle_ib.reset(IndexBuffer::create(rectangle_indices, sizeof(rectangle_indices) / sizeof(uint32_t)));
 		s_data->rectangle_va_->setIndexBuffer(rectangle_ib);
 
-		s_data->rectangle_shader_ = Shader::createShader("assets/shaders/flatcolor.glsl");
-		s_data->texture_shader_ = Shader::createShader("assets/shaders/texture.glsl");
-		s_data->texture_shader_->bind();
-		s_data->texture_shader_->setInt("u_texture", 0);
+		s_data->white_texture_ = Texture2D::createTexture(1, 1);
+		uint32_t white_texture_data = 0xffffffff;
+		s_data->white_texture_->setData(&white_texture_data, sizeof(uint32_t));
+
+		s_data->single_shader_ = Shader::createShader("assets/shaders/c3_single_shader.glsl");
+		s_data->single_shader_->bind();
+		s_data->single_shader_->setInt("u_texture", 0);
 	}
 
 	void Renderer2D::shutdown()
@@ -62,11 +67,9 @@ namespace Donut
 
 	void Renderer2D::beginScene(const OrthographicCamera& camera)
 	{
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->rectangle_shader_)->bind();
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->rectangle_shader_)->setMat4("u_viewProjectionMatrix", camera.getViewProjectionMatrix());
+		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->single_shader_)->bind();
+		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->single_shader_)->setMat4("u_viewProjectionMatrix", camera.getViewProjectionMatrix());
 
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->texture_shader_)->bind();
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->texture_shader_)->setMat4("u_viewProjectionMatrix", camera.getViewProjectionMatrix());
 	}
 
 	void Renderer2D::endScene()
@@ -81,14 +84,14 @@ namespace Donut
 
 	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, glm::vec4& color)
 	{
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->rectangle_shader_)->bind();
-
-		std::dynamic_pointer_cast<Donut::OpenGLVertexArray>(s_data->rectangle_va_)->bind();
-
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->rectangle_shader_)->setMat4("u_transformMatrix", transform);
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->rectangle_shader_)->setFloat4("u_color", color);
+
+		s_data->single_shader_->setMat4("u_transformMatrix", transform);
+		s_data->single_shader_->setFloat4("u_color", color);
+
+		s_data->white_texture_->bind();
+		s_data->rectangle_va_->bind();
 
 		RenderCommand::drawIndices(s_data->rectangle_va_);
 	}
@@ -100,16 +103,15 @@ namespace Donut
 
 	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, Ref<Texture2D>& texture)
 	{
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->texture_shader_)->bind();
-
-		std::dynamic_pointer_cast<Donut::OpenGLVertexArray>(s_data->rectangle_va_)->bind();
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->texture_shader_)->setMat4("u_transformMatrix", transform);
-		//std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->texture_shader_)->setInt("u_texture", 0);
-		
-		std::dynamic_pointer_cast<Donut::OpenGLTexture2D>(texture)->bind();
+
+		s_data->single_shader_->setMat4("u_transformMatrix", transform);
+		s_data->single_shader_->setFloat4("u_color", glm::vec4(1.0f));
+
+		texture->bind();
+		s_data->rectangle_va_->bind();
 
 		RenderCommand::drawIndices(s_data->rectangle_va_);
 	}

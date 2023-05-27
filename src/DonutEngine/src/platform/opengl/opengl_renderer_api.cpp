@@ -31,5 +31,6 @@ namespace Donut
 	void OpenGLRendererAPI::drawIndices(const Donut::Ref<VertexArray>& va)
 	{
 		glDrawElements(GL_TRIANGLES, va->getIndexBuffer()->getIndicesCount(), GL_UNSIGNED_INT, nullptr);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
