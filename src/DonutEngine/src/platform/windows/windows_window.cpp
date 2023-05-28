@@ -26,16 +26,22 @@ namespace Donut {
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		DN_PROFILE_FUNCTION();
+
 		init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
+		DN_PROFILE_FUNCTION();
+
 		shutdown();
 	}
 
 	void WindowsWindow::init(const WindowProps& props)
 	{
+		DN_PROFILE_FUNCTION();
+
 		win_data_.title = props.title;
 		win_data_.width = props.width;
 		win_data_.height = props.height;
@@ -155,17 +161,23 @@ namespace Donut {
 
 	void WindowsWindow::shutdown()
 	{
+		DN_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(glfw_window_);
 	}
 
 	void WindowsWindow::onUpdate()
 	{
+		DN_PROFILE_FUNCTION();
+
 		glfwPollEvents();
 		graphics_ctx_->swapBuffers();
 	}
 
 	void WindowsWindow::setVSync(bool enabled)
 	{
+		DN_PROFILE_FUNCTION();
+
 		if (enabled)
 			glfwSwapInterval(1);
 		else

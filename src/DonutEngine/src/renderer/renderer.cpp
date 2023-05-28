@@ -8,6 +8,8 @@ namespace Donut
 
     void Renderer::init()
     {
+        DN_PROFILE_FUNCTION();
+
         RenderCommand::init();
     }
 

@@ -25,16 +25,22 @@ namespace Donut
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
+		DN_PROFILE_FUNCTION();
+
 		glCreateVertexArrays(1, &object_id_);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
+		DN_PROFILE_FUNCTION();
+
 		glDeleteVertexArrays(1, &object_id_);
 	}
 
 	void OpenGLVertexArray::addVertexBuffer(const Donut::Ref<VertexBuffer>& buffer)
 	{
+		DN_PROFILE_FUNCTION();
+
 		//DN_CORE_ASSERT(buffer->getLayout().getBufferElements().size(), "vertex buffer is empty!");
 
 		glBindVertexArray(object_id_);
@@ -68,11 +74,15 @@ namespace Donut
 
 	void OpenGLVertexArray::bind() const
 	{
+		DN_PROFILE_FUNCTION();
+
 		glBindVertexArray(object_id_);
 	}
 
 	void OpenGLVertexArray::unBind() const
 	{
+		DN_PROFILE_FUNCTION();
+
 		glBindVertexArray(0);
 	}
 }

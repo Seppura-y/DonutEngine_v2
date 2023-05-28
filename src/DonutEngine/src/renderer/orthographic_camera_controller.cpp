@@ -15,6 +15,8 @@ namespace Donut
 
 	void OrthographicCameraController::onUpdate(Timestep ts)
 	{
+		DN_PROFILE_FUNCTION();
+
 		if (Input::isKeyPressed(DN_KEY_A))
 		{
 			camera_pos_.x += camera_move_speed_ * ts;
@@ -58,6 +60,8 @@ namespace Donut
 
 	void OrthographicCameraController::onEvent(Event& ev)
 	{
+		DN_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(ev);
 		dispatcher.dispatch<MouseScrolledEvent>(DN_BIND_EVENT_FN(OrthographicCameraController::onMouseScrolledEvent));
 		dispatcher.dispatch<WindowResizeEvent>(DN_BIND_EVENT_FN(OrthographicCameraController::onWindowResizedEvent));
@@ -65,6 +69,8 @@ namespace Donut
 
 	bool OrthographicCameraController::onMouseScrolledEvent(MouseScrolledEvent& ev)
 	{
+		DN_PROFILE_FUNCTION();
+
 		zoom_level_ -= ev.getYOffset() * 0.4f;
 		zoom_level_ = std::max(zoom_level_, 0.25f);
 		camera_.setProjection(-aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_);
@@ -73,6 +79,8 @@ namespace Donut
 
 	bool OrthographicCameraController::onWindowResizedEvent(WindowResizeEvent& ev)
 	{
+		DN_PROFILE_FUNCTION();
+
 		aspect_ratio_ = (float)ev.getWidth() / (float)ev.getHeight();
 		camera_.setProjection(-aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_);
 		return false;

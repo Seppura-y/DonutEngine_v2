@@ -17,6 +17,8 @@ namespace Donut
 
 	void OpenGLContext::init()
 	{
+		DN_PROFILE_FUNCTION();
+
 		glfwMakeContextCurrent(win_handle_);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		DN_CORE_ASSERT(status, "failed to initialize glad");
@@ -38,6 +40,8 @@ namespace Donut
 
 	void OpenGLContext::swapBuffers()
 	{
+		DN_PROFILE_FUNCTION();
+
 		glfwSwapBuffers(win_handle_);
 	}
 }

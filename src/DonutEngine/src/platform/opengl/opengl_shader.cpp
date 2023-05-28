@@ -20,6 +20,8 @@ namespace Donut
 
 	OpenGLShader::OpenGLShader(const std::string& filepath)
 	{
+		DN_PROFILE_FUNCTION();
+
 		std::string source = readFile(filepath);
 		auto shader_sources = preProcess(source);
 		compileShaders(shader_sources);
@@ -34,6 +36,8 @@ namespace Donut
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertex_shader, const std::string& fragment_shader)
 		: name_(name)
 	{
+		DN_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertex_shader;
 		sources[GL_FRAGMENT_SHADER] = fragment_shader;
@@ -42,11 +46,15 @@ namespace Donut
 
 	OpenGLShader::~OpenGLShader()
 	{
+		DN_PROFILE_FUNCTION();
+
 		glDeleteProgram(shader_id_);
 	}
 
 	std::string OpenGLShader::readFile(const std::string& filepath)
 	{
+		DN_PROFILE_FUNCTION();
+
 		std::string result;
 		std::ifstream ifs(filepath, std::ios::in | std::ios::binary);
 		if (ifs)
@@ -68,6 +76,8 @@ namespace Donut
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::preProcess(const std::string& source)
 	{
+		DN_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> shader_sources;
 
 		const char* type_token = "#type";
@@ -92,6 +102,8 @@ namespace Donut
 
 	void OpenGLShader::compileShaders(const std::unordered_map<GLenum, std::string>& shader_sources)
 	{
+		DN_PROFILE_FUNCTION();
+
 		GLuint program = glCreateProgram();
 		DN_CORE_ASSERT(shader_sources.size() <= 2, "we only support 2 shaders for now");
 		std::array<GLenum, 2> glShaderIDs;
@@ -164,11 +176,15 @@ namespace Donut
 
 	void OpenGLShader::bind() const
 	{
+		DN_PROFILE_FUNCTION();
+
 		glUseProgram(shader_id_);
 	}
 
 	void OpenGLShader::unBind() const
 	{
+		DN_PROFILE_FUNCTION();
+
 		glUseProgram(0);
 	}
 
@@ -179,57 +195,77 @@ namespace Donut
 
 	void OpenGLShader::setFloat3(const std::string& name, const glm::vec3& value)
 	{
+		DN_PROFILE_FUNCTION();
+
 		uploadUniformFloat3(name, value);
 	}
 
 	void OpenGLShader::setFloat4(const std::string& name, const glm::vec4& value)
 	{
+		DN_PROFILE_FUNCTION();
+
 		uploadUniformFloat4(name, value);
 	}
 
 	void OpenGLShader::setMat4(const std::string& name, const glm::mat4& value)
 	{
+		DN_PROFILE_FUNCTION();
+
 		uploadUniformMat4fv(name, value);
 	}
 
 	void OpenGLShader::uploadUniformInt(const std::string& name, const int value)
 	{
+		DN_PROFILE_FUNCTION();
+
 		GLint location = glGetUniformLocation(shader_id_, name.c_str());
 		glUniform1i(location, value);
 	}
 
 	void OpenGLShader::uploadUniformFloat(const std::string& name, const float value)
 	{
+		DN_PROFILE_FUNCTION();
+
 		GLint location = glGetUniformLocation(shader_id_, name.c_str());
 		glUniform1f(location, value);
 	}
 
 	void OpenGLShader::uploadUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
+		DN_PROFILE_FUNCTION();
+
 		GLint location = glGetUniformLocation(shader_id_, name.c_str());
 		glUniform2f(location, value.x, value.y);
 	}
 
 	void OpenGLShader::uploadUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
+		DN_PROFILE_FUNCTION();
+
 		GLint location = glGetUniformLocation(shader_id_, name.c_str());
 		glUniform3f(location, value.x, value.y, value.z);
 	}
 
 	void OpenGLShader::uploadUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
+		DN_PROFILE_FUNCTION();
+
 		GLint location = glGetUniformLocation(shader_id_, name.c_str());
 		glUniform4f(location, value.x, value.y, value.z, value.w);
 	}
 
 	void OpenGLShader::uploadUniformMat3fv(const std::string& name, const glm::mat3& matrix)
 	{
+		DN_PROFILE_FUNCTION();
+
 		GLint location = glGetUniformLocation(shader_id_, name.c_str());
 		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	void OpenGLShader::uploadUniformMat4fv(const std::string& name, const glm::mat4& matrix)
 	{
+		DN_PROFILE_FUNCTION();
+
 		GLint location = glGetUniformLocation(shader_id_, name.c_str());
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}

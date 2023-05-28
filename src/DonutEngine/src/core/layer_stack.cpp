@@ -16,6 +16,8 @@ namespace Donut {
 
 	void LayerStack::pushLayer(Layer* layer)
 	{
+		DN_PROFILE_FUNCTION();
+
 		layers_.emplace(layers_.begin() + layer_insert_idx_, layer);
 		layer_insert_idx_++;
 		//layer->onAttach();
@@ -23,6 +25,8 @@ namespace Donut {
 
 	void LayerStack::pushOverlay(Layer* overlay)
 	{
+		DN_PROFILE_FUNCTION();
+
 		layers_.emplace_back(overlay);
 		//overlay->onAttach();
 	}

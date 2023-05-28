@@ -18,6 +18,8 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::onAttach()
 {
+	DN_PROFILE_FUNCTION();
+
 	rectangle_texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
 }
 
@@ -31,10 +33,7 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 	//Timer timer("Sandbox2D::onUpdate", [&](auto profile_result) { profile_results_.push_back(profile_result)});
 	DN_PROFILE_FUNCTION();
 
-	{
-		DN_PROFILE_SCOPE("Camera_controler.onUpdate");
-		camera_controller_.onUpdate(ts);
-	}
+	camera_controller_.onUpdate(ts);
 
 	{
 		DN_PROFILE_SCOPE("RenderCommand::clear");

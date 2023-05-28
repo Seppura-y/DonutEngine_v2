@@ -40,6 +40,7 @@ namespace Donut
 
 	Application::Application()
 	{
+		DN_PROFILE_FUNCTION();
 		s_instance_ = this;
 		window_ = std::unique_ptr<Window>(Window::create(WindowProps()));
 		window_->setEventCallback(BIND_EVENT_FN(onEvent));
@@ -66,11 +67,14 @@ namespace Donut
 
 	void Application::run()
 	{
+		DN_PROFILE_FUNCTION();
+
 		WindowResizeEvent ev(1600, 900);
 		DN_CORE_INFO(ev);
 		DN_CORE_INFO("{0}, {1}", "app",std::this_thread::get_id());
 		while (is_running_)
 		{
+			DN_PROFILE_SCOPE("runloop");
 			float time = (float)glfwGetTime();
 			Timestep timestep = time - last_frame_time_;
 			last_frame_time_ = time;
@@ -78,19 +82,29 @@ namespace Donut
 			// when the window is minimized, then we don't need to render anything in the viewport.
 			if (!is_minimized_)
 			{
-				for (Layer* layer : layer_stack_)
 				{
-					layer->onUpdate(timestep);
+					DN_PROFILE_SCOPE("LayerStack -- onUpdate");
+
+					for (Layer* layer : layer_stack_)
+					{
+						layer->onUpdate(timestep);
+					}
 				}
+				imgui_layer_->begin();
+				{
+					DN_PROFILE_SCOPE("LayerStack -- onImGuiRender");
+
+					for (Layer* layer : layer_stack_)
+					{
+						layer->onImGuiRender();
+					}
+				}
+
+				imgui_layer_->end();
 			}
 
 
-			imgui_layer_->begin();
-			for (Layer* layer : layer_stack_)
-			{
-				layer->onImGuiRender();
-			}
-			imgui_layer_->end();
+
 
 			window_->onUpdate();
 		}
@@ -100,6 +114,8 @@ namespace Donut
 
 	void Application::onEvent(Event& ev)
 	{
+		DN_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(ev);
 		dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(onWindowClose));
 		dispatcher.dispatch<WindowResizeEvent>(BIND_EVENT_FN(onWindowResize));
@@ -136,6 +152,8 @@ namespace Donut
 
 	bool Application::onWindowResize(WindowResizeEvent& ev)
 	{
+		DN_PROFILE_FUNCTION();
+
 		if (ev.getWidth() == 0 || ev.getHeight() == 0)
 		{
 			is_minimized_ = true;

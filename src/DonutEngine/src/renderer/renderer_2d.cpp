@@ -84,6 +84,8 @@ namespace Donut
 
 	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, glm::vec4& color)
 	{
+		DN_PROFILE_FUNCTION();
+
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
@@ -97,12 +99,14 @@ namespace Donut
 	}
 
 	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, Ref<Texture2D>& texture)
-	{
+	{		DN_PROFILE_FUNCTION();
+
 		drawRectangle(glm::vec3(position.x, position.y, 0.0f), size, texture);
 	}
 
 	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, Ref<Texture2D>& texture)
 	{
+		DN_PROFILE_FUNCTION();
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });

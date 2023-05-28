@@ -9,6 +9,8 @@ namespace Donut
 	////Vertex Buffer
 	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size)
 	{
+		DN_PROFILE_FUNCTION();
+
 		glCreateBuffers(1, &object_id_);
 		glBindBuffer(GL_ARRAY_BUFFER, object_id_);
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
@@ -16,6 +18,8 @@ namespace Donut
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
+		DN_PROFILE_FUNCTION();
+
 		glDeleteBuffers(1, &object_id_);
 	}
 
@@ -31,11 +35,15 @@ namespace Donut
 
 	void OpenGLVertexBuffer::bind() const
 	{
+		DN_PROFILE_FUNCTION();
+
 		glBindBuffer(GL_ARRAY_BUFFER, object_id_);
 	}
 
 	void OpenGLVertexBuffer::unBind() const
 	{
+		DN_PROFILE_FUNCTION();
+
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 

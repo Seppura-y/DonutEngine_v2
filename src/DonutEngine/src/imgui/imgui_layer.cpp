@@ -27,6 +27,8 @@ namespace Donut
 
 	void ImGuiLayer::onAttach()
 	{
+		DN_PROFILE_FUNCTION();
+
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -61,6 +63,8 @@ namespace Donut
 
 	void ImGuiLayer::onDetach()
 	{
+		DN_PROFILE_FUNCTION();
+
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
@@ -94,6 +98,8 @@ namespace Donut
 
 	void ImGuiLayer::begin()
 	{
+		DN_PROFILE_FUNCTION();
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -101,6 +107,8 @@ namespace Donut
 
 	void ImGuiLayer::end()
 	{
+		DN_PROFILE_FUNCTION();
+
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::getInstance();
 		io.DisplaySize = ImVec2(app.getWindow().getWidth(), app.getWindow().getHeight());

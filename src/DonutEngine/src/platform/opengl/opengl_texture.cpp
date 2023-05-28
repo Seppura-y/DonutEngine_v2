@@ -10,6 +10,8 @@ namespace Donut
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
 		: width_(width), height_(height)
 	{
+		DN_PROFILE_FUNCTION();
+
 		internal_format_ = GL_RGBA8, data_format_ = GL_RGBA;
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &object_id_);
@@ -25,10 +27,18 @@ namespace Donut
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 		: file_path_(path)
 	{
+		DN_PROFILE_FUNCTION();
+
 		stbi_set_flip_vertically_on_load(1);
 		int width, height, channels;
-		stbi_uc* data = stbi_load(file_path_.c_str(), &width, &height, &channels, 0);
-		DN_CORE_ASSERT(data, "failed to load image");
+
+		stbi_uc* data = nullptr;
+		{
+			DN_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string& path)");
+
+			data = stbi_load(file_path_.c_str(), &width, &height, &channels, 0);
+			DN_CORE_ASSERT(data, "failed to load image");
+		}
 
 		if (channels == 3)
 		{
@@ -62,11 +72,15 @@ namespace Donut
 
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
+		DN_PROFILE_FUNCTION();
+
 		glDeleteTextures(1, &object_id_);
 	}
 
 	void OpenGLTexture2D::setData(void* data, uint32_t size)
 	{
+		DN_PROFILE_FUNCTION();
+
 		uint32_t bytes_per_pixel = data_format_ == GL_RGBA ? 4 : 3;
 		DN_CORE_ASSERT(size == width_ * height_ * bytes_per_pixel, "data must be entire texture!");
 		glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data);
@@ -74,6 +88,8 @@ namespace Donut
 
 	void OpenGLTexture2D::bind(uint32_t slot) const
 	{
+		DN_PROFILE_FUNCTION();
+
 		glBindTextureUnit(slot, object_id_);
 	}
 
