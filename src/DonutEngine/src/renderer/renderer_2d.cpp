@@ -98,13 +98,13 @@ namespace Donut
 		RenderCommand::drawIndices(s_data->rectangle_va_);
 	}
 
-	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, Ref<Texture2D>& texture)
+	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
 	{		DN_PROFILE_FUNCTION();
 
-		drawRectangle(glm::vec3(position.x, position.y, 0.0f), size, texture);
+		drawRectangle(glm::vec3(position.x, position.y, 0.0f), size, texture, tiling_factor, tincolor);
 	}
 
-	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, Ref<Texture2D>& texture)
+	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
 	{
 		DN_PROFILE_FUNCTION();
 
@@ -112,11 +112,57 @@ namespace Donut
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		s_data->single_shader_->setMat4("u_transformMatrix", transform);
-		s_data->single_shader_->setFloat4("u_color", glm::vec4(1.0f));
+		s_data->single_shader_->setFloat4("u_color", tincolor);
+		s_data->single_shader_->setFloat("u_tiling_factor", tiling_factor);
 
 		texture->bind();
 		s_data->rectangle_va_->bind();
 
 		RenderCommand::drawIndices(s_data->rectangle_va_);
 	}
+
+	void Renderer2D::drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, glm::vec4& color)
+	{
+		drawRotatedRectangle({ position.x, position.y, 1.0f }, size, rotation, color);
+	}
+
+	void Renderer2D::drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, glm::vec4& color)
+	{
+		DN_PROFILE_FUNCTION();
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
+			glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0, 0, 1.0f}) *
+			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_data->single_shader_->setMat4("u_transformMatrix", transform);
+		s_data->single_shader_->setFloat4("u_color", color);
+
+		s_data->white_texture_->bind();
+		s_data->rectangle_va_->bind();
+
+		RenderCommand::drawIndices(s_data->rectangle_va_);
+	}
+
+	void Renderer2D::drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
+	{
+		drawRotatedRectangle({ position.x, position.y, 1.0f }, size, rotation, texture,tiling_factor, tincolor);
+	}
+
+	void Renderer2D::drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
+	{
+		DN_PROFILE_FUNCTION();
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
+			glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0, 0, 1.0f}) *
+			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_data->single_shader_->setMat4("u_transformMatrix", transform);
+		s_data->single_shader_->setFloat("u_tiling_factor", tiling_factor);
+		s_data->single_shader_->setFloat4("u_color", tincolor);
+
+		texture->bind();
+		s_data->rectangle_va_->bind();
+
+		RenderCommand::drawIndices(s_data->rectangle_va_);
+	}
+
+
 }

@@ -49,6 +49,7 @@ namespace Donut {
 		DN_CORE_INFO("Creating window {0} ({1}, {2})", props.title, props.width, props.height);
 		if (!s_GLFWInitialized)
 		{
+			DN_PROFILE_SCOPE("glfwInit");
 			// TODO: glfwTerminate on system shutdown
 			int success = glfwInit();
 			DN_CORE_ASSERT(success, "Could not intialize GLFW!");
@@ -57,7 +58,10 @@ namespace Donut {
 			s_GLFWInitialized = true;
 		}
 
-		glfw_window_ = glfwCreateWindow((int)props.width, (int)props.height, win_data_.title.c_str(), nullptr, nullptr);
+		{
+			DN_PROFILE_SCOPE("glfwCreateWindow");
+			glfw_window_ = glfwCreateWindow((int)props.width, (int)props.height, win_data_.title.c_str(), nullptr, nullptr);
+		}
 		
 		graphics_ctx_ = new OpenGLContext(glfw_window_);
 		graphics_ctx_->init();

@@ -18,9 +18,14 @@ namespace Donut
 		static void drawRectangle(const glm::vec2& position, glm::vec2& size, glm::vec4& color);
 		static void drawRectangle(const glm::vec3& position, glm::vec2& size, glm::vec4& color);
 
+		static void drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, glm::vec4& color);
+		static void drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, glm::vec4& color);
 
-		static void drawRectangle(const glm::vec2& position, glm::vec2& size, Ref<Texture2D>& texture);
-		static void drawRectangle(const glm::vec3& position, glm::vec2& size, Ref<Texture2D>& texture);
+		static void drawRectangle(const glm::vec2& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor = 1.0f, glm::vec4 tincolor = glm::vec4(1.0f));
+		static void drawRectangle(const glm::vec3& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor = 1.0f, glm::vec4 tincolor = glm::vec4(1.0f));
+
+		static void drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor = 1.0f, glm::vec4 tincolor = glm::vec4(1.0f));
+		static void drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor = 1.0f, glm::vec4 tincolor = glm::vec4(1.0f));
 	};
 }
 #endif
