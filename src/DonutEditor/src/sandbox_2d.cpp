@@ -48,11 +48,13 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 		Donut::Renderer2D::beginScene(camera_controller_.getCamera());
 
 		rectangle_texture_->bind();
-		Donut::Renderer2D::drawRectangle(glm::vec3{ 0.5f, 0.8f, 0.1f }, glm::vec2{ 0.5f, 0.5f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
-		Donut::Renderer2D::drawRotatedRectangle(glm::vec3{ 1.0f, 0.5f, 0.2f }, glm::vec2{ 0.8f, 0.6f }, 45.0f, glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
-		Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, -0.1f }, glm::vec2{ 10.0f, 10.0f }, rectangle_texture_, 10.0f);
-		Donut::Renderer2D::drawRotatedRectangle(glm::vec3{ 0.0f, 0.0f, -0.1f }, glm::vec2{ 10.0f, 10.0f }, 34.0f, rectangle_texture_, 10.0f, {1.0f, 0.8f, 0.8f, 0.5f});
+		//Donut::Renderer2D::drawRectangle(glm::vec3{ 0.5f, 0.8f, 0.1f }, glm::vec2{ 0.5f, 0.5f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
+		//Donut::Renderer2D::drawRotatedRectangle(glm::vec3{ 1.0f, 0.5f, 0.2f }, glm::vec2{ 0.8f, 0.6f }, 45.0f, glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
+		//Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, -0.1f }, glm::vec2{ 10.0f, 10.0f }, rectangle_texture_, 10.0f);
+		//Donut::Renderer2D::drawRotatedRectangle(glm::vec3{ 0.0f, 0.0f, -0.1f }, glm::vec2{ 10.0f, 10.0f }, 34.0f, rectangle_texture_, 10.0f, {1.0f, 0.8f, 0.8f, 0.5f});
 
+		Donut::Renderer2D::drawRectangle(glm::vec2{  0.5f, 0.5f }, glm::vec2{ 0.5f, 0.75f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
+		Donut::Renderer2D::drawRectangle(glm::vec2{ -1.0f, 0.0f }, glm::vec2{ 0.5f, 0.25f }, glm::vec4{ 0.2f, 0.2f, 0.8f, 1.0f });
 		Donut::Renderer2D::endScene();
 	}
 

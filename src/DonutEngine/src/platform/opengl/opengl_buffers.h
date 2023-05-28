@@ -10,11 +10,14 @@ namespace Donut
 	class OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
+		OpenGLVertexBuffer(uint32_t size);
 		OpenGLVertexBuffer(float* vertices, uint32_t size);
 		virtual ~OpenGLVertexBuffer();
 
 		virtual void setLayout(const BufferLayout& layout) override;
 		virtual const BufferLayout& getLayout() const override;
+
+		virtual void setData(const void* data, uint32_t size) override;
 
 		virtual void bind() const override;
 		virtual void unBind() const override;

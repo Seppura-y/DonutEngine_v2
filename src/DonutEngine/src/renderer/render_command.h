@@ -26,9 +26,9 @@ namespace Donut
 			renderer_api_->clear();
 		}
 
-		inline static void drawIndices(const Donut::Ref<VertexArray>& va)
+		inline static void drawIndices(const Donut::Ref<VertexArray>& va, uint32_t count = 0)
 		{
-			renderer_api_->drawIndices(va);
+			renderer_api_->drawIndices(va, count);
 		}
 	private:
 		static RendererAPI* renderer_api_;

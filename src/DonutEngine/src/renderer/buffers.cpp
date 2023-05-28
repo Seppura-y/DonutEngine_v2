@@ -6,6 +6,18 @@
 
 namespace Donut
 {
+	VertexBuffer* VertexBuffer::create(uint32_t size)
+	{
+		switch (RendererAPI::getCurrentAPIType())
+		{
+		case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
+		case RendererAPI::RendererAPIType::OpenGL: return new OpenGLVertexBuffer(size);
+		}
+		DN_CORE_ASSERT(false, "unknown renderer api");
+
+		return nullptr;
+	}
+
 	VertexBuffer* VertexBuffer::create(float* vertices, uint32_t size)
 	{
 		switch (RendererAPI::getCurrentAPIType())
@@ -18,12 +30,12 @@ namespace Donut
 		return nullptr;
 	}
 
-	IndexBuffer* IndexBuffer::create(uint32_t* indices, uint32_t size)
+	IndexBuffer* IndexBuffer::create(uint32_t* indices, uint32_t count)
 	{
 		switch (RendererAPI::getCurrentAPIType())
 		{
 			case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
-			case RendererAPI::RendererAPIType::OpenGL: return new OpenGLIndexBuffer(indices, size);
+			case RendererAPI::RendererAPIType::OpenGL: return new OpenGLIndexBuffer(indices, count);
 		}
 		DN_CORE_ASSERT(false, "unknown renderer api");
 		return nullptr;

@@ -111,6 +111,9 @@ namespace Donut
 		virtual void setLayout(const BufferLayout& layout) = 0;
 		virtual const BufferLayout& getLayout() const = 0;
 
+		virtual void setData(const void* data, uint32_t size) = 0;
+
+		static VertexBuffer* create(uint32_t size);
 		static VertexBuffer* create(float* vertices, uint32_t size);
 	};
 
@@ -124,7 +127,7 @@ namespace Donut
 
 		virtual uint32_t getIndicesCount() const = 0;
 
-		static IndexBuffer* create(uint32_t* indices, uint32_t size);
+		static IndexBuffer* create(uint32_t* indices, uint32_t count);
 	};
 
 

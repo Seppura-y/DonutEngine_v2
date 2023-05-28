@@ -14,6 +14,7 @@ namespace Donut
 
 		static void beginScene(const OrthographicCamera& camera);
 		static void endScene();
+		static void flush();
 
 		static void drawRectangle(const glm::vec2& position, glm::vec2& size, glm::vec4& color);
 		static void drawRectangle(const glm::vec3& position, glm::vec2& size, glm::vec4& color);

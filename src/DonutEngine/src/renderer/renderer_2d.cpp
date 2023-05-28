@@ -14,67 +14,105 @@
 
 namespace Donut
 {
-	struct Renderer2DStorage
+	struct RectangleVertex
 	{
-		Ref<VertexArray> rectangle_va_;
-		//Ref<Shader> rectangle_shader_;
-		//Ref<Shader> texture_shader_;
-		Ref<Shader> single_shader_;
-		Ref<Texture2D> white_texture_;
+		glm::vec3 position_;
+		glm::vec4 color_;
+		glm::vec2 tex_coordinate_;
 	};
 
-	static Renderer2DStorage* s_data;
+	struct Renderer2DData
+	{
+		const uint32_t max_rects_ = 10000;
+		const uint32_t max_vertices_ = max_rects_ * 4;
+		const uint32_t max_indices_ = max_rects_ * 6;
+
+		Ref<VertexArray> rectangle_va_;
+		Ref<VertexBuffer> rectangle_vb_;
+
+		Ref<Texture2D> white_texture_;
+
+		Ref<Shader> single_shader_;
+
+		uint32_t rect_indices_count_ = 0;
+		RectangleVertex* rect_vertex_buffer_base_ = nullptr;
+		RectangleVertex* rect_vertex_buffer_ptr_ = nullptr;
+	};
+
+	static Renderer2DData s_data;
+
+
 
 	void Renderer2D::init()
 	{
-		s_data = new Renderer2DStorage();
+		s_data.rectangle_va_ = VertexArray::create();
 
-		s_data->rectangle_va_ = VertexArray::create();
-
-		float rect_vertices[5 * 4] = {
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
-		};
-
-		Ref<VertexBuffer> rectangle_vb;
-		rectangle_vb.reset(VertexBuffer::create(rect_vertices, sizeof(rect_vertices)));
-		rectangle_vb->setLayout({
+		s_data.rectangle_vb_.reset(VertexBuffer::create(s_data.max_vertices_ * sizeof(RectangleVertex)));
+		s_data.rectangle_vb_->setLayout({
 				{ ShaderDataType::Float3, "a_Position" },
+				{ ShaderDataType::Float4, "a_Color"},
 				{ ShaderDataType::Float2, "a_TexCoord"}
 			});
-		s_data->rectangle_va_->addVertexBuffer(rectangle_vb);
+		s_data.rectangle_va_->addVertexBuffer(s_data.rectangle_vb_);
 
-		uint32_t rectangle_indices[6] = { 0, 1, 2, 2, 3, 0 };
+		s_data.rect_vertex_buffer_base_ = new RectangleVertex[s_data.max_vertices_];
+
+		uint32_t* rectangle_indices = new uint32_t[s_data.max_indices_];
+		uint32_t offset = 0;
+		for (uint32_t i = 0; i < s_data.max_indices_; i += 6)
+		{
+			rectangle_indices[i + 0] = offset + 0;
+			rectangle_indices[i + 1] = offset + 1;
+			rectangle_indices[i + 2] = offset + 2;
+
+			rectangle_indices[i + 3] = offset + 2;
+			rectangle_indices[i + 4] = offset + 3;
+			rectangle_indices[i + 5] = offset + 0;
+
+			offset += 4;
+		}
+
 		Ref<IndexBuffer> rectangle_ib;
-		rectangle_ib.reset(IndexBuffer::create(rectangle_indices, sizeof(rectangle_indices) / sizeof(uint32_t)));
-		s_data->rectangle_va_->setIndexBuffer(rectangle_ib);
+		rectangle_ib.reset(IndexBuffer::create(rectangle_indices, s_data.max_indices_));
+		s_data.rectangle_va_->setIndexBuffer(rectangle_ib);
+		delete[] rectangle_indices;
 
-		s_data->white_texture_ = Texture2D::createTexture(1, 1);
+		s_data.white_texture_ = Texture2D::createTexture(1, 1);
 		uint32_t white_texture_data = 0xffffffff;
-		s_data->white_texture_->setData(&white_texture_data, sizeof(uint32_t));
+		s_data.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
 
-		s_data->single_shader_ = Shader::createShader("assets/shaders/c3_single_shader.glsl");
-		s_data->single_shader_->bind();
-		s_data->single_shader_->setInt("u_texture", 0);
+		s_data.single_shader_ = Shader::createShader("assets/shaders/c4_batch_rendering.glsl");
+		s_data.single_shader_->bind();
+		s_data.single_shader_->setInt("u_texture", 0);
 	}
 
 	void Renderer2D::shutdown()
 	{
-		delete s_data;
+
 	}
 
 	void Renderer2D::beginScene(const OrthographicCamera& camera)
 	{
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->single_shader_)->bind();
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data->single_shader_)->setMat4("u_viewProjectionMatrix", camera.getViewProjectionMatrix());
+		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data.single_shader_)->bind();
+		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data.single_shader_)->setMat4("u_viewProjectionMatrix", camera.getViewProjectionMatrix());
 
+		s_data.rect_indices_count_ = 0;
+		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
 	}
 
 	void Renderer2D::endScene()
 	{
+		DN_PROFILE_FUNCTION();
 
+		uint32_t data_size = (uint8_t*)s_data.rect_vertex_buffer_ptr_ - (uint8_t*)s_data.rect_vertex_buffer_base_;
+		s_data.rectangle_vb_->setData(s_data.rect_vertex_buffer_base_, data_size);
+
+		flush();
+	}
+
+	void Renderer2D::flush()
+	{
+		RenderCommand::drawIndices(s_data.rectangle_va_, s_data.rect_indices_count_);
 	}
 
 	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, glm::vec4& color)
@@ -86,16 +124,37 @@ namespace Donut
 	{
 		DN_PROFILE_FUNCTION();
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
-			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		s_data.rect_vertex_buffer_ptr_->position_ = position;
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 0.0f };
+		s_data.rect_vertex_buffer_ptr_++;
 
-		s_data->single_shader_->setMat4("u_transformMatrix", transform);
-		s_data->single_shader_->setFloat4("u_color", color);
+		s_data.rect_vertex_buffer_ptr_->position_ = { position.x + size.x, position.y, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 0.0f };
+		s_data.rect_vertex_buffer_ptr_++;
 
-		s_data->white_texture_->bind();
-		s_data->rectangle_va_->bind();
+		s_data.rect_vertex_buffer_ptr_->position_ = { position.x + size.x, position.y + size.y, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 1.0f };
+		s_data.rect_vertex_buffer_ptr_++;
 
-		RenderCommand::drawIndices(s_data->rectangle_va_);
+		s_data.rect_vertex_buffer_ptr_->position_ = { position.x, position.y + size.y, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 1.0f };
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_indices_count_ += 6;
+		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
+		//	glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		//s_data.single_shader_->setMat4("u_transformMatrix", transform);
+		//s_data.single_shader_->setFloat4("u_color", color);
+
+		//s_data.white_texture_->bind();
+		//s_data.rectangle_va_->bind();
+
+		//RenderCommand::drawIndices(s_data.rectangle_va_);
 	}
 
 	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
@@ -111,14 +170,14 @@ namespace Donut
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_data->single_shader_->setMat4("u_transformMatrix", transform);
-		s_data->single_shader_->setFloat4("u_color", tincolor);
-		s_data->single_shader_->setFloat("u_tiling_factor", tiling_factor);
+		s_data.single_shader_->setMat4("u_transformMatrix", transform);
+		s_data.single_shader_->setFloat4("u_color", tincolor);
+		s_data.single_shader_->setFloat("u_tiling_factor", tiling_factor);
 
 		texture->bind();
-		s_data->rectangle_va_->bind();
+		s_data.rectangle_va_->bind();
 
-		RenderCommand::drawIndices(s_data->rectangle_va_);
+		RenderCommand::drawIndices(s_data.rectangle_va_);
 	}
 
 	void Renderer2D::drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, glm::vec4& color)
@@ -133,13 +192,13 @@ namespace Donut
 			glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0, 0, 1.0f}) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_data->single_shader_->setMat4("u_transformMatrix", transform);
-		s_data->single_shader_->setFloat4("u_color", color);
+		s_data.single_shader_->setMat4("u_transformMatrix", transform);
+		s_data.single_shader_->setFloat4("u_color", color);
 
-		s_data->white_texture_->bind();
-		s_data->rectangle_va_->bind();
+		s_data.white_texture_->bind();
+		s_data.rectangle_va_->bind();
 
-		RenderCommand::drawIndices(s_data->rectangle_va_);
+		RenderCommand::drawIndices(s_data.rectangle_va_);
 	}
 
 	void Renderer2D::drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
@@ -154,14 +213,14 @@ namespace Donut
 			glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0, 0, 1.0f}) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_data->single_shader_->setMat4("u_transformMatrix", transform);
-		s_data->single_shader_->setFloat("u_tiling_factor", tiling_factor);
-		s_data->single_shader_->setFloat4("u_color", tincolor);
+		s_data.single_shader_->setMat4("u_transformMatrix", transform);
+		s_data.single_shader_->setFloat("u_tiling_factor", tiling_factor);
+		s_data.single_shader_->setFloat4("u_color", tincolor);
 
 		texture->bind();
-		s_data->rectangle_va_->bind();
+		s_data.rectangle_va_->bind();
 
-		RenderCommand::drawIndices(s_data->rectangle_va_);
+		RenderCommand::drawIndices(s_data.rectangle_va_);
 	}
 
 

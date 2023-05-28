@@ -30,9 +30,10 @@ namespace Donut
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLRendererAPI::drawIndices(const Donut::Ref<VertexArray>& va)
+	void OpenGLRendererAPI::drawIndices(const Donut::Ref<VertexArray>& va, uint32_t count)
 	{
-		glDrawElements(GL_TRIANGLES, va->getIndexBuffer()->getIndicesCount(), GL_UNSIGNED_INT, nullptr);
+		uint32_t indices_count = count ? va->getIndexBuffer()->getIndicesCount() : count;
+		glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
