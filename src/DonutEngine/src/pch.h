@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include "core/logger.h"
+#include "debug/instrumentor.h"
 
 #ifdef DN_PLATFORM_WINDOWS
 #include <Windows.h>

@@ -148,6 +148,16 @@ FILE(GLOB ${PROJECT_NAME}_SHADERS
 )
 
 #####################################################################################################
+# debug
+FILE(GLOB ${PROJECT_NAME}_DEBUG_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/src/debug/*.h
+)
+
+FILE(GLOB ${PROJECT_NAME}_DEBUG_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/src/debug/*.cpp
+)
+
+#####################################################################################################
 source_group("src\\DonutEngine\\Global" FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
 source_group("src\\DonutEngine\\Core" FILES ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC})
 source_group("src\\DonutEngine\\Events" FILES ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC})
@@ -156,6 +166,8 @@ source_group("src\\DonutEngine\\ImGui" FILES ${${PROJECT_NAME}_IMGUI_HEADER} ${$
 
 source_group("src\\DonutEngine\\Platform\\OpenGL" FILES ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC})
 source_group("src\\DonutEngine\\Platform\\Windows" FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
+
+source_group("src\\Debug" FILES ${${PROJECT_NAME}_DEBUG_HEADER} ${${PROJECT_NAME}_DEBUG_SRC})
 
 source_group("src\\glm" FILES ${${PROJECT_NAME}_GLM_HEADER})
 
@@ -193,6 +205,9 @@ if (WIN32)
         ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC}
 
         ${${PROJECT_NAME}_GLM_HEADER}
+
+        ${${PROJECT_NAME}_DEBUG_HEADER} ${${PROJECT_NAME}_DEBUG_SRC}
+
         ${${PROJECT_NAME}_STB_IMAGE_HEADER} ${${PROJECT_NAME}_STB_IMAGE_SRC}
 
 
@@ -278,6 +293,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/src
     ${CMAKE_CURRENT_LIST_DIR}/src/core
     ${CMAKE_CURRENT_LIST_DIR}/src/renderer
+    ${CMAKE_CURRENT_LIST_DIR}/src/debug
 
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/spdlog/include
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw/include
