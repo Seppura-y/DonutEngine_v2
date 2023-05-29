@@ -193,6 +193,13 @@ namespace Donut
 		uploadUniformInt(name, value);
 	}
 
+	void OpenGLShader::setIntArray(const std::string& name, int* values, uint32_t count)
+	{
+		DN_PROFILE_FUNCTION();
+
+		uploadUniformIntArray(name, values, count);
+	}
+
 	void OpenGLShader::setFloat(const std::string& name, float value)
 	{
 		DN_PROFILE_FUNCTION();
@@ -226,6 +233,13 @@ namespace Donut
 
 		GLint location = glGetUniformLocation(shader_id_, name.c_str());
 		glUniform1i(location, value);
+	}
+
+	void OpenGLShader::uploadUniformIntArray(const std::string& name, const int* values, uint32_t count)
+	{
+		DN_PROFILE_FUNCTION();
+		GLint location = glGetUniformLocation(shader_id_, name.c_str());
+		glUniform1iv(location, count, values);
 	}
 
 	void OpenGLShader::uploadUniformFloat(const std::string& name, const float value)

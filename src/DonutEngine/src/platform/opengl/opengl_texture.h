@@ -20,6 +20,11 @@ namespace Donut
 		virtual void setData(void* data, uint32_t size) override;
 
 		virtual void bind(uint32_t slot = 0) const override;
+
+		virtual bool operator==(const Texture& other) const override
+		{
+			return object_id_ == ((OpenGLTexture2D&)other).object_id_;
+		}
 	private:
 		uint32_t width_;
 		uint32_t height_;
