@@ -43,6 +43,9 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 
 
 	{
+		static float rotation = 0.0f;
+		rotation += ts * 20;
+
 		DN_PROFILE_SCOPE("Renderer2D - draw");
 
 		Donut::Renderer2D::beginScene(camera_controller_.getCamera());
@@ -57,6 +60,7 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 		Donut::Renderer2D::drawRectangle(glm::vec3{ -1.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.25f }, glm::vec4{ 0.2f, 0.2f, 0.8f, 1.0f });
 		Donut::Renderer2D::drawRectangle(glm::vec3{ -5.0f, -5.0f, -0.2f }, glm::vec2{ 10.0f, 10.0f }, rectangle_texture_, 10.0f);
 		Donut::Renderer2D::drawRectangle(glm::vec3{ -1.3f, -0.8f, 0.0f }, glm::vec2{ 1.0f, 1.0f }, rectangle_texture_, 10.0f);
+		Donut::Renderer2D::drawRotatedRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 1.0f, 1.0f }, rotation, rectangle_texture_, 10.0f);
 		Donut::Renderer2D::endScene();
 	}
 

@@ -44,6 +44,8 @@ namespace Donut
 
 		std::array<Ref<Texture2D>, max_texture_slots_> texture_slots_;
 		uint32_t texture_index_ = 1;	//slot 0 for white texture
+
+		glm::vec4 rect_vertex_positions_[4];
 	};
 
 	static Renderer2DData s_data;
@@ -101,6 +103,11 @@ namespace Donut
 		s_data.single_shader_->setIntArray("u_textures", samplers, s_data.max_texture_slots_);
 
 		s_data.texture_slots_[0] = s_data.white_texture_;
+
+		s_data.rect_vertex_positions_[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+		s_data.rect_vertex_positions_[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
+		s_data.rect_vertex_positions_[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
+		s_data.rect_vertex_positions_[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 	}
 
 	void Renderer2D::shutdown()
@@ -145,31 +152,35 @@ namespace Donut
 	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, glm::vec4& color)
 	{
 		DN_PROFILE_FUNCTION();
-		const float texture_index = 0.0f;
-		const float tiling_factor = 1.0f;
 
-		s_data.rect_vertex_buffer_ptr_->position_ = position;
+		const float tiling_factor = 1.0f;
+		const float texture_index = 0.0f;
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[0];
 		s_data.rect_vertex_buffer_ptr_->color_ = color;
 		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 0.0f };
 		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
 		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
 		s_data.rect_vertex_buffer_ptr_++;
 
-		s_data.rect_vertex_buffer_ptr_->position_ = { position.x + size.x, position.y, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[1];
 		s_data.rect_vertex_buffer_ptr_->color_ = color;
 		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 0.0f };
 		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
 		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
 		s_data.rect_vertex_buffer_ptr_++;
 
-		s_data.rect_vertex_buffer_ptr_->position_ = { position.x + size.x, position.y + size.y, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[2];
 		s_data.rect_vertex_buffer_ptr_->color_ = color;
 		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 1.0f };
 		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
 		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
 		s_data.rect_vertex_buffer_ptr_++;
 
-		s_data.rect_vertex_buffer_ptr_->position_ = { position.x, position.y + size.y, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[3];
 		s_data.rect_vertex_buffer_ptr_->color_ = color;
 		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 1.0f };
 		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
@@ -177,16 +188,6 @@ namespace Donut
 		s_data.rect_vertex_buffer_ptr_++;
 
 		s_data.rect_indices_count_ += 6;
-		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
-		//	glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
-		//s_data.single_shader_->setMat4("u_transformMatrix", transform);
-		//s_data.single_shader_->setFloat4("u_color", color);
-
-		//s_data.white_texture_->bind();
-		//s_data.rectangle_va_->bind();
-
-		//RenderCommand::drawIndices(s_data.rectangle_va_);
 	}
 
 	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
@@ -220,28 +221,31 @@ namespace Donut
 			s_data.texture_index_++;
 		}
 
-		s_data.rect_vertex_buffer_ptr_->position_ = position;
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[0];
 		s_data.rect_vertex_buffer_ptr_->color_ = color;
 		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 0.0f };
 		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
 		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
 		s_data.rect_vertex_buffer_ptr_++;
 
-		s_data.rect_vertex_buffer_ptr_->position_ = { position.x + size.x, position.y, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[1];
 		s_data.rect_vertex_buffer_ptr_->color_ = color;
 		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 0.0f };
 		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
 		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
 		s_data.rect_vertex_buffer_ptr_++;
 
-		s_data.rect_vertex_buffer_ptr_->position_ = { position.x + size.x, position.y + size.y, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[2];
 		s_data.rect_vertex_buffer_ptr_->color_ = color;
 		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 1.0f };
 		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
 		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
 		s_data.rect_vertex_buffer_ptr_++;
 
-		s_data.rect_vertex_buffer_ptr_->position_ = { position.x, position.y + size.y, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[3];
 		s_data.rect_vertex_buffer_ptr_->color_ = color;
 		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 1.0f };
 		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
@@ -273,17 +277,43 @@ namespace Donut
 	void Renderer2D::drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, glm::vec4& color)
 	{
 		DN_PROFILE_FUNCTION();
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
-			glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0, 0, 1.0f}) *
-			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_data.single_shader_->setMat4("u_transformMatrix", transform);
-		s_data.single_shader_->setFloat4("u_color", color);
+		const float tiling_factor = 1.0f;
+		const float texture_index = 0.0f;
 
-		s_data.white_texture_->bind();
-		s_data.rectangle_va_->bind();
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		RenderCommand::drawIndices(s_data.rectangle_va_);
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[0];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[1];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[2];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 1.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[3];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 1.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_indices_count_ += 6;
 	}
 
 	void Renderer2D::drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
@@ -294,18 +324,61 @@ namespace Donut
 	void Renderer2D::drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
 	{
 		DN_PROFILE_FUNCTION();
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
-			glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0, 0, 1.0f}) *
-			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_data.single_shader_->setMat4("u_transformMatrix", transform);
-		s_data.single_shader_->setFloat("u_tiling_factor", tiling_factor);
-		s_data.single_shader_->setFloat4("u_color", tincolor);
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-		texture->bind();
-		s_data.rectangle_va_->bind();
+		float texture_index = 0.0f;
 
-		RenderCommand::drawIndices(s_data.rectangle_va_);
+		for (uint32_t i = 1; i < s_data.texture_index_; i++)
+		{
+			// 获取raw指针，然后解引用，以调用operator==(const Texture& other)
+			if (*s_data.texture_slots_[i].get() == *texture.get())
+			{
+				texture_index = (float)i;
+				break;
+			}
+		}
+
+		if (texture_index == 0.0f)
+		{
+			texture_index = (float)s_data.texture_index_;
+			s_data.texture_slots_[s_data.texture_index_] = texture;
+			s_data.texture_index_++;
+		}
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[0];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[1];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[2];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 1.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[3];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 1.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_indices_count_ += 6;
 	}
 
 
