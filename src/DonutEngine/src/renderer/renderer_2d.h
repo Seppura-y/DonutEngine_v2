@@ -27,6 +27,21 @@ namespace Donut
 
 		static void drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor = 1.0f, glm::vec4 tincolor = glm::vec4(1.0f));
 		static void drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor = 1.0f, glm::vec4 tincolor = glm::vec4(1.0f));
+	public:
+		struct Statistics
+		{
+			uint32_t drawcalls_ = 0;
+			uint32_t rect_count_ = 0;
+
+			uint32_t getTotalVertexCount() { return rect_count_ * 4; }
+			uint32_t getTotalIndexCount() { return rect_count_ * 6; }
+		};
+
+		static void resetStatistics();
+		static Statistics getStatistics();
+	private:
+
+		static void flushAndReset();
 	};
 }
 #endif

@@ -26,9 +26,9 @@ namespace Donut
 
 	struct Renderer2DData
 	{
-		const uint32_t max_rects_ = 10000;
-		const uint32_t max_vertices_ = max_rects_ * 4;
-		const uint32_t max_indices_ = max_rects_ * 6;
+		static const uint32_t max_rects_ = 20000;
+		static const uint32_t max_vertices_ = max_rects_ * 4;
+		static const uint32_t max_indices_ = max_rects_ * 6;
 		static const uint32_t max_texture_slots_ = 32;
 
 		Ref<VertexArray> rectangle_va_;
@@ -46,6 +46,7 @@ namespace Donut
 		uint32_t texture_index_ = 1;	//slot 0 for white texture
 
 		glm::vec4 rect_vertex_positions_[4];
+		Renderer2D::Statistics statistics_;
 	};
 
 	static Renderer2DData s_data;
@@ -142,6 +143,16 @@ namespace Donut
 			s_data.texture_slots_[i]->bind(i);
 		}
 		RenderCommand::drawIndices(s_data.rectangle_va_, s_data.rect_indices_count_);
+		s_data.statistics_.drawcalls_++;
+	}
+
+
+	void Renderer2D::flushAndReset()
+	{
+		endScene();
+		s_data.rect_indices_count_ = 0;
+		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
+		s_data.texture_index_ = 1;
 	}
 
 	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, glm::vec4& color)
@@ -152,6 +163,11 @@ namespace Donut
 	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, glm::vec4& color)
 	{
 		DN_PROFILE_FUNCTION();
+
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
 
 		const float tiling_factor = 1.0f;
 		const float texture_index = 0.0f;
@@ -188,6 +204,8 @@ namespace Donut
 		s_data.rect_vertex_buffer_ptr_++;
 
 		s_data.rect_indices_count_ += 6;
+
+		s_data.statistics_.rect_count_++;
 	}
 
 	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
@@ -199,6 +217,11 @@ namespace Donut
 	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tintcolor)
 	{
 		DN_PROFILE_FUNCTION();
+
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
 
 		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -253,6 +276,8 @@ namespace Donut
 		s_data.rect_vertex_buffer_ptr_++;
 
 		s_data.rect_indices_count_ += 6;
+
+		s_data.statistics_.rect_count_++;
 
 #if 0
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
@@ -278,6 +303,11 @@ namespace Donut
 	{
 		DN_PROFILE_FUNCTION();
 
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
+
 		const float tiling_factor = 1.0f;
 		const float texture_index = 0.0f;
 
@@ -314,6 +344,7 @@ namespace Donut
 		s_data.rect_vertex_buffer_ptr_++;
 
 		s_data.rect_indices_count_ += 6;
+		s_data.statistics_.rect_count_++;
 	}
 
 	void Renderer2D::drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
@@ -324,6 +355,11 @@ namespace Donut
 	void Renderer2D::drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
 	{
 		DN_PROFILE_FUNCTION();
+
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
 
 		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -379,7 +415,20 @@ namespace Donut
 		s_data.rect_vertex_buffer_ptr_++;
 
 		s_data.rect_indices_count_ += 6;
+
+		s_data.statistics_.rect_count_++;
 	}
+
+	void Renderer2D::resetStatistics()
+	{
+		memset(&s_data.statistics_, 0, sizeof(Statistics));
+	}
+
+	Renderer2D::Statistics Renderer2D::getStatistics()
+	{
+		return Statistics();
+	}
+
 
 
 }
