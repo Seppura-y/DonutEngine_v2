@@ -19,6 +19,8 @@ namespace Donut
 
 		virtual void setData(void* data, uint32_t size) override;
 
+		virtual uint32_t getObjectId() const override;
+
 		virtual void bind(uint32_t slot = 0) const override;
 
 		virtual bool operator==(const Texture& other) const override

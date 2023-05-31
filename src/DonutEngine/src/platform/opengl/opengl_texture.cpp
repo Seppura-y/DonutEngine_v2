@@ -86,6 +86,11 @@ namespace Donut
 		glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data);
 	}
 
+	uint32_t OpenGLTexture2D::getObjectId() const
+	{
+		return object_id_;
+	}
+
 	void OpenGLTexture2D::bind(uint32_t slot) const
 	{
 		DN_PROFILE_FUNCTION();

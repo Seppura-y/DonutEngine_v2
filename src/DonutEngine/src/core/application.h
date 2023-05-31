@@ -20,6 +20,7 @@ namespace Donut
 		virtual ~Application();
 
 		void run();
+		void close() { is_running_ = false; }
 		virtual void windowUpdate() = 0;
 
 		void onEvent(Event& ev);
