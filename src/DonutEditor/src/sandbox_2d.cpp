@@ -10,7 +10,10 @@
 #include <chrono>
 
 Sandbox2D::Sandbox2D()
-	: Donut::Layer("sandbox 2d"), camera_controller_(1600.0f / 900.0f, true)
+	:	Donut::Layer("sandbox 2d"), 
+		camera_controller_(1600.0f / 900.0f, true), 
+		rectangle_color_({0.2f, 0.3f, 0.8f, 1.0f}),
+		particle_system_(100)
 {
 
 }
@@ -21,6 +24,14 @@ void Sandbox2D::onAttach()
 	DN_PROFILE_FUNCTION();
 
 	rectangle_texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
+
+	particle_props_.color_begin_ = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };
+	particle_props_.color_end_ = { 254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f };
+	particle_props_.size_begin_ = 0.5f, particle_props_.size_variation_ = 0.3f, particle_props_.size_end_ = 0.0f;
+	particle_props_.lifetime_ = 5.0f;
+	particle_props_.velocity_ = { 0.0f, 0.0f };
+	particle_props_.velocity_variation_ = { 3.0f, 1.0f };
+	particle_props_.position_ = { 0.0f, 0.0f };
 }
 
 void Sandbox2D::onDetach()
@@ -59,26 +70,43 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 		//Donut::Renderer2D::drawRotatedRectangle(glm::vec3{ 0.0f, 0.0f, -0.1f }, glm::vec2{ 10.0f, 10.0f }, 34.0f, rectangle_texture_, 10.0f, {1.0f, 0.8f, 0.8f, 0.5f});
 
 		Donut::Renderer2D::drawRectangle(glm::vec3{  0.5f, 0.5f, 0.0f }, glm::vec2{ 0.5f, 0.75f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
-		Donut::Renderer2D::drawRectangle(glm::vec3{ -1.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.25f }, glm::vec4{ 0.2f, 0.2f, 0.8f, 1.0f });
+		Donut::Renderer2D::drawRectangle(glm::vec3{ -1.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.25f }, rectangle_color_);
 		Donut::Renderer2D::drawRectangle(glm::vec3{  0.0f, 0.0f, -0.2f }, glm::vec2{ 20.0f, 20.0f }, rectangle_texture_, 10.0f);
 		//Donut::Renderer2D::drawRectangle(glm::vec3{ -1.3f, -0.8f, 0.0f }, glm::vec2{ 1.0f, 1.0f }, rectangle_texture_, 10.0f);
 		//Donut::Renderer2D::drawRotatedRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 1.0f, 1.0f }, rotation, rectangle_texture_, 10.0f);
 		Donut::Renderer2D::endScene();
+
+		Donut::Renderer2D::beginScene(camera_controller_.getCamera());
+		for (float y = -5.0f; y < 5.0f; y += 0.5f)
+		{
+			for (float x = -5.0f; x < 5.0f; x += 0.5f)
+			{
+				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
+				Donut::Renderer2D::drawRectangle(glm::vec2{ x, y }, glm::vec2{ 0.45, 0.45f }, color);
+			}
+		}
+
+		Donut::Renderer2D::endScene();
 	}
 
-	Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-	int c = 0;
-	for (float y = -5.0f; y < 5.0f; y += 0.5f)
+	if (Donut::Input::isMouseButtonPressed(DN_MOUSE_BUTTON_LEFT))
 	{
-		for (float x = -5.0f; x < 5.0f; x += 0.5f)
-		{
-			glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-			Donut::Renderer2D::drawRectangle(glm::vec2{ x, y }, glm::vec2{ 0.45f, 0.45f }, color);
-			c++;
-		}
+		auto [x, y] = Donut::Input::getMousePosition();
+		auto width = Donut::Application::getInstance().getWindow().getWidth();
+		auto height = Donut::Application::getInstance().getWindow().getHeight();
+
+		auto bounds = camera_controller_.getBounds(); // we need to know the bound of our camera so that we can actually draw or emit the particle in the correct place 
+		auto pos = camera_controller_.getCamera().getPosition();
+		x = (x / width) * bounds.getWidth() - bounds.getWidth() * 0.5f;
+		y = bounds.getHeight() * 0.5f - (y / height) * bounds.getHeight();
+		particle_props_.position_ = { x + pos.x, y + pos.y };
+		for (int i = 0; i < 20; i++)
+			particle_system_.emit(particle_props_);
 	}
-	c;
-	Donut::Renderer2D::endScene();
+
+	particle_system_.onUpdate(ts);
+	particle_system_.onRender(camera_controller_.getCamera());
+
 }
 
 void Sandbox2D::onEvent(Donut::Event& ev)

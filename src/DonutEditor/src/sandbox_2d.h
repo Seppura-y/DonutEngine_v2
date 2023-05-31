@@ -3,6 +3,8 @@
 
 #include "donut.h"
 
+#include "particle_system.h"
+
 class Sandbox2D : public Donut::Layer
 {
 public:
@@ -23,6 +25,9 @@ private:
 	Donut::Ref<Donut::Texture2D> rectangle_texture_;
 
 	glm::vec4 rectangle_color_{ 0.2f, 0.3f, 0.8f, 1.0f };
+
+	ParticleSystem particle_system_;
+	ParticleProps particle_props_;
 };
 
 #endif

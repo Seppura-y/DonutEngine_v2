@@ -8,7 +8,10 @@
 namespace Donut
 {
 	OrthographicCameraController::OrthographicCameraController(float aspect_ratio, bool rotation)
-		: aspect_ratio_(aspect_ratio), camera_(-aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_), rotation_(rotation)
+		:	aspect_ratio_(aspect_ratio), 
+			ortho_cam_bound_({-aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_}),
+			camera_(-aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_), 
+			rotation_(rotation)
 	{
 
 	}
@@ -73,7 +76,9 @@ namespace Donut
 
 		zoom_level_ -= ev.getYOffset() * 0.4f;
 		zoom_level_ = std::max(zoom_level_, 0.25f);
-		camera_.setProjection(-aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_);
+
+		ortho_cam_bound_ = { -aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_ };
+		camera_.setProjection(ortho_cam_bound_.left_, ortho_cam_bound_.right_, ortho_cam_bound_.bottom_, ortho_cam_bound_.top_);
 		return false;
 	}
 

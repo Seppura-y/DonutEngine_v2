@@ -113,16 +113,18 @@ namespace Donut
 
 	void Renderer2D::shutdown()
 	{
-
+		delete[] s_data.rect_vertex_buffer_base_;
 	}
 
 	void Renderer2D::beginScene(const OrthographicCamera& camera)
 	{
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data.single_shader_)->bind();
-		std::dynamic_pointer_cast<Donut::OpenGLShader>(s_data.single_shader_)->setMat4("u_viewProjectionMatrix", camera.getViewProjectionMatrix());
+		s_data.single_shader_->bind();
+		s_data.single_shader_->setMat4("u_viewProjectionMatrix", camera.getViewProjectionMatrix());
 
 		s_data.rect_indices_count_ = 0;
 		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
+
+		s_data.texture_index_ = 1;
 	}
 
 	void Renderer2D::endScene()
@@ -137,6 +139,10 @@ namespace Donut
 
 	void Renderer2D::flush()
 	{
+		if (s_data.rect_indices_count_ == 0)
+		{
+			return;
+		}
 		// bind textures
 		for (uint32_t i = 0; i < s_data.texture_index_; i++)
 		{
@@ -157,7 +163,7 @@ namespace Donut
 
 	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, glm::vec4& color)
 	{
-		drawRectangle({ position.x, position.y, position.x }, size, color);
+		drawRectangle({ position.x, position.y, 0.0f }, size, color);
 	}
 
 	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, glm::vec4& color)
@@ -209,7 +215,8 @@ namespace Donut
 	}
 
 	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
-	{		DN_PROFILE_FUNCTION();
+	{
+		DN_PROFILE_FUNCTION();
 
 		drawRectangle(glm::vec3(position.x, position.y, 0.0f), size, texture, tiling_factor, tincolor);
 	}
@@ -239,6 +246,10 @@ namespace Donut
 
 		if (texture_index == 0.0f)
 		{
+			if (s_data.texture_index_ >= Renderer2DData::max_texture_slots_)
+			{
+				flushAndReset();
+			}
 			texture_index = (float)s_data.texture_index_;
 			s_data.texture_slots_[s_data.texture_index_] = texture;
 			s_data.texture_index_++;
@@ -377,6 +388,10 @@ namespace Donut
 
 		if (texture_index == 0.0f)
 		{
+			if (s_data.texture_index_ >= Renderer2DData::max_texture_slots_)
+			{
+				flushAndReset();
+			}
 			texture_index = (float)s_data.texture_index_;
 			s_data.texture_slots_[s_data.texture_index_] = texture;
 			s_data.texture_index_++;
@@ -426,7 +441,7 @@ namespace Donut
 
 	Renderer2D::Statistics Renderer2D::getStatistics()
 	{
-		return Statistics();
+		return s_data.statistics_;
 	}
 
 

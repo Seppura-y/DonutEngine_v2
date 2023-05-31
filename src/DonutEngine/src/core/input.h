@@ -12,7 +12,7 @@ namespace Donut
         inline static bool isMouseButtonPressed(int button) { return s_instance_->isMouseButtonPressedImpl(button); }
         inline static float getMouseX() { return s_instance_->getMouseXImpl(); }
         inline static float getMouseY() { return s_instance_->getMouseYImpl(); }
-        inline static std::pair<float, float> getMousePostion() { return s_instance_->getMousePositionImpl(); }
+        inline static std::pair<float, float> getMousePosition() { return s_instance_->getMousePositionImpl(); }
         
     protected:
         virtual bool isKeyPressedImpl(int keycode) = 0;

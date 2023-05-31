@@ -32,7 +32,7 @@ namespace Donut
 
 	void OpenGLRendererAPI::drawIndices(const Donut::Ref<VertexArray>& va, uint32_t count)
 	{
-		uint32_t indices_count = count ? va->getIndexBuffer()->getIndicesCount() : count;
+		uint32_t indices_count = count ? count : va->getIndexBuffer()->getIndicesCount();
 		glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
