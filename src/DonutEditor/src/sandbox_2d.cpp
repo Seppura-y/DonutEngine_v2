@@ -13,7 +13,7 @@ Sandbox2D::Sandbox2D()
 	:	Donut::Layer("sandbox 2d"), 
 		camera_controller_(1600.0f / 900.0f, true), 
 		rectangle_color_({0.2f, 0.3f, 0.8f, 1.0f}),
-		particle_system_(100)
+		particle_system_(1000)
 {
 
 }
@@ -24,6 +24,11 @@ void Sandbox2D::onAttach()
 	DN_PROFILE_FUNCTION();
 
 	rectangle_texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
+	sprite_texture_ = Donut::Texture2D::createTexture("assets/textures/RPG Base/RPGpack_sheet_2X.png");
+
+	texture_stair_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 7,6 }, { 1,1 }, { 128,128 });
+	texture_tree_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 2,1 }, { 1,2 }, { 128,128 });
+	texture_barrel_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 8,2 }, { 1,1 }, { 128,128 });
 
 	particle_props_.color_begin_ = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };
 	particle_props_.color_end_ = { 254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f };
@@ -62,19 +67,13 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 		DN_PROFILE_SCOPE("Renderer2D - draw");
 
 		Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-
 		rectangle_texture_->bind();
-		//Donut::Renderer2D::drawRectangle(glm::vec3{ 0.5f, 0.8f, 0.1f }, glm::vec2{ 0.5f, 0.5f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
-		//Donut::Renderer2D::drawRotatedRectangle(glm::vec3{ 1.0f, 0.5f, 0.2f }, glm::vec2{ 0.8f, 0.6f }, 45.0f, glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
-		//Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, -0.1f }, glm::vec2{ 10.0f, 10.0f }, rectangle_texture_, 10.0f);
-		//Donut::Renderer2D::drawRotatedRectangle(glm::vec3{ 0.0f, 0.0f, -0.1f }, glm::vec2{ 10.0f, 10.0f }, 34.0f, rectangle_texture_, 10.0f, {1.0f, 0.8f, 0.8f, 0.5f});
 
 		Donut::Renderer2D::drawRectangle(glm::vec3{  0.5f, 0.5f, 0.0f }, glm::vec2{ 0.5f, 0.75f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
 		Donut::Renderer2D::drawRectangle(glm::vec3{ -1.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.25f }, rectangle_color_);
 		Donut::Renderer2D::drawRectangle(glm::vec3{  0.0f, 0.0f, -0.2f }, glm::vec2{ 20.0f, 20.0f }, rectangle_texture_, 10.0f);
-		//Donut::Renderer2D::drawRectangle(glm::vec3{ -1.3f, -0.8f, 0.0f }, glm::vec2{ 1.0f, 1.0f }, rectangle_texture_, 10.0f);
-		//Donut::Renderer2D::drawRotatedRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 1.0f, 1.0f }, rotation, rectangle_texture_, 10.0f);
 		Donut::Renderer2D::endScene();
+
 
 		Donut::Renderer2D::beginScene(camera_controller_.getCamera());
 		for (float y = -5.0f; y < 5.0f; y += 0.5f)
@@ -85,8 +84,13 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 				Donut::Renderer2D::drawRectangle(glm::vec2{ x, y }, glm::vec2{ 0.45, 0.45f }, color);
 			}
 		}
-
 		Donut::Renderer2D::endScene();
+
+
+		//Donut::Renderer2D::beginScene(camera_controller_.getCamera());
+		//sprite_texture_->bind();
+		//Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, sprite_texture_, 1.0f);
+		//Donut::Renderer2D::endScene();
 	}
 
 	if (Donut::Input::isMouseButtonPressed(DN_MOUSE_BUTTON_LEFT))
@@ -106,6 +110,10 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 
 	particle_system_.onUpdate(ts);
 	particle_system_.onRender(camera_controller_.getCamera());
+
+	Donut::Renderer2D::beginScene(camera_controller_.getCamera());
+	Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, 0.0f, texture_stair_, 1.0f);
+	Donut::Renderer2D::endScene();
 
 }
 

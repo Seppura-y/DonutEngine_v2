@@ -3,6 +3,7 @@
 
 #include "renderer/orthographic_camera.h"
 #include "renderer/texture.h"
+#include "renderer/subtexture.h"
 
 namespace Donut
 {
@@ -27,6 +28,9 @@ namespace Donut
 
 		static void drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor = 1.0f, glm::vec4 tincolor = glm::vec4(1.0f));
 		static void drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor = 1.0f, glm::vec4 tincolor = glm::vec4(1.0f));
+	
+		static void drawRectangle(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Subtexture>& subtexture, float tiling_factor = 1.0f, glm::vec4& tincolor = glm::vec4(1.0f));
+		static void drawRectangle(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Subtexture>& subtexture, float tiling_factor = 1.0f, glm::vec4& tincolor = glm::vec4(1.0f));
 	public:
 		struct Statistics
 		{

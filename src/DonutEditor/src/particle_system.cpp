@@ -68,9 +68,9 @@ void ParticleSystem::onRender(Donut::OrthographicCamera& camera)
 
 		float size = glm::lerp(particle.size_end_, particle.size_begin_, life);
 
-		glm::vec3 position_ = { particle.position_.x,particle.position_.y, 0.2f };
+		glm::vec3 position = { particle.position_.x,particle.position_.y, 0.2f };
 
-		Donut::Renderer2D::drawRotatedRectangle(position_, glm::vec2{ size, size }, particle.rotation_, color);
+		Donut::Renderer2D::drawRotatedRectangle(position, glm::vec2{ size, size }, particle.rotation_, color);
 	}
 	Donut::Renderer2D::endScene();
 }
