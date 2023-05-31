@@ -31,11 +31,13 @@ namespace Donut
 		const OrthographicCamera& getCamera() const { return camera_; }
 
 		float getZoomLevel() const { return zoom_level_; }
-		void setZoomLevel(float value) { zoom_level_ = value; }
+		void setZoomLevel(float value) { zoom_level_ = value; calculateView(); }
 
 		const OrthographicCameraBounds& getBounds() const { return ortho_cam_bound_; }
 
 	private:
+		void calculateView();
+
 		bool onMouseScrolledEvent(MouseScrolledEvent& ev);
 		bool onWindowResizedEvent(WindowResizeEvent& ev);
 

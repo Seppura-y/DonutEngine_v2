@@ -9,6 +9,23 @@
 
 #include <chrono>
 
+static const uint32_t tile_width = 24;
+static const char* map_tiles =
+								"WWWWWWWWWWWWWWWWWWWWWWWW"
+								"WWWWWWWDDDDDDDDDDWWWWWWW"
+								"WWWWDDDDDDDDDDDDDDDDWWWW"
+								"WWWDDDDDWDDDDDDDDDDDDDWW"
+								"WWDDDDDWWWDDDDDDDDDDWWW"
+								"WWWDDDDWWDDDDDDDDDDDDWWW"
+								"WWWWDDDDDDDDDDDDDDDWWWWW"
+								"WWWWWWDDDDDDDDDDDDWWWWWW"
+								"WWWWWWWWWWDDDDDDDWWWWWWW"
+								"WWWWWWWWWWDDDDDWWWWWWWWW"
+								"WWWWWWWWWWWWWWWWWWWWWWWW"
+								"WWWWWWWWWWWWWWWWWCWWWWWW"
+								"WWWWWWWWWWWWWWWWWWWWWWWW"
+								"WWWWWWWWWWWWWWWWWWWWWWWW";
+
 Sandbox2D::Sandbox2D()
 	:	Donut::Layer("sandbox 2d"), 
 		camera_controller_(1600.0f / 900.0f, true), 
@@ -30,6 +47,14 @@ void Sandbox2D::onAttach()
 	texture_tree_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 2,1 }, { 1,2 }, { 128,128 });
 	texture_barrel_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 8,2 }, { 1,1 }, { 128,128 });
 
+	texture_water_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 1,11 }, { 1,1 }, { 128,128 });
+	texture_dirt_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 6,11 }, { 1,1 }, { 128,128 });
+	tile_map_.insert({ 'W', texture_water_ });
+	tile_map_.insert({ 'D', texture_dirt_ });
+
+	map_width_ = tile_width;
+	map_height_ = strlen(map_tiles) / tile_width;
+
 	particle_props_.color_begin_ = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };
 	particle_props_.color_end_ = { 254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f };
 	particle_props_.size_begin_ = 0.5f, particle_props_.size_variation_ = 0.3f, particle_props_.size_end_ = 0.0f;
@@ -37,6 +62,8 @@ void Sandbox2D::onAttach()
 	particle_props_.velocity_ = { 0.0f, 0.0f };
 	particle_props_.velocity_variation_ = { 3.0f, 1.0f };
 	particle_props_.position_ = { 0.0f, 0.0f };
+
+	camera_controller_.setZoomLevel(1.0f);
 }
 
 void Sandbox2D::onDetach()
@@ -112,7 +139,27 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 	particle_system_.onRender(camera_controller_.getCamera());
 
 	Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-	Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, 0.0f, texture_stair_, 1.0f);
+	//Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, 0.0f, texture_stair_, 1.0f);
+	
+	for (int y = 0; y < map_height_; y++)
+	{
+		for (int x = 0; x < map_width_; x++)
+		{
+			Donut::Ref<Donut::Subtexture> texture;
+
+			char s = map_tiles[x + y * map_width_];
+			if (tile_map_.find(s) != tile_map_.end())
+			{
+				texture = tile_map_[s];
+			}
+			else
+			{
+				texture = texture_barrel_;
+			}
+
+			Donut::Renderer2D::drawRectangle(glm::vec3{ x - map_width_ / 2.0f, map_height_ / 2.0f - y, 0.5f }, glm::vec2{ 1.0f,1.0f }, 1.0f, texture, 1.0f);
+		}
+	}
 	Donut::Renderer2D::endScene();
 
 }

@@ -32,6 +32,10 @@ private:
 	ParticleProps particle_props_;
 
 	Donut::Ref<Donut::Subtexture> texture_stair_, texture_tree_, texture_barrel_;
+	Donut::Ref<Donut::Subtexture> texture_water_, texture_dirt_;
+
+	uint32_t map_width_, map_height_;
+	std::unordered_map<char, Donut::Ref<Donut::Subtexture>> tile_map_;
 };
 
 #endif

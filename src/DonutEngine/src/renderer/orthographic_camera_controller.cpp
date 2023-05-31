@@ -70,6 +70,13 @@ namespace Donut
 		dispatcher.dispatch<WindowResizeEvent>(DN_BIND_EVENT_FN(OrthographicCameraController::onWindowResizedEvent));
 	}
 
+	void OrthographicCameraController::calculateView()
+	{
+		ortho_cam_bound_ = { -aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_ };
+		camera_.setProjection(ortho_cam_bound_.left_, ortho_cam_bound_.right_, ortho_cam_bound_.bottom_, ortho_cam_bound_.top_);
+	}
+
+
 	bool OrthographicCameraController::onMouseScrolledEvent(MouseScrolledEvent& ev)
 	{
 		DN_PROFILE_FUNCTION();
@@ -77,8 +84,7 @@ namespace Donut
 		zoom_level_ -= ev.getYOffset() * 0.4f;
 		zoom_level_ = std::max(zoom_level_, 0.25f);
 
-		ortho_cam_bound_ = { -aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_ };
-		camera_.setProjection(ortho_cam_bound_.left_, ortho_cam_bound_.right_, ortho_cam_bound_.bottom_, ortho_cam_bound_.top_);
+		calculateView();
 		return false;
 	}
 
@@ -87,7 +93,7 @@ namespace Donut
 		DN_PROFILE_FUNCTION();
 
 		aspect_ratio_ = (float)ev.getWidth() / (float)ev.getHeight();
-		camera_.setProjection(-aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_);
+		calculateView();
 		return false;
 	}
 }
