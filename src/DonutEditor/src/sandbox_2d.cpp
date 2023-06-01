@@ -64,6 +64,11 @@ void Sandbox2D::onAttach()
 	particle_props_.position_ = { 0.0f, 0.0f };
 
 	camera_controller_.setZoomLevel(1.0f);
+
+	Donut::FramebufferSpecification framebuffer_spec;
+	framebuffer_spec.width_ = 1280;
+	framebuffer_spec.height_ = 720;
+	framebuffer_ = Donut::Framebuffer::createFramebuffer(framebuffer_spec);
 }
 
 void Sandbox2D::onDetach()
@@ -82,6 +87,7 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 
 	{
 		DN_PROFILE_SCOPE("RenderCommand::clear");
+		framebuffer_->bind();
 		Donut::RenderCommand::setClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Donut::RenderCommand::clear();
 	}
@@ -162,6 +168,7 @@ void Sandbox2D::onUpdate(Donut::Timestep ts)
 	}
 	Donut::Renderer2D::endScene();
 
+	framebuffer_->unBind();
 }
 
 void Sandbox2D::onEvent(Donut::Event& ev)
@@ -266,8 +273,9 @@ void Sandbox2D::onImGuiRender()
 
 		ImGui::ColorEdit4("Square Color", glm::value_ptr(rectangle_color_));
 
-		uint32_t textureID = rectangle_texture_->getObjectId();
-		ImGui::Image((void*)textureID, ImVec2{ 256.0f, 256.0f });
+		//uint32_t textureID = rectangle_texture_->getObjectId();
+		uint32_t textureID = framebuffer_->getColorAttachmentID();
+		ImGui::Image((void*)textureID, ImVec2{ 1280.0f, 720.0f });
 		ImGui::End();
 
 		ImGui::End();

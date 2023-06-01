@@ -1,0 +1,29 @@
+#ifndef OPENGL_FRAMEBUFFER_H
+#define OPENGL_FRAMEBUFFER_H
+
+#include "renderer/framebuffer.h"
+
+namespace Donut
+{
+	class OpenGLFramebuffer : public Framebuffer
+	{
+	public:
+		OpenGLFramebuffer(const FramebufferSpecification& spec);
+		virtual ~OpenGLFramebuffer();
+
+		virtual const FramebufferSpecification& getSpecification() const override;
+
+		void invalidate();
+
+		virtual void bind() override;
+		virtual void unBind() override;
+
+		virtual uint32_t getColorAttachmentID() const override { return color_attachment_; }
+	private:
+		uint32_t object_id_;
+		uint32_t color_attachment_;
+		uint32_t depth_attachment_;
+		FramebufferSpecification specification_;
+	};
+}
+#endif

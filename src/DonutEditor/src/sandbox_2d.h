@@ -26,6 +26,8 @@ private:
 	Donut::Ref<Donut::Texture2D> rectangle_texture_;
 	Donut::Ref<Donut::Texture2D> sprite_texture_;
 
+	Donut::Ref<Donut::Framebuffer> framebuffer_;
+
 	glm::vec4 rectangle_color_{ 0.2f, 0.3f, 0.8f, 1.0f };
 
 	ParticleSystem particle_system_;
