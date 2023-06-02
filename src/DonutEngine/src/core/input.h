@@ -8,6 +8,7 @@ namespace Donut
     class DONUT_API Input
     {
     public:
+        virtual ~Input() = default;
         inline static bool isKeyPressed(int keycode) { return s_instance_->isKeyPressedImpl(keycode); }
         inline static bool isMouseButtonPressed(int button) { return s_instance_->isMouseButtonPressedImpl(button); }
         inline static float getMouseX() { return s_instance_->getMouseXImpl(); }

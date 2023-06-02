@@ -73,7 +73,10 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 	//Timer timer("Donut::EditorLayer::onUpdate", [&](auto profile_result) { profile_results_.push_back(profile_result)});
 	DN_PROFILE_FUNCTION();
 
-	camera_controller_.onUpdate(ts);
+	if (is_viewport_focused_)
+	{
+		camera_controller_.onUpdate(ts);
+	}
 
 	Donut::Renderer2D::resetStatistics();
 
@@ -244,6 +247,10 @@ void Donut::EditorLayer::onImGuiRender()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
 	ImGui::Begin("Viewport");
+
+	is_viewport_focused_ = ImGui::IsWindowFocused();
+	is_viewport_hovered_ = ImGui::IsWindowHovered();
+	Application::getInstance().getImGuiLayer()->setBlockEvents(!(is_viewport_focused_ && is_viewport_hovered_));
 
 	ImVec2 viewport_size = ImGui::GetContentRegionAvail();
 	if (viewport_size_ != *((glm::vec2*)&viewport_size))

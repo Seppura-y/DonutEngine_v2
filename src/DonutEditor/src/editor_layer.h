@@ -46,6 +46,9 @@ namespace Donut
 		std::unordered_map<char, Donut::Ref<Donut::Subtexture>> tile_map_;
 
 		glm::vec2 viewport_size_{ 0,0 };
+
+		bool is_viewport_focused_ = false;
+		bool is_viewport_hovered_ = false;
 	};
 }
 #endif

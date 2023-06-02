@@ -70,6 +70,16 @@ namespace Donut
 		ImGui::DestroyContext();
 	}
 
+	void ImGuiLayer::onEvent(Event& ev)
+	{
+		if (is_block_events_)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			ev.setHandled(ev.isHandled() | (ev.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse));
+			ev.setHandled(ev.isHandled() | (ev.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard));
+		}
+	}
+
 	//void ImGuiLayer::onUpdate()
 	//{
 	//	ImGuiIO& io = ImGui::GetIO();

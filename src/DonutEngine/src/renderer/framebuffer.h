@@ -16,8 +16,12 @@ namespace Donut
 	class Framebuffer
 	{
 	public:
-		virtual const FramebufferSpecification& getSpecification() const = 0;
 		static Ref<Framebuffer> createFramebuffer(const FramebufferSpecification& spec);
+
+
+		virtual ~Framebuffer() = default;
+
+		virtual const FramebufferSpecification& getSpecification() const = 0;
 
 		virtual void bind() = 0;
 		virtual void unBind() = 0;

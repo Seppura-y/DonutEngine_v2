@@ -30,6 +30,7 @@ namespace Donut
 
 		inline static Application& getInstance() { return *s_instance_; }
 		inline Window& getWindow() { return *window_; }
+		ImGuiLayer* getImGuiLayer() { return imgui_layer_; }
 
 		void initWindow(WindowProps props = WindowProps());
 	private:

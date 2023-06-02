@@ -120,15 +120,13 @@ namespace Donut
 		dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(onWindowClose));
 		dispatcher.dispatch<WindowResizeEvent>(BIND_EVENT_FN(onWindowResize));
 
-		//DN_CORE_TRACE("{0}", ev);
-
 		for (auto it = layer_stack_.end(); it != layer_stack_.begin();)
 		{
-			(*--it)->onEvent(ev);
 			if (ev.isHandled())
 			{
 				break;
 			}
+			(*--it)->onEvent(ev);
 		}
 	}
 
