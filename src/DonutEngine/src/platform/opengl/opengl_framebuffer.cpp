@@ -14,6 +14,8 @@ namespace Donut
 	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
 		glDeleteFramebuffers(1, &object_id_);
+		glDeleteTextures(1, &color_attachment_);
+		glDeleteTextures(1, &depth_attachment_);
 	}
 
 	const FramebufferSpecification& OpenGLFramebuffer::getSpecification() const
@@ -23,6 +25,13 @@ namespace Donut
 
 	void OpenGLFramebuffer::invalidate()
 	{
+		if (object_id_)
+		{
+			glDeleteFramebuffers(1, &object_id_);
+			glDeleteTextures(1, &color_attachment_);
+			glDeleteTextures(1, &depth_attachment_);
+		}
+
 		glCreateFramebuffers(1, &object_id_);
 		glBindFramebuffer(GL_FRAMEBUFFER, object_id_);
 
@@ -44,9 +53,17 @@ namespace Donut
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	void OpenGLFramebuffer::resize(uint32_t width, uint32_t height)
+	{
+		specification_.width_ = width;
+		specification_.height_ = height;
+		invalidate();
+	}
+
 	void OpenGLFramebuffer::bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, object_id_);
+		glViewport(0, 0, specification_.width_, specification_.height_);
 	}
 
 	void OpenGLFramebuffer::unBind()

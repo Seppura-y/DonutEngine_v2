@@ -21,6 +21,8 @@ namespace Donut
 
 		virtual void bind() = 0;
 		virtual void unBind() = 0;
+
+		virtual void resize(uint32_t width, uint32_t height) = 0;
 		
 		virtual uint32_t getColorAttachmentID() const = 0;
 	private:

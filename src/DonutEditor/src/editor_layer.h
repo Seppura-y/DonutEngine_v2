@@ -44,6 +44,8 @@ namespace Donut
 
 		uint32_t map_width_, map_height_;
 		std::unordered_map<char, Donut::Ref<Donut::Subtexture>> tile_map_;
+
+		glm::vec2 viewport_size_{ 0,0 };
 	};
 }
 #endif

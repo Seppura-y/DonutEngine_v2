@@ -35,6 +35,7 @@ namespace Donut
 
 		const OrthographicCameraBounds& getBounds() const { return ortho_cam_bound_; }
 
+		void onResize(float width, float height);
 	private:
 		void calculateView();
 

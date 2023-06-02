@@ -70,6 +70,12 @@ namespace Donut
 		dispatcher.dispatch<WindowResizeEvent>(DN_BIND_EVENT_FN(OrthographicCameraController::onWindowResizedEvent));
 	}
 
+	void OrthographicCameraController::onResize(float width, float height)
+	{
+		aspect_ratio_ = width / height;
+		calculateView();
+	}
+
 	void OrthographicCameraController::calculateView()
 	{
 		ortho_cam_bound_ = { -aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_ };
