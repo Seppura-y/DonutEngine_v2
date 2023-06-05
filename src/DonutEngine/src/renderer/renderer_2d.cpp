@@ -512,6 +512,117 @@ namespace Donut
 		s_data.statistics_.rect_count_++;
 	}
 
+	void Renderer2D::drawRectangle(const glm::mat4 transform, const glm::vec4& color)
+	{
+		DN_PROFILE_FUNCTION();
+
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
+
+		const float tiling_factor = 1.0f;
+		const float texture_index = 0.0f;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[0];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[1];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[2];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 1.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[3];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 1.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_indices_count_ += 6;
+		s_data.statistics_.rect_count_++;
+	}
+
+	void Renderer2D::drawRectangle(const glm::mat4 transform, const Ref<Texture2D>& texture, float tiling_factor, const glm::vec4& tint_color)
+	{
+		DN_PROFILE_FUNCTION();
+
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
+
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		float texture_index = 0.0f;
+
+		for (uint32_t i = 1; i < s_data.texture_index_; i++)
+		{
+			// 获取raw指针，然后解引用，以调用operator==(const Texture& other)
+			if (*s_data.texture_slots_[i].get() == *texture.get())
+			{
+				texture_index = (float)i;
+				break;
+			}
+		}
+
+		if (texture_index == 0.0f)
+		{
+			if (s_data.texture_index_ >= Renderer2DData::max_texture_slots_)
+			{
+				flushAndReset();
+			}
+			texture_index = (float)s_data.texture_index_;
+			s_data.texture_slots_[s_data.texture_index_] = texture;
+			s_data.texture_index_++;
+		}
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[0];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[1];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 0.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[2];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 1.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[3];
+		s_data.rect_vertex_buffer_ptr_->color_ = color;
+		s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 1.0f };
+		s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_indices_count_ += 6;
+
+		s_data.statistics_.rect_count_++;
+	}
+
 	void Renderer2D::resetStatistics()
 	{
 		memset(&s_data.statistics_, 0, sizeof(Statistics));

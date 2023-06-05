@@ -40,27 +40,35 @@ void Donut::EditorLayer::onAttach()
 {
 	DN_PROFILE_FUNCTION();
 
-	rectangle_texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
-	sprite_texture_ = Donut::Texture2D::createTexture("assets/textures/RPG Base/RPGpack_sheet_2X.png");
+	//rectangle_texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
+	//sprite_texture_ = Donut::Texture2D::createTexture("assets/textures/RPG Base/RPGpack_sheet_2X.png");
 
-	texture_stair_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 7,6 }, { 1,1 }, { 128,128 });
-	texture_tree_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 2,1 }, { 1,2 }, { 128,128 });
-	texture_barrel_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 8,2 }, { 1,1 }, { 128,128 });
+	//texture_stair_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 7,6 }, { 1,1 }, { 128,128 });
+	//texture_tree_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 2,1 }, { 1,2 }, { 128,128 });
+	//texture_barrel_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 8,2 }, { 1,1 }, { 128,128 });
 
-	texture_water_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 1,11 }, { 1,1 }, { 128,128 });
-	texture_dirt_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 6,11 }, { 1,1 }, { 128,128 });
-	tile_map_.insert({ 'W', texture_water_ });
-	tile_map_.insert({ 'D', texture_dirt_ });
+	//texture_water_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 1,11 }, { 1,1 }, { 128,128 });
+	//texture_dirt_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 6,11 }, { 1,1 }, { 128,128 });
+	//tile_map_.insert({ 'W', texture_water_ });
+	//tile_map_.insert({ 'D', texture_dirt_ });
 
-	map_width_ = tile_width;
-	map_height_ = strlen(map_tiles) / tile_width;
+	//map_width_ = tile_width;
+	//map_height_ = strlen(map_tiles) / tile_width;
 
-	camera_controller_.setZoomLevel(1.0f);
+	//camera_controller_.setZoomLevel(1.0f);
 
 	Donut::FramebufferSpecification framebuffer_spec;
 	framebuffer_spec.width_ = 1280;
 	framebuffer_spec.height_ = 720;
 	framebuffer_ = Donut::Framebuffer::createFramebuffer(framebuffer_spec);
+
+
+	active_scene_ = createRef<Scene>();
+	auto rect = active_scene_->createEntity();
+	active_scene_->getRegistry().emplace<TransformComponent>(rect);
+	active_scene_->getRegistry().emplace <SpriteRendererComponent>(rect, glm::vec4{ 1.0f });
+
+	rect_entity_ = rect;
 }
 
 void Donut::EditorLayer::onDetach()
@@ -87,39 +95,45 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 		Donut::RenderCommand::clear();
 	}
 
+	Renderer2D::beginScene(camera_controller_.getCamera());
 
-	{
-		static float rotation = 0.0f;
-		rotation += ts * 20;
+	active_scene_->onUpdate(ts);
 
-		DN_PROFILE_SCOPE("Renderer2D - draw");
-
-		Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-		rectangle_texture_->bind();
-
-		Donut::Renderer2D::drawRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 0.5f, 0.75f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
-		Donut::Renderer2D::drawRectangle(glm::vec3{ -1.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.25f }, rectangle_color_);
-		Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, -0.2f }, glm::vec2{ 20.0f, 20.0f }, rectangle_texture_, 10.0f);
-		Donut::Renderer2D::endScene();
+	Renderer2D::endScene();
 
 
-		Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-		for (float y = -5.0f; y < 5.0f; y += 0.5f)
-		{
-			for (float x = -5.0f; x < 5.0f; x += 0.5f)
-			{
-				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-				Donut::Renderer2D::drawRectangle(glm::vec2{ x, y }, glm::vec2{ 0.45, 0.45f }, color);
-			}
-		}
-		Donut::Renderer2D::endScene();
+	//{
+	//	static float rotation = 0.0f;
+	//	rotation += ts * 20;
+
+	//	DN_PROFILE_SCOPE("Renderer2D - draw");
+
+	//	Donut::Renderer2D::beginScene(camera_controller_.getCamera());
+	//	rectangle_texture_->bind();
+
+	//	Donut::Renderer2D::drawRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 0.5f, 0.75f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
+	//	Donut::Renderer2D::drawRectangle(glm::vec3{ -1.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.25f }, rectangle_color_);
+	//	Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, -0.2f }, glm::vec2{ 20.0f, 20.0f }, rectangle_texture_, 10.0f);
+	//	Donut::Renderer2D::endScene();
 
 
-		//Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-		//sprite_texture_->bind();
-		//Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, sprite_texture_, 1.0f);
-		//Donut::Renderer2D::endScene();
-	}
+	//	Donut::Renderer2D::beginScene(camera_controller_.getCamera());
+	//	for (float y = -5.0f; y < 5.0f; y += 0.5f)
+	//	{
+	//		for (float x = -5.0f; x < 5.0f; x += 0.5f)
+	//		{
+	//			glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
+	//			Donut::Renderer2D::drawRectangle(glm::vec2{ x, y }, glm::vec2{ 0.45, 0.45f }, color);
+	//		}
+	//	}
+	//	Donut::Renderer2D::endScene();
+
+
+	//	//Donut::Renderer2D::beginScene(camera_controller_.getCamera());
+	//	//sprite_texture_->bind();
+	//	//Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, sprite_texture_, 1.0f);
+	//	//Donut::Renderer2D::endScene();
+	//}
 
 	if (Donut::Input::isMouseButtonPressed(DN_MOUSE_BUTTON_LEFT))
 	{
@@ -239,7 +253,8 @@ void Donut::EditorLayer::onImGuiRender()
 	ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
 	ImGui::Text("Indices: %d", stats.getTotalIndexCount());
 
-	ImGui::ColorEdit4("Square Color", glm::value_ptr(rectangle_color_));
+	auto rect_color = active_scene_->getRegistry().get<SpriteRendererComponent>(rect_entity_).color;
+	ImGui::ColorEdit4("Square Color", glm::value_ptr(rect_color));
 
 	ImGui::End();
 

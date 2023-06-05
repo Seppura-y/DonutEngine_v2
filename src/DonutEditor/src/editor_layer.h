@@ -49,6 +49,10 @@ namespace Donut
 
 		bool is_viewport_focused_ = false;
 		bool is_viewport_hovered_ = false;
+
+		Donut::Ref<Donut::Scene> active_scene_;
+		entt::entity rect_entity_;
+
 	};
 }
 #endif

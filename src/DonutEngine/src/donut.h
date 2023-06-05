@@ -32,4 +32,7 @@
 
 #include "imgui/imgui_layer.h"
 
+#include "scene/scene.h"
+#include "scene/components.h"
+
 #endif

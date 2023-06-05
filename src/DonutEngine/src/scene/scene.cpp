@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "scene.h"
+#include "components.h"
+#include "renderer/renderer_2d.h"
 
 #include <glm/glm.hpp>
 
@@ -13,6 +15,7 @@ namespace Donut
 
 	Scene::Scene()
 	{
+#if ENTT_TEST_CODE
 		struct MeshComponent
 		{
 			//MeshComponent() = default;
@@ -21,17 +24,6 @@ namespace Donut
 			int a;
 		};
 
-		struct TransformComponent
-		{
-			glm::mat4 transform_;
-
-			TransformComponent() = default;
-			TransformComponent(const TransformComponent&) = default;
-			TransformComponent(const glm::mat4& transform) : transform_(transform){}
-
-			operator glm::mat4&() { return transform_; }
-			operator const glm::mat4& () const { return transform_; }
-		};
 
 		entt::entity entity = registry_.create();
 		registry_.emplace<TransformComponent>(entity, glm::mat4(1.0f));
@@ -53,14 +45,28 @@ namespace Donut
 		auto group = registry_.group<TransformComponent>(entt::get<MeshComponent>);
 		for (auto entity : group)
 		{
-			//TransformComponent& transform = group.get<TransformComponent>(entity);
 			auto&[trans, mesh] = group.get<TransformComponent, MeshComponent>(entity);
 		}
-
+#endif
 	}
 
 	Scene::~Scene()
 	{
 
+	}
+
+	void Scene::onUpdate(Timestep ts)
+	{
+		auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto entity : group)
+		{
+			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			Renderer2D::drawRectangle(transform, sprite.color);
+		}
+	}
+
+	entt::entity Scene::createEntity()
+	{
+		return registry_.create();
 	}
 }
