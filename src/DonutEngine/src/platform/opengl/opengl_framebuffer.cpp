@@ -5,6 +5,8 @@
 
 namespace Donut
 {
+	static const uint32_t s_max_framebuffer_size = 8192;
+
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification& spec)
 		: specification_(spec)
 	{
@@ -55,6 +57,10 @@ namespace Donut
 
 	void OpenGLFramebuffer::resize(uint32_t width, uint32_t height)
 	{
+		if (width == 0 || height == 0 || width > s_max_framebuffer_size || height > s_max_framebuffer_size)
+		{
+			return;
+		}
 		specification_.width_ = width;
 		specification_.height_ = height;
 		invalidate();

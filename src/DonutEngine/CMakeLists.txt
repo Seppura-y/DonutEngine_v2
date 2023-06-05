@@ -158,11 +158,23 @@ FILE(GLOB ${PROJECT_NAME}_DEBUG_SRC
 )
 
 #####################################################################################################
+# scene
+FILE(GLOB ${PROJECT_NAME}_SCENE_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/src/scene/*.h
+)
+
+FILE(GLOB ${PROJECT_NAME}_SCENE_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/src/scene/*.cpp
+)
+
+
+#####################################################################################################
 source_group("src\\DonutEngine\\Global" FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
 source_group("src\\DonutEngine\\Core" FILES ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC})
 source_group("src\\DonutEngine\\Events" FILES ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC})
 source_group("src\\DonutEngine\\Renderer" FILES ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC})
 source_group("src\\DonutEngine\\ImGui" FILES ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC})
+source_group("src\\DonutEngine\\Scene" FILES ${${PROJECT_NAME}_SCENE_HEADER} ${${PROJECT_NAME}_SCENE_SRC})
 
 source_group("src\\DonutEngine\\Platform\\OpenGL" FILES ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC})
 source_group("src\\DonutEngine\\Platform\\Windows" FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
@@ -203,6 +215,7 @@ if (WIN32)
         ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC}
         ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC}
         ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC}
+        ${${PROJECT_NAME}_SCENE_HEADER} ${${PROJECT_NAME}_SCENE_SRC}
 
         ${${PROJECT_NAME}_GLM_HEADER}
 
@@ -301,6 +314,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/glm
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/stb_image
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/entt/include
 
 )
 

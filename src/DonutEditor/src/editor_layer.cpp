@@ -255,7 +255,7 @@ void Donut::EditorLayer::onImGuiRender()
 	ImVec2 viewport_size = ImGui::GetContentRegionAvail();
 	if (viewport_size_ != *((glm::vec2*)&viewport_size))
 	{
-		if (viewport_size.x != 0 || viewport_size.y != 0)
+		if (viewport_size.x > 0 || viewport_size.y > 0)
 		{
 			viewport_size_.x = viewport_size.x;
 			viewport_size_.y = viewport_size.y;
