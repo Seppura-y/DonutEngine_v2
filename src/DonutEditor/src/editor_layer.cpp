@@ -64,9 +64,8 @@ void Donut::EditorLayer::onAttach()
 
 
 	active_scene_ = createRef<Scene>();
-	auto rect = active_scene_->createEntity();
-	active_scene_->getRegistry().emplace<TransformComponent>(rect);
-	active_scene_->getRegistry().emplace <SpriteRendererComponent>(rect, glm::vec4{ 1.0f });
+	auto rect = active_scene_->createEntity("Test Rect");
+	rect.addComponent<SpriteRendererComponent>(glm::vec4{ 1.0f });
 
 	rect_entity_ = rect;
 }
@@ -253,8 +252,18 @@ void Donut::EditorLayer::onImGuiRender()
 	ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
 	ImGui::Text("Indices: %d", stats.getTotalIndexCount());
 
-	auto rect_color = active_scene_->getRegistry().get<SpriteRendererComponent>(rect_entity_).color;
-	ImGui::ColorEdit4("Square Color", glm::value_ptr(rect_color));
+	if (rect_entity_)
+	{
+		ImGui::Separator();
+
+		auto& tag = rect_entity_.getComponent<TagComponent>();
+		ImGui::Text("%s", tag.tag_.c_str());
+
+		auto& rect_color = rect_entity_.getComponent<SpriteRendererComponent>().color;
+		ImGui::ColorEdit4("Square Color", glm::value_ptr(rect_color));
+
+		ImGui::Separator();
+	}
 
 	ImGui::End();
 

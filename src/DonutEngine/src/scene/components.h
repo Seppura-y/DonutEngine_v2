@@ -6,6 +6,18 @@
 
 namespace Donut
 {
+	struct TagComponent
+	{
+		std::string tag_;
+
+		TagComponent() = default;
+		TagComponent(const TagComponent&) = default;
+		TagComponent(const std::string& tag)
+			: tag_(tag)
+		{
+
+		}
+	};
 
 	struct TransformComponent
 	{

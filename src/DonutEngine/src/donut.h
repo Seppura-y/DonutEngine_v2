@@ -34,5 +34,6 @@
 
 #include "scene/scene.h"
 #include "scene/components.h"
+#include "scene/entity.h"
 
 #endif

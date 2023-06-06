@@ -6,6 +6,8 @@
 
 namespace Donut
 {
+	class Entity;
+
 	class Scene
 	{
 	public:
@@ -14,6 +16,7 @@ namespace Donut
 
 		void onUpdate(Timestep ts);
 
+		Entity createEntity(const std::string& tag = std::string());
 		entt::entity createEntity();
 		entt::registry& getRegistry() { return registry_; }
 	private:

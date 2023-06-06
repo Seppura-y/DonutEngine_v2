@@ -2,6 +2,7 @@
 #include "scene.h"
 #include "components.h"
 #include "renderer/renderer_2d.h"
+#include "scene/entity.h"
 
 #include <glm/glm.hpp>
 
@@ -63,6 +64,15 @@ namespace Donut
 			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 			Renderer2D::drawRectangle(transform, sprite.color);
 		}
+	}
+
+	Entity Scene::createEntity(const std::string& tag)
+	{
+		Entity entity = { registry_.create(), this };
+		entity.addComponent<TagComponent>(tag);
+		entity.addComponent<TransformComponent>(glm::mat4(1.0f));
+
+		return entity;
 	}
 
 	entt::entity Scene::createEntity()
