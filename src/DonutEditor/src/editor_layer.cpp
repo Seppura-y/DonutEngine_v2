@@ -53,10 +53,10 @@ void Donut::EditorLayer::onAttach()
 	rect_entity_ = rect;
 
 	fst_camera_ = active_scene_->createEntity("First Camera");
-	fst_camera_.addComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+	fst_camera_.addComponent<CameraComponent>();
 
 	sec_camera_ = active_scene_->createEntity("Second Camera");
-	auto& camera_component = sec_camera_.addComponent<CameraComponent>(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+	auto& camera_component = sec_camera_.addComponent<CameraComponent>();
 	camera_component.is_primary_ = false;
 }
 
@@ -71,16 +71,18 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 	DN_PROFILE_FUNCTION();
 
 	// Resize
-	//if (FramebufferSpecification spec = framebuffer_->getSpecification();
-	//	viewport_size_.x > 0.0f && viewport_size_.y > 0.0f && // zero sized framebuffer is invalid
-	//	(spec.width_ != viewport_size_.x || spec.height_ != viewport_size_.y))
-	//{
-	//	framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
-	//	camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
-	//}
+	if (FramebufferSpecification spec = framebuffer_->getSpecification();
+		viewport_size_.x > 0.0f && viewport_size_.y > 0.0f && // zero sized framebuffer is invalid
+		(spec.width_ != viewport_size_.x || spec.height_ != viewport_size_.y))
+	{
+		framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+		camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
 
-	framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
-	camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
+		active_scene_->onViewportResize(viewport_size_.x, viewport_size_.y);
+	}
+
+	//framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+	//camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
 
 	if (is_viewport_focused_)
 	{
@@ -215,6 +217,15 @@ void Donut::EditorLayer::onImGuiRender()
 	{
 		fst_camera_.getComponent<CameraComponent>().is_primary_ = is_first_cam_;
 		sec_camera_.getComponent<CameraComponent>().is_primary_ = !is_first_cam_;
+	}
+
+	{
+		auto& camera = sec_camera_.getComponent<CameraComponent>().camera_;
+		float ortho_size = camera.getOrthographicSize();
+		if (ImGui::DragFloat("Second Camera Orthographic Size", &ortho_size))
+		{
+			camera.setOrthographicSize(ortho_size);
+		}
 	}
 
 	ImGui::End();

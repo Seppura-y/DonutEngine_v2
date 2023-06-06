@@ -90,6 +90,23 @@ namespace Donut
 		}
 	}
 
+	void Scene::onViewportResize(uint32_t width, uint32_t height)
+	{
+		viewport_width_ = width;
+		viewport_height_ = height;
+
+		// resize our non fixed aspect ratio camera
+		auto view = registry_.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			auto& camera_component = view.get<CameraComponent>(entity);
+			if (!camera_component.is_fixed_aspect_ratio_)
+			{
+				camera_component.camera_.setViewportSize(width, height);
+			}
+		}
+	}
+
 	Entity Scene::createEntity(const std::string& tag)
 	{
 		Entity entity = { registry_.create(), this };

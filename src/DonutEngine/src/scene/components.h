@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include "renderer/texture.h"
 #include "renderer/camera.h"
+#include "scene/scene_camera.h"
 
 namespace Donut
 {
@@ -46,12 +47,12 @@ namespace Donut
 
 	struct CameraComponent
 	{
-		Donut::Camera camera_;
+		Donut::SceneCamera camera_;
 		bool is_primary_ = true;
+		bool is_fixed_aspect_ratio_ = false;
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
-		CameraComponent(const glm::mat4& projection) : camera_(projection) {}
 	};
 }
 #endif
