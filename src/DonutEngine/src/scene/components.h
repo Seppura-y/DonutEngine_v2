@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include "renderer/texture.h"
+#include "renderer/camera.h"
 
 namespace Donut
 {
@@ -41,6 +42,16 @@ namespace Donut
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
 		SpriteRendererComponent(const glm::vec4& c) :color(c) {}
 
+	};
+
+	struct CameraComponent
+	{
+		Donut::Camera camera_;
+		bool is_primary_ = true;
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent&) = default;
+		CameraComponent(const glm::mat4& projection) : camera_(projection) {}
 	};
 }
 #endif

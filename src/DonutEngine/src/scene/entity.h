@@ -54,7 +54,7 @@ namespace Donut
 
 
 	private:
-		entt::entity entity_handle_{ 0 };
+		entt::entity entity_handle_{ entt::null };
 		Scene* scene_{ nullptr };
 	};
 }

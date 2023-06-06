@@ -4,6 +4,7 @@
 #include "renderer/orthographic_camera.h"
 #include "renderer/texture.h"
 #include "renderer/subtexture.h"
+#include "renderer/camera.h"
 
 namespace Donut
 {
@@ -12,7 +13,12 @@ namespace Donut
 	public:
 		static void init();
 		static void shutdown();
-
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="camera"></param>
+		/// <param name="transform">摄像机自身的转换矩阵</param>
+		static void beginScene(const Camera& camera, const glm::mat4& transform);
 		static void beginScene(const OrthographicCamera& camera);
 		static void endScene();
 		static void flush();

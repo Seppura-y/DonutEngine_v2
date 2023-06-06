@@ -58,11 +58,35 @@ namespace Donut
 
 	void Scene::onUpdate(Timestep ts)
 	{
-		auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto entity : group)
+		Camera* main_camera = nullptr;
+		glm::mat4* camera_transform = nullptr;
 		{
-			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			Renderer2D::drawRectangle(transform, sprite.color);
+			auto group = registry_.view<TransformComponent, CameraComponent>();
+			for (auto entity : group)
+			{
+				auto& [transform, camera] = group.get<TransformComponent, CameraComponent>(entity);
+
+				if (camera.is_primary_)
+				{
+					main_camera = &camera.camera_;
+					camera_transform = &transform.transform_;
+					break;
+				}
+			}
+		}
+
+		if (main_camera)
+		{
+			Renderer2D::beginScene(main_camera->getProjection(), *camera_transform);
+
+			auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto entity : group)
+			{
+				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				Renderer2D::drawRectangle(transform, sprite.color);
+			}
+
+			Renderer2D::endScene();
 		}
 	}
 

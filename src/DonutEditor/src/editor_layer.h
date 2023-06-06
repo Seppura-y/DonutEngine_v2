@@ -53,6 +53,10 @@ namespace Donut
 		Donut::Ref<Donut::Scene> active_scene_;
 		Donut::Entity rect_entity_;
 
+		Donut::Entity fst_camera_;
+		Donut::Entity sec_camera_;
+		bool is_first_cam_ = true;
+
 	};
 }
 #endif

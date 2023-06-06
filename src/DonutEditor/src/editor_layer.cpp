@@ -40,23 +40,6 @@ void Donut::EditorLayer::onAttach()
 {
 	DN_PROFILE_FUNCTION();
 
-	//rectangle_texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
-	//sprite_texture_ = Donut::Texture2D::createTexture("assets/textures/RPG Base/RPGpack_sheet_2X.png");
-
-	//texture_stair_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 7,6 }, { 1,1 }, { 128,128 });
-	//texture_tree_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 2,1 }, { 1,2 }, { 128,128 });
-	//texture_barrel_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 8,2 }, { 1,1 }, { 128,128 });
-
-	//texture_water_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 1,11 }, { 1,1 }, { 128,128 });
-	//texture_dirt_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 6,11 }, { 1,1 }, { 128,128 });
-	//tile_map_.insert({ 'W', texture_water_ });
-	//tile_map_.insert({ 'D', texture_dirt_ });
-
-	//map_width_ = tile_width;
-	//map_height_ = strlen(map_tiles) / tile_width;
-
-	//camera_controller_.setZoomLevel(1.0f);
-
 	Donut::FramebufferSpecification framebuffer_spec;
 	framebuffer_spec.width_ = 1280;
 	framebuffer_spec.height_ = 720;
@@ -68,6 +51,13 @@ void Donut::EditorLayer::onAttach()
 	rect.addComponent<SpriteRendererComponent>(glm::vec4{ 1.0f });
 
 	rect_entity_ = rect;
+
+	fst_camera_ = active_scene_->createEntity("First Camera");
+	fst_camera_.addComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+
+	sec_camera_ = active_scene_->createEntity("Second Camera");
+	auto& camera_component = sec_camera_.addComponent<CameraComponent>(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+	camera_component.is_primary_ = false;
 }
 
 void Donut::EditorLayer::onDetach()
@@ -79,6 +69,18 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 {
 	//Timer timer("Donut::EditorLayer::onUpdate", [&](auto profile_result) { profile_results_.push_back(profile_result)});
 	DN_PROFILE_FUNCTION();
+
+	// Resize
+	//if (FramebufferSpecification spec = framebuffer_->getSpecification();
+	//	viewport_size_.x > 0.0f && viewport_size_.y > 0.0f && // zero sized framebuffer is invalid
+	//	(spec.width_ != viewport_size_.x || spec.height_ != viewport_size_.y))
+	//{
+	//	framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+	//	camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
+	//}
+
+	framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+	camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
 
 	if (is_viewport_focused_)
 	{
@@ -94,45 +96,12 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 		Donut::RenderCommand::clear();
 	}
 
-	Renderer2D::beginScene(camera_controller_.getCamera());
+	//Renderer2D::beginScene(camera_controller_.getCamera());
 
 	active_scene_->onUpdate(ts);
 
-	Renderer2D::endScene();
+	//Renderer2D::endScene();
 
-
-	//{
-	//	static float rotation = 0.0f;
-	//	rotation += ts * 20;
-
-	//	DN_PROFILE_SCOPE("Renderer2D - draw");
-
-	//	Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-	//	rectangle_texture_->bind();
-
-	//	Donut::Renderer2D::drawRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 0.5f, 0.75f }, glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
-	//	Donut::Renderer2D::drawRectangle(glm::vec3{ -1.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.25f }, rectangle_color_);
-	//	Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, -0.2f }, glm::vec2{ 20.0f, 20.0f }, rectangle_texture_, 10.0f);
-	//	Donut::Renderer2D::endScene();
-
-
-	//	Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-	//	for (float y = -5.0f; y < 5.0f; y += 0.5f)
-	//	{
-	//		for (float x = -5.0f; x < 5.0f; x += 0.5f)
-	//		{
-	//			glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-	//			Donut::Renderer2D::drawRectangle(glm::vec2{ x, y }, glm::vec2{ 0.45, 0.45f }, color);
-	//		}
-	//	}
-	//	Donut::Renderer2D::endScene();
-
-
-	//	//Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-	//	//sprite_texture_->bind();
-	//	//Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, sprite_texture_, 1.0f);
-	//	//Donut::Renderer2D::endScene();
-	//}
 
 	if (Donut::Input::isMouseButtonPressed(DN_MOUSE_BUTTON_LEFT))
 	{
@@ -146,31 +115,6 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 		y = bounds.getHeight() * 0.5f - (y / height) * bounds.getHeight();
 
 	}
-
-
-	//Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-	////Donut::Renderer2D::drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, 0.0f, texture_stair_, 1.0f);
-
-	//for (int y = 0; y < map_height_; y++)
-	//{
-	//	for (int x = 0; x < map_width_; x++)
-	//	{
-	//		Donut::Ref<Donut::Subtexture> texture;
-
-	//		char s = map_tiles[x + y * map_width_];
-	//		if (tile_map_.find(s) != tile_map_.end())
-	//		{
-	//			texture = tile_map_[s];
-	//		}
-	//		else
-	//		{
-	//			texture = texture_barrel_;
-	//		}
-
-	//		Donut::Renderer2D::drawRectangle(glm::vec3{ x - map_width_ / 2.0f, map_height_ / 2.0f - y, 0.5f }, glm::vec2{ 1.0f,1.0f }, 1.0f, texture, 1.0f);
-	//	}
-	//}
-	//Donut::Renderer2D::endScene();
 
 	framebuffer_->unBind();
 }
@@ -265,6 +209,14 @@ void Donut::EditorLayer::onImGuiRender()
 		ImGui::Separator();
 	}
 
+	ImGui::DragFloat3("Camera Transform", glm::value_ptr(fst_camera_.getComponent<TransformComponent>().transform_[3]));
+
+	if (ImGui::Checkbox("Use First Camera", &is_first_cam_))
+	{
+		fst_camera_.getComponent<CameraComponent>().is_primary_ = is_first_cam_;
+		sec_camera_.getComponent<CameraComponent>().is_primary_ = !is_first_cam_;
+	}
+
 	ImGui::End();
 
 
@@ -283,9 +235,9 @@ void Donut::EditorLayer::onImGuiRender()
 		{
 			viewport_size_.x = viewport_size.x;
 			viewport_size_.y = viewport_size.y;
-			framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+			//framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 
-			camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
+			//camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
 		}
 	}
 
