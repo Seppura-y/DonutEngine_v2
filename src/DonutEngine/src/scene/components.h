@@ -56,7 +56,7 @@ namespace Donut
 		CameraComponent(const CameraComponent&) = default;
 	};
 
-	struct NativeScriptComponent
+	struct NativeScriptComponent_Version1
 	{
 		ScriptableEntity* instance_ = nullptr;
 
@@ -76,6 +76,21 @@ namespace Donut
 			onCreateFunction = [](ScriptableEntity* instance) { ((T*)instance)->onCreate(); };
 			onDestroyFunction = [](ScriptableEntity* instance) { ((T*)instance)->onDestroy(); };
 			onUpdateFunction = [](ScriptableEntity* instance, Timestep ts) { ((T*)instance)->onUpdate(ts); };
+		}
+	};
+
+	struct NativeScriptComponent
+	{
+		ScriptableEntity* instance_ = nullptr;
+
+		ScriptableEntity* (*instantiateScript)();
+		void (*destroyScript)(NativeScriptComponent*);
+
+		template<typename T>
+		void bind()
+		{
+			instantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+			destroyScript = [](NativeScriptComponent* nsc) {delete nsc->instance_; nsc->instance_ = nullptr; };
 		}
 	};
 }

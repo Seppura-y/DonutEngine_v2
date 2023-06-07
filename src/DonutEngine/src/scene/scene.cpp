@@ -8,12 +8,6 @@
 
 namespace Donut
 {
-	static void doMath(const glm::mat4& transform)
-	{
-
-	}
-
-
 	Scene::Scene()
 	{
 #if ENTT_TEST_CODE
@@ -64,12 +58,12 @@ namespace Donut
 				{
 					if (!nsc.instance_)
 					{
-						nsc.instantiateFunction();
+						nsc.instance_ = nsc.instantiateScript();
 						nsc.instance_->entity_ = Entity{ entity, this };
-						nsc.onCreateFunction(nsc.instance_);
+						nsc.instance_->onCreate();
 					}
 
-					nsc.onUpdateFunction(nsc.instance_, ts);
+					nsc.instance_->onUpdate(ts);
 				});
 		}
 
@@ -79,7 +73,7 @@ namespace Donut
 			auto group = registry_.view<TransformComponent, CameraComponent>();
 			for (auto entity : group)
 			{
-				auto& [transform, camera] = group.get<TransformComponent, CameraComponent>(entity);
+				auto [transform, camera] = group.get<TransformComponent, CameraComponent>(entity);
 
 				if (camera.is_primary_)
 				{
@@ -97,7 +91,11 @@ namespace Donut
 			auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto entity : group)
 			{
-				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				// return a tuple that consturct with the references value, and the tuple return as value
+				// so we don't need to use '&' to receive the return value.
+				// because the API already did that.
+				//auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 				Renderer2D::drawRectangle(transform, sprite.color);
 			}
 
@@ -125,9 +123,10 @@ namespace Donut
 	Entity Scene::createEntity(const std::string& tag)
 	{
 		Entity entity = { registry_.create(), this };
-		entity.addComponent<TagComponent>(tag);
 		entity.addComponent<TransformComponent>(glm::mat4(1.0f));
 
+		auto t = entity.addComponent<TagComponent>(tag);
+		t.tag_ = tag.empty() ? "entity" : tag;
 		return entity;
 	}
 

@@ -69,7 +69,8 @@ void Donut::EditorLayer::onAttach()
 	public:
 		void onCreate()
 		{
-			
+			auto& transform = getComponent<TransformComponent>().transform_;
+			transform[3][0] = rand() % 10 - 5.0f;
 		}
 
 		void onDestroy()
