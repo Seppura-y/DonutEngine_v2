@@ -5,6 +5,7 @@
 #include "renderer/texture.h"
 #include "renderer/camera.h"
 #include "scene/scene_camera.h"
+#include "scene/scriptable_entity.h"
 
 namespace Donut
 {
@@ -53,6 +54,29 @@ namespace Donut
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
+	};
+
+	struct NativeScriptComponent
+	{
+		ScriptableEntity* instance_ = nullptr;
+
+		std::function<void()> instantiateFunction;
+		std::function<void()> destroyInstanceFunction;
+
+		std::function<void(ScriptableEntity*)> onCreateFunction;
+		std::function<void(ScriptableEntity*)> onDestroyFunction;
+		std::function<void(ScriptableEntity*, Timestep)> onUpdateFunction;
+
+		template<typename T>
+		void bind()
+		{
+			instantiateFunction = [&]() { instance_ = new T(); };
+			destroyInstanceFunction = [&]() {delete (T*)instance_; instance_ = nullptr; };
+
+			onCreateFunction = [](ScriptableEntity* instance) { ((T*)instance)->onCreate(); };
+			onDestroyFunction = [](ScriptableEntity* instance) { ((T*)instance)->onDestroy(); };
+			onUpdateFunction = [](ScriptableEntity* instance, Timestep ts) { ((T*)instance)->onUpdate(ts); };
+		}
 	};
 }
 #endif

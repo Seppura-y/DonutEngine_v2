@@ -58,6 +58,21 @@ namespace Donut
 
 	void Scene::onUpdate(Timestep ts)
 	{
+		// Update scripts
+		{
+			registry_.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+				{
+					if (!nsc.instance_)
+					{
+						nsc.instantiateFunction();
+						nsc.instance_->entity_ = Entity{ entity, this };
+						nsc.onCreateFunction(nsc.instance_);
+					}
+
+					nsc.onUpdateFunction(nsc.instance_, ts);
+				});
+		}
+
 		Camera* main_camera = nullptr;
 		glm::mat4* camera_transform = nullptr;
 		{

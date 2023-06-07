@@ -5,6 +5,10 @@
 #include "platform/opengl/opengl_shader.h"
 #include "platform/opengl/opengl_texture.h"
 
+#include "scene/scriptable_entity.h"
+
+#include "core/key_codes.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -58,6 +62,50 @@ void Donut::EditorLayer::onAttach()
 	sec_camera_ = active_scene_->createEntity("Second Camera");
 	auto& camera_component = sec_camera_.addComponent<CameraComponent>();
 	camera_component.is_primary_ = false;
+
+
+	class CameraController : public ScriptableEntity
+	{
+	public:
+		void onCreate()
+		{
+			
+		}
+
+		void onDestroy()
+		{
+
+		}
+
+		void onUpdate(Timestep ts)
+		{
+			auto& transform = getComponent<TransformComponent>().transform_;
+			float speed = 5.0f;
+			
+			if (Input::isKeyPressed(DN_KEY_A))
+			{
+				transform[3][0] -= speed * ts;
+			}
+			if (Input::isKeyPressed(DN_KEY_D))
+			{
+				transform[3][0] += speed * ts;
+			}
+			if (Input::isKeyPressed(DN_KEY_W))
+			{
+				transform[3][1] += speed * ts;
+			}
+			if (Input::isKeyPressed(DN_KEY_S))
+			{
+				transform[3][1] -= speed * ts;
+			}
+		}
+
+	private:
+
+	};
+
+	fst_camera_.addComponent<NativeScriptComponent>().bind<CameraController>();
+	sec_camera_.addComponent<NativeScriptComponent>().bind<CameraController>();
 }
 
 void Donut::EditorLayer::onDetach()
