@@ -2,7 +2,7 @@
 #define EDITOR_LAYER_H
 #include "donut.h"
 #include "renderer/subtexture.h"
-
+#include "panels/scene_hierarchy_panel.h"
 namespace Donut
 {
 	class EditorLayer : public Donut::Layer
@@ -56,6 +56,8 @@ namespace Donut
 		Donut::Entity fst_camera_;
 		Donut::Entity sec_camera_;
 		bool is_first_cam_ = true;
+
+		SceneHierarchyPanel scene_hierarchy_panel_;
 
 	};
 }

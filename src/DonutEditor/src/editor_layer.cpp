@@ -9,6 +9,7 @@
 
 #include "core/key_codes.h"
 
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -107,6 +108,8 @@ void Donut::EditorLayer::onAttach()
 
 	fst_camera_.addComponent<NativeScriptComponent>().bind<CameraController>();
 	sec_camera_.addComponent<NativeScriptComponent>().bind<CameraController>();
+
+	scene_hierarchy_panel_.setContext(active_scene_);
 }
 
 void Donut::EditorLayer::onDetach()
@@ -237,6 +240,8 @@ void Donut::EditorLayer::onImGuiRender()
 
 		ImGui::EndMenuBar();
 	}
+
+	scene_hierarchy_panel_.onImGuiRender();
 
 	ImGui::Begin("Settings");
 

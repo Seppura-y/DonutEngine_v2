@@ -34,6 +34,13 @@ FILE(GLOB ${PROJECT_NAME}_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/src/*.h
 )
 
+FILE(GLOB ${PROJECT_NAME}_PANEL_SOURCES 
+    ${CMAKE_CURRENT_LIST_DIR}/src/panels/*.cpp
+)
+
+FILE(GLOB ${PROJECT_NAME}_PANEL_HEADERS
+    ${CMAKE_CURRENT_LIST_DIR}/src/panels/*.h
+)
 #####################################################################################################
 # assets
 FILE(GLOB ${PROJECT_NAME}_TEXTURES
@@ -51,6 +58,9 @@ if (WIN32)
     add_executable(${PROJECT_NAME} WIN32
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_SOURCES}
+
+        ${${PROJECT_NAME}_PANEL_HEADERS}
+        ${${PROJECT_NAME}_PANEL_SOURCES}
     )
 
 elseif(UNIX)
