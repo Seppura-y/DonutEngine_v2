@@ -57,6 +57,12 @@ void Donut::EditorLayer::onAttach()
 
 	rect_entity_ = rect;
 
+	auto rect2 = active_scene_->createEntity("Rect 2");
+	rect2.addComponent<SpriteRendererComponent>(glm::vec4{ 1.0f , 0.0f, 0.0f, 1.0f });
+
+	auto& trans = rect2.getComponent<TransformComponent>().transform_;
+	trans = glm::translate(trans, glm::vec3{ 1.0f, 2.0f, 0.0f });
+
 	fst_camera_ = active_scene_->createEntity("First Camera");
 	fst_camera_.addComponent<CameraComponent>();
 
@@ -243,7 +249,7 @@ void Donut::EditorLayer::onImGuiRender()
 
 	scene_hierarchy_panel_.onImGuiRender();
 
-	ImGui::Begin("Settings");
+	ImGui::Begin("Stats");
 
 	auto stats = Donut::Renderer2D::getStatistics();
 	ImGui::Text("Renderer2D Stats:");
@@ -252,35 +258,35 @@ void Donut::EditorLayer::onImGuiRender()
 	ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
 	ImGui::Text("Indices: %d", stats.getTotalIndexCount());
 
-	if (rect_entity_)
-	{
-		ImGui::Separator();
+	//if (rect_entity_)
+	//{
+	//	ImGui::Separator();
 
-		auto& tag = rect_entity_.getComponent<TagComponent>();
-		ImGui::Text("%s", tag.tag_.c_str());
+	//	auto& tag = rect_entity_.getComponent<TagComponent>();
+	//	ImGui::Text("%s", tag.tag_.c_str());
 
-		auto& rect_color = rect_entity_.getComponent<SpriteRendererComponent>().color;
-		ImGui::ColorEdit4("Square Color", glm::value_ptr(rect_color));
+	//	auto& rect_color = rect_entity_.getComponent<SpriteRendererComponent>().color;
+	//	ImGui::ColorEdit4("Square Color", glm::value_ptr(rect_color));
 
-		ImGui::Separator();
-	}
+	//	ImGui::Separator();
+	//}
 
-	ImGui::DragFloat3("Camera Transform", glm::value_ptr(fst_camera_.getComponent<TransformComponent>().transform_[3]));
+	//ImGui::DragFloat3("Camera Transform", glm::value_ptr(fst_camera_.getComponent<TransformComponent>().transform_[3]));
 
-	if (ImGui::Checkbox("Use First Camera", &is_first_cam_))
-	{
-		fst_camera_.getComponent<CameraComponent>().is_primary_ = is_first_cam_;
-		sec_camera_.getComponent<CameraComponent>().is_primary_ = !is_first_cam_;
-	}
+	//if (ImGui::Checkbox("Use First Camera", &is_first_cam_))
+	//{
+	//	fst_camera_.getComponent<CameraComponent>().is_primary_ = is_first_cam_;
+	//	sec_camera_.getComponent<CameraComponent>().is_primary_ = !is_first_cam_;
+	//}
 
-	{
-		auto& camera = sec_camera_.getComponent<CameraComponent>().camera_;
-		float ortho_size = camera.getOrthographicSize();
-		if (ImGui::DragFloat("Second Camera Orthographic Size", &ortho_size))
-		{
-			camera.setOrthographicSize(ortho_size);
-		}
-	}
+	//{
+	//	auto& camera = sec_camera_.getComponent<CameraComponent>().camera_;
+	//	float ortho_size = camera.getOrthographicSize();
+	//	if (ImGui::DragFloat("Second Camera Orthographic Size", &ortho_size))
+	//	{
+	//		camera.setOrthographicSize(ortho_size);
+	//	}
+	//}
 
 	ImGui::End();
 

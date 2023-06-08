@@ -148,6 +148,17 @@ namespace Donut
 			}
 		}
 
+		if (entity.hasComponent<SpriteRendererComponent>())
+		{
+			auto& sprite_renderer_component = entity.getComponent<SpriteRendererComponent>();
+			if (ImGui::TreeNodeEx((void*)(typeid(SpriteRendererComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "SpriteRendererComponent"))
+			{
+				auto& color = sprite_renderer_component.color;
+				ImGui::ColorEdit4("SpriteColor", glm::value_ptr(color));
+
+				ImGui::TreePop();
+			}
+		}
 	}
 
 	void SceneHierarchyPanel::drawEntityNode(Entity& entity)
