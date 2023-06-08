@@ -19,6 +19,7 @@ namespace Donut
 		void onImGuiRender();
 
 	private:
+		void drawComponents(Entity entity);
 		void drawEntityNode(Entity& entity);
 	private:
 		Ref<Scene> context_;
