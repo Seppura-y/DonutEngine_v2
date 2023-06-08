@@ -60,7 +60,7 @@ void Donut::EditorLayer::onAttach()
 	auto rect2 = active_scene_->createEntity("Rect 2");
 	rect2.addComponent<SpriteRendererComponent>(glm::vec4{ 1.0f , 0.0f, 0.0f, 1.0f });
 
-	auto& trans = rect2.getComponent<TransformComponent>().transform_;
+	auto& trans = rect2.getComponent<TransformComponent>().getTransform();
 	trans = glm::translate(trans, glm::vec3{ 1.0f, 2.0f, 0.0f });
 
 	fst_camera_ = active_scene_->createEntity("First Camera");
@@ -76,8 +76,8 @@ void Donut::EditorLayer::onAttach()
 	public:
 		void onCreate()
 		{
-			auto& transform = getComponent<TransformComponent>().transform_;
-			transform[3][0] = rand() % 10 - 5.0f;
+			auto& translation = getComponent<TransformComponent>().translation_;
+			translation.x = rand() % 10 - 5.0f;
 		}
 
 		void onDestroy()
@@ -87,24 +87,24 @@ void Donut::EditorLayer::onAttach()
 
 		void onUpdate(Timestep ts)
 		{
-			auto& transform = getComponent<TransformComponent>().transform_;
+			auto& translation = getComponent<TransformComponent>().translation_;
 			float speed = 5.0f;
 			
 			if (Input::isKeyPressed(DN_KEY_A))
 			{
-				transform[3][0] -= speed * ts;
+				translation.x -= speed * ts;
 			}
 			if (Input::isKeyPressed(DN_KEY_D))
 			{
-				transform[3][0] += speed * ts;
+				translation.x += speed * ts;
 			}
 			if (Input::isKeyPressed(DN_KEY_W))
 			{
-				transform[3][1] += speed * ts;
+				translation.y += speed * ts;
 			}
 			if (Input::isKeyPressed(DN_KEY_S))
 			{
-				transform[3][1] -= speed * ts;
+				translation.y -= speed * ts;
 			}
 		}
 

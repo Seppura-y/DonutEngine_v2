@@ -1,12 +1,82 @@
 #include "scene_hierarchy_panel.h"
 
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include "../DonutEngine/src/scene/components.h"
 
 namespace Donut
 {
+	static void drawVec3Control(const std::string& label, glm::vec3& values, float reset_value = 0.0f, float colum_width = 100.0f)
+	{
+		ImGui::PushID(label.c_str());
+
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, colum_width);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+		float line_height = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 button_size = { line_height + 3.0f, line_height };
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.25f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		if (ImGui::Button("X", button_size))
+		{
+			values.x = reset_value;
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		// Note : "##X" is the identifier, need to be unique, otherwise the drag movement will affect multi-items
+		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.15f, 0.8f, 0.1f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.25f, 0.9f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.15f, 0.8f, 0.1f, 1.0f });
+		if (ImGui::Button("Y", button_size))
+		{
+			values.y = reset_value;
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.15f, 0.8f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.25f, 0.9f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.15f, 0.8f, 1.0f });
+		if (ImGui::Button("Z", button_size))
+		{
+			values.z = reset_value;
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+
+		ImGui::PopStyleVar();
+
+		ImGui::Columns(1);
+
+		ImGui::PopID();
+	}
+
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
 	{
 		setContext(scene);
@@ -61,8 +131,14 @@ namespace Donut
 		{
 			if (ImGui::TreeNodeEx((void*)(typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
 			{
-				auto& transform = entity.getComponent<TransformComponent>().transform_;
-				ImGui::DragFloat3("Position", glm::value_ptr(transform[3]), 0.1f);
+				auto& transform_component = entity.getComponent<TransformComponent>();
+				//ImGui::DragFloat3("Position", glm::value_ptr(transform_component.translation_), 0.1f);
+				drawVec3Control("Translation", transform_component.translation_);
+				auto degree = glm::degrees(transform_component.rotation_);
+				drawVec3Control("Rotation", degree);
+				transform_component.rotation_ = glm::radians(degree);
+
+				drawVec3Control("Scale", transform_component.scale_);
 
 				ImGui::TreePop();
 			}

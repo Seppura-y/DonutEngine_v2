@@ -2,6 +2,8 @@
 #define COMPONENTS_H
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "renderer/texture.h"
 #include "renderer/camera.h"
 #include "scene/scene_camera.h"
@@ -24,14 +26,33 @@ namespace Donut
 
 	struct TransformComponent
 	{
-		glm::mat4 transform_{ 1.0f };
+		glm::vec3 translation_ = { 0.0f,0.0f,0.0f };
+		glm::vec3 rotation_ = { 0.0f,0.0f,0.0f };
+		glm::vec3 scale_ = { 1.0f,1.0f,1.0f };
+
+		//glm::mat4 transform_{ 1.0f };
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const glm::mat4& transform) : transform_(transform) {}
+		TransformComponent(const glm::vec3& translation) : translation_(translation){}
 
-		operator glm::mat4& () { return transform_; }
-		operator const glm::mat4& () const { return transform_; }
+		//TransformComponent(const glm::mat4& transform) : transform_(transform) {}
+
+		//operator glm::mat4& () { return transform_; }
+		//operator const glm::mat4& () const { return transform_; }
+
+		glm::mat4 getTransform() const
+		{
+			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), rotation_.x, { 1, 0, 0 })
+				* glm::rotate(glm::mat4(1.0f), rotation_.y, { 0, 1, 0 })
+				* glm::rotate(glm::mat4(1.0f), rotation_.z, { 0, 0, 1 });
+
+			glm::mat4 scale = glm::scale(glm::mat4(1.0f), scale_);
+
+			return glm::translate(glm::mat4(1.0f), translation_)
+				* rotation
+				* scale;
+		}
 	};
 
 	struct SpriteRendererComponent

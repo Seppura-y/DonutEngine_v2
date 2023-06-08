@@ -68,7 +68,7 @@ namespace Donut
 		}
 
 		Camera* main_camera = nullptr;
-		glm::mat4* camera_transform = nullptr;
+		glm::mat4 camera_transform;
 		{
 			auto group = registry_.view<TransformComponent, CameraComponent>();
 			for (auto entity : group)
@@ -78,7 +78,7 @@ namespace Donut
 				if (camera.is_primary_)
 				{
 					main_camera = &camera.camera_;
-					camera_transform = &transform.transform_;
+					camera_transform = transform.getTransform();
 					break;
 				}
 			}
@@ -86,7 +86,7 @@ namespace Donut
 
 		if (main_camera)
 		{
-			Renderer2D::beginScene(main_camera->getProjection(), *camera_transform);
+			Renderer2D::beginScene(main_camera->getProjection(), camera_transform);
 
 			auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto entity : group)
@@ -96,7 +96,7 @@ namespace Donut
 				// because the API already did that.
 				//auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				Renderer2D::drawRectangle(transform, sprite.color);
+				Renderer2D::drawRectangle(transform.getTransform(), sprite.color);
 			}
 
 			Renderer2D::endScene();
@@ -123,7 +123,7 @@ namespace Donut
 	Entity Scene::createEntity(const std::string& tag)
 	{
 		Entity entity = { registry_.create(), this };
-		entity.addComponent<TransformComponent>(glm::mat4(1.0f));
+		entity.addComponent<TransformComponent>();
 
 		auto t = entity.addComponent<TagComponent>(tag);
 		t.tag_ = tag.empty() ? "entity" : tag;
