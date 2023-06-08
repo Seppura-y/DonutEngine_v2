@@ -134,4 +134,8 @@ namespace Donut
 	{
 		return registry_.create();
 	}
+	void Scene::destroyEntity(Entity entity)
+	{
+		registry_.destroy(entity);
+	}
 }

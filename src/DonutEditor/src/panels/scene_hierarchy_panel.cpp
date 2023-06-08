@@ -101,6 +101,16 @@ namespace Donut
 			selection_context_ = {};
 		}
 
+		if (ImGui::BeginPopupContextWindow(0, 1, false))
+		{
+			if (ImGui::MenuItem("Create Empty Entity"))
+			{
+				context_->createEntity("Empty Entity");
+			}
+
+			ImGui::EndPopup();
+		}
+
 		ImGui::End();
 
 		ImGui::Begin("Properties");
@@ -108,6 +118,28 @@ namespace Donut
 		if (selection_context_)
 		{
 			drawComponents(selection_context_);
+
+			if (ImGui::Button("Add Component"))
+			{
+				ImGui::OpenPopup("AddComponent");
+			}
+
+			if (ImGui::BeginPopup("AddComponent"))
+			{
+				if (ImGui::MenuItem("Camera"))
+				{
+					selection_context_.addComponent<CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Sprite Renderer"))
+				{
+					selection_context_.addComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
 		}
 
 		ImGui::End();
@@ -129,7 +161,7 @@ namespace Donut
 
 		if (entity.hasComponent<TransformComponent>())
 		{
-			if (ImGui::TreeNodeEx((void*)(typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
+			if (ImGui::TreeNodeEx((void*)(typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "TransformComponent"))
 			{
 				auto& transform_component = entity.getComponent<TransformComponent>();
 				//ImGui::DragFloat3("Position", glm::value_ptr(transform_component.translation_), 0.1f);
@@ -146,7 +178,7 @@ namespace Donut
 
 		if (entity.hasComponent<CameraComponent>())
 		{
-			if (ImGui::TreeNodeEx((void*)(typeid(CameraComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Camera"))
+			if (ImGui::TreeNodeEx((void*)(typeid(CameraComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "CameraComponent"))
 			{
 				auto& camera_component = entity.getComponent<CameraComponent>();
 				auto& camera = camera_component.camera_;
@@ -248,6 +280,19 @@ namespace Donut
 			selection_context_ = entity;
 		}
 
+		bool entity_deleted = false;
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Delete Entity"))
+			{
+				//context_->destroyEntity(entity);
+				entity_deleted = true;
+			}
+
+			ImGui::EndPopup();
+
+		}
+
 		if (opened)
 		{
 			ImGuiTreeNodeFlags flags = ((selection_context_ == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
@@ -257,6 +302,15 @@ namespace Donut
 				ImGui::TreePop();
 			}
 			ImGui::TreePop();
+		}
+
+		if (entity_deleted)
+		{
+			context_->destroyEntity(entity);
+			if (selection_context_ == entity)
+			{
+				selection_context_ = {};
+			}
 		}
 	}
 }

@@ -23,6 +23,8 @@ namespace Donut
 
 		operator uint32_t() const { return (uint32_t)entity_handle_; }
 
+		operator entt::entity() const { return entity_handle_; }
+
 		bool operator==(const Entity& other) const 
 		{
 			return entity_handle_ == other.entity_handle_ && scene_ == other.scene_;
