@@ -68,6 +68,86 @@ namespace Donut
 			}
 		}
 
+		if (entity.hasComponent<CameraComponent>())
+		{
+			if (ImGui::TreeNodeEx((void*)(typeid(CameraComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Camera"))
+			{
+				auto& camera_component = entity.getComponent<CameraComponent>();
+				auto& camera = camera_component.camera_;
+
+				ImGui::Checkbox("Is Primary Camera", &camera_component.is_primary_);
+
+				const char* projection_type[] = { "Perspective", "Orthographic" };
+				const char* current_projection_type = projection_type[(int)camera.getProjectionType()];
+				if (ImGui::BeginCombo("Projection", current_projection_type))
+				{
+					for (int i = 0; i < 2; i++)
+					{
+						// is_selected 设置点击扩展后是否高亮显示
+						bool is_selected = current_projection_type == projection_type[i];
+						if (ImGui::Selectable(projection_type[i], is_selected))
+						{
+							current_projection_type = projection_type[i];
+							camera.setProjectionType((SceneCamera::ProjectionType)i);
+						}
+
+						// 暂时不知有什么作用
+						if (is_selected)
+						{
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
+				}
+
+				if(camera_component.camera_.getProjectionType() == SceneCamera::ProjectionType::Orthographic)
+				{
+					float ortho_size = camera.getOrthographicSize();
+					if (ImGui::DragFloat("Size", &ortho_size), 0.1f)
+					{
+						camera.setOrthographicSize(ortho_size);
+					}
+
+					float ortho_near = camera.getOrthographicNearClip();
+					if (ImGui::DragFloat("Near", &ortho_near), 0.1f)
+					{
+						camera.setOrthographicNearClip(ortho_near);
+					}
+
+					float ortho_far = camera.getOrthographicFarClip();
+					if (ImGui::DragFloat("Far", &ortho_far), 0.1f)
+					{
+						camera.setOrthographicFarClip(ortho_far);
+					}
+
+					ImGui::Checkbox("Is Fixed Aspect Ratio", &camera_component.is_fixed_aspect_ratio_);
+				}
+
+				if (camera_component.camera_.getProjectionType() == SceneCamera::ProjectionType::Perspective)
+				{
+					float perspective_fov = glm::degrees(camera.getPerspectiveVerticalFov());
+					if (ImGui::DragFloat("FOV", &perspective_fov), 0.1f)
+					{
+						camera.setPerspectiveVerticalFov(perspective_fov);
+					}
+
+					float perspective_near = camera.getPerspectiveNearClip();
+					if (ImGui::DragFloat("Near", &perspective_near), 0.1f)
+					{
+						camera.setPerspectiveNearClip(perspective_near);
+					}
+
+					float perspective_far = camera.getPerspectiveFarClip();
+					if (ImGui::DragFloat("Far", &perspective_far), 0.1f)
+					{
+						camera.setPerspectiveFarClip(perspective_far);
+					}
+				}
+
+				ImGui::TreePop();
+			}
+		}
+
 	}
 
 	void SceneHierarchyPanel::drawEntityNode(Entity& entity)
