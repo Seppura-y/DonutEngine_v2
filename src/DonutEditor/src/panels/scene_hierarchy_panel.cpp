@@ -132,6 +132,12 @@ namespace Donut
 					ImGui::CloseCurrentPopup();
 				}
 
+				if (ImGui::MenuItem("Transform"))
+				{
+					selection_context_.addComponent<TransformComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
 				if (ImGui::MenuItem("Sprite Renderer"))
 				{
 					selection_context_.addComponent<SpriteRendererComponent>();
@@ -147,6 +153,9 @@ namespace Donut
 
 	void SceneHierarchyPanel::drawComponents(Entity entity)
 	{
+		// allow overlap to draw a overlap button which is used to delete the overlapped component
+		const ImGuiTreeNodeFlags treenode_flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
+
 		if (entity.hasComponent<TagComponent>())
 		{
 			auto& tag = entity.getComponent<TagComponent>().tag_;
@@ -161,7 +170,25 @@ namespace Donut
 
 		if (entity.hasComponent<TransformComponent>())
 		{
-			if (ImGui::TreeNodeEx((void*)(typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "TransformComponent"))
+			bool is_opened = ImGui::TreeNodeEx((void*)(typeid(TransformComponent).hash_code()), treenode_flags, "TransformComponent");
+			ImGui::SameLine();
+			if (ImGui::Button("+"))
+			{
+				// the string that as parameter is only a identifier, not the text to render in the UI
+				ImGui::OpenPopup("ComponentSettings");
+			}
+
+			bool component_removed = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				if (ImGui::MenuItem("Remove component"))
+				{
+					component_removed = true;
+				}
+				ImGui::EndPopup();
+			}
+
+			if (is_opened)
 			{
 				auto& transform_component = entity.getComponent<TransformComponent>();
 				//ImGui::DragFloat3("Position", glm::value_ptr(transform_component.translation_), 0.1f);
@@ -174,11 +201,18 @@ namespace Donut
 
 				ImGui::TreePop();
 			}
+
+			if (component_removed)
+			{
+				entity.removeComponent<TransformComponent>();
+			}
 		}
 
 		if (entity.hasComponent<CameraComponent>())
 		{
-			if (ImGui::TreeNodeEx((void*)(typeid(CameraComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "CameraComponent"))
+			bool is_opened = ImGui::TreeNodeEx((void*)(typeid(CameraComponent).hash_code()), treenode_flags, "CameraComponent");
+
+			if (is_opened)
 			{
 				auto& camera_component = entity.getComponent<CameraComponent>();
 				auto& camera = camera_component.camera_;
@@ -258,13 +292,36 @@ namespace Donut
 
 		if (entity.hasComponent<SpriteRendererComponent>())
 		{
-			auto& sprite_renderer_component = entity.getComponent<SpriteRendererComponent>();
-			if (ImGui::TreeNodeEx((void*)(typeid(SpriteRendererComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "SpriteRendererComponent"))
+			bool is_opened = ImGui::TreeNodeEx((void*)(typeid(SpriteRendererComponent).hash_code()), treenode_flags, "SpriteRendererComponent");
+			ImGui::SameLine();
+			if (ImGui::Button("+"))
 			{
+				// the string that as parameter is only a identifier, not the text to render in the UI
+				ImGui::OpenPopup("ComponentSettings");
+			}
+
+			bool component_removed = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				if (ImGui::MenuItem("Remove component"))
+				{
+					component_removed = true;
+				}
+				ImGui::EndPopup();
+			}
+
+			if (is_opened)
+			{
+				auto& sprite_renderer_component = entity.getComponent<SpriteRendererComponent>();
 				auto& color = sprite_renderer_component.color;
 				ImGui::ColorEdit4("SpriteColor", glm::value_ptr(color));
 
 				ImGui::TreePop();
+			}
+
+			if (component_removed)
+			{
+				entity.removeComponent<SpriteRendererComponent>();
 			}
 		}
 	}
