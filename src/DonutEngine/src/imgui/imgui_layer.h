@@ -26,6 +26,8 @@ namespace Donut
 		void end();
 
 		void setBlockEvents(bool status) { is_block_events_ = status; }
+
+		void setDarkThemeColors();
 	private:
 		float time_ = 0.0f;
 		bool is_block_events_ = false;

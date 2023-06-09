@@ -13,20 +13,25 @@ namespace Donut
 	static void drawComponent(const std::string& name, Entity entity, UIFunction function)
 	{
 		// allow overlap to draw a overlap button which is used to delete the overlapped component
-		const ImGuiTreeNodeFlags treenode_flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
+		const ImGuiTreeNodeFlags treenode_flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed 
+			| ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
 		if (entity.hasComponent<T>())
 		{
 			auto& component = entity.getComponent<T>();
+			ImVec2 content_region_avail = ImGui::GetContentRegionAvail();
 
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4,4 });
+			float line_height = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+			ImGui::Separator();
 			bool is_opened = ImGui::TreeNodeEx((void*)(typeid(T).hash_code()), treenode_flags, name.c_str());
-			ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
-			if (ImGui::Button("+"))
+			ImGui::PopStyleVar();
+
+			ImGui::SameLine(content_region_avail.x - line_height * 0.5f);
+			if (ImGui::Button("+", ImVec2{ line_height, line_height }))
 			{
-				// the string that as parameter is only a identifier, not the text to render in the UI
+				// the string that as parameter is only a identifier, not the text to render in the UI.
 				ImGui::OpenPopup("ComponentSettings");
 			}
-			ImGui::PopStyleVar();
 
 			bool component_removed = false;
 			if (ImGui::BeginPopup("ComponentSettings"))
@@ -170,34 +175,6 @@ namespace Donut
 		if (selection_context_)
 		{
 			drawComponents(selection_context_);
-
-			if (ImGui::Button("Add Component"))
-			{
-				ImGui::OpenPopup("AddComponent");
-			}
-
-			if (ImGui::BeginPopup("AddComponent"))
-			{
-				if (ImGui::MenuItem("Camera"))
-				{
-					selection_context_.addComponent<CameraComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("Transform"))
-				{
-					selection_context_.addComponent<TransformComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("Sprite Renderer"))
-				{
-					selection_context_.addComponent<SpriteRendererComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				ImGui::EndPopup();
-			}
 		}
 
 		ImGui::End();
@@ -213,133 +190,44 @@ namespace Donut
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
 			strcpy_s(buffer, sizeof(buffer), tag.c_str());
-			if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
+			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
 			}
 		}
 
-		//if (entity.hasComponent<TransformComponent>())
-		//{
-		//	bool is_opened = ImGui::TreeNodeEx((void*)(typeid(TransformComponent).hash_code()), treenode_flags, "TransformComponent");
-		//	ImGui::SameLine();
-		//	if (ImGui::Button("+"))
-		//	{
-		//		// the string that as parameter is only a identifier, not the text to render in the UI
-		//		ImGui::OpenPopup("ComponentSettings");
-		//	}
+		ImGui::SameLine();
+		//ImGui::PushItemWidth(-1);
 
-		//	bool component_removed = false;
-		//	if (ImGui::BeginPopup("ComponentSettings"))
-		//	{
-		//		if (ImGui::MenuItem("Remove component"))
-		//		{
-		//			component_removed = true;
-		//		}
-		//		ImGui::EndPopup();
-		//	}
+		if (ImGui::Button("Add Component"))
+		{
+			ImGui::OpenPopup("AddComponent");
+		}
 
-		//	if (is_opened)
-		//	{
-		//		auto& transform_component = entity.getComponent<TransformComponent>();
-		//		//ImGui::DragFloat3("Position", glm::value_ptr(transform_component.translation_), 0.1f);
-		//		drawVec3Control("Translation", transform_component.translation_);
-		//		auto degree = glm::degrees(transform_component.rotation_);
-		//		drawVec3Control("Rotation", degree);
-		//		transform_component.rotation_ = glm::radians(degree);
+		if (ImGui::BeginPopup("AddComponent"))
+		{
+			if (ImGui::MenuItem("Camera"))
+			{
+				selection_context_.addComponent<CameraComponent>();
+				ImGui::CloseCurrentPopup();
+			}
 
-		//		drawVec3Control("Scale", transform_component.scale_);
+			if (ImGui::MenuItem("Transform"))
+			{
+				selection_context_.addComponent<TransformComponent>();
+				ImGui::CloseCurrentPopup();
+			}
 
-		//		ImGui::TreePop();
-		//	}
+			if (ImGui::MenuItem("Sprite Renderer"))
+			{
+				selection_context_.addComponent<SpriteRendererComponent>();
+				ImGui::CloseCurrentPopup();
+			}
 
-		//	if (component_removed)
-		//	{
-		//		entity.removeComponent<TransformComponent>();
-		//	}
-		//}
+			ImGui::EndPopup();
+		}
 
-		//if (entity.hasComponent<CameraComponent>())
-		//{
-		//	bool is_opened = ImGui::TreeNodeEx((void*)(typeid(CameraComponent).hash_code()), treenode_flags, "CameraComponent");
-
-		//	if (is_opened)
-		//	{
-		//		auto& camera_component = entity.getComponent<CameraComponent>();
-		//		auto& camera = camera_component.camera_;
-
-		//		ImGui::Checkbox("Is Primary Camera", &camera_component.is_primary_);
-
-		//		const char* projection_type[] = { "Perspective", "Orthographic" };
-		//		const char* current_projection_type = projection_type[(int)camera.getProjectionType()];
-		//		if (ImGui::BeginCombo("Projection", current_projection_type))
-		//		{
-		//			for (int i = 0; i < 2; i++)
-		//			{
-		//				// is_selected 设置点击扩展后是否高亮显示
-		//				bool is_selected = current_projection_type == projection_type[i];
-		//				if (ImGui::Selectable(projection_type[i], is_selected))
-		//				{
-		//					current_projection_type = projection_type[i];
-		//					camera.setProjectionType((SceneCamera::ProjectionType)i);
-		//				}
-
-		//				// 暂时不知有什么作用
-		//				if (is_selected)
-		//				{
-		//					ImGui::SetItemDefaultFocus();
-		//				}
-		//			}
-		//			ImGui::EndCombo();
-		//		}
-
-		//		if (camera_component.camera_.getProjectionType() == SceneCamera::ProjectionType::Orthographic)
-		//		{
-		//			float ortho_size = camera.getOrthographicSize();
-		//			if (ImGui::DragFloat("Size", &ortho_size), 0.1f)
-		//			{
-		//				camera.setOrthographicSize(ortho_size);
-		//			}
-
-		//			float ortho_near = camera.getOrthographicNearClip();
-		//			if (ImGui::DragFloat("Near", &ortho_near), 0.1f)
-		//			{
-		//				camera.setOrthographicNearClip(ortho_near);
-		//			}
-
-		//			float ortho_far = camera.getOrthographicFarClip();
-		//			if (ImGui::DragFloat("Far", &ortho_far), 0.1f)
-		//			{
-		//				camera.setOrthographicFarClip(ortho_far);
-		//			}
-
-		//			ImGui::Checkbox("Is Fixed Aspect Ratio", &camera_component.is_fixed_aspect_ratio_);
-		//		}
-
-		//		if (camera_component.camera_.getProjectionType() == SceneCamera::ProjectionType::Perspective)
-		//		{
-		//			float perspective_fov = glm::degrees(camera.getPerspectiveVerticalFov());
-		//			if (ImGui::DragFloat("FOV", &perspective_fov), 0.1f)
-		//			{
-		//				camera.setPerspectiveVerticalFov(perspective_fov);
-		//			}
-
-		//			float perspective_near = camera.getPerspectiveNearClip();
-		//			if (ImGui::DragFloat("Near", &perspective_near), 0.1f)
-		//			{
-		//				camera.setPerspectiveNearClip(perspective_near);
-		//			}
-
-		//			float perspective_far = camera.getPerspectiveFarClip();
-		//			if (ImGui::DragFloat("Far", &perspective_far), 0.1f)
-		//			{
-		//				camera.setPerspectiveFarClip(perspective_far);
-		//			}
-		//		}
-
-		//		ImGui::TreePop();
-		//	}
-		//}
+		//ImGui::PopItemWidth();
 
 		drawComponent<TransformComponent>("Transform", entity, [](auto& component)
 		{
@@ -433,42 +321,6 @@ namespace Donut
 			ImGui::ColorEdit4("Color", glm::value_ptr(color));
 		});
 
-		//if (entity.hasComponent<SpriteRendererComponent>())
-		//{
-		//	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4,4 });
-		//	bool is_opened = ImGui::TreeNodeEx((void*)(typeid(SpriteRendererComponent).hash_code()), treenode_flags, "SpriteRendererComponent");
-		//	ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
-		//	if (ImGui::Button("+"))
-		//	{
-		//		// the string that as parameter is only a identifier, not the text to render in the UI
-		//		ImGui::OpenPopup("ComponentSettings");
-		//	}
-		//	ImGui::PopStyleVar();
-
-		//	bool component_removed = false;
-		//	if (ImGui::BeginPopup("ComponentSettings"))
-		//	{
-		//		if (ImGui::MenuItem("Remove component"))
-		//		{
-		//			component_removed = true;
-		//		}
-		//		ImGui::EndPopup();
-		//	}
-
-		//	if (is_opened)
-		//	{
-		//		auto& sprite_renderer_component = entity.getComponent<SpriteRendererComponent>();
-		//		auto& color = sprite_renderer_component.color;
-		//		ImGui::ColorEdit4("SpriteColor", glm::value_ptr(color));
-
-		//		ImGui::TreePop();
-		//	}
-
-		//	if (component_removed)
-		//	{
-		//		entity.removeComponent<SpriteRendererComponent>();
-		//	}
-		//}
 	}
 
 	void SceneHierarchyPanel::drawEntityNode(Entity& entity)
