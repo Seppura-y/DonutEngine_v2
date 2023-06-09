@@ -138,4 +138,41 @@ namespace Donut
 	{
 		registry_.destroy(entity);
 	}
+
+	template<typename T>
+	void Scene::onComponentAdded(Entity entity, T& component)
+	{
+		// you never suppose to not have a specializaion for this function
+		static_assert(false);
+	}
+
+	template<>
+	void Scene::onComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::onComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
+	{
+		component.camera_.setViewportSize(viewport_width_, viewport_height_);
+	}
+
+	template<>
+	void Scene::onComponentAdded<TagComponent>(Entity entity, TagComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::onComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::onComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
+	{
+
+	}
 }

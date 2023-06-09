@@ -292,13 +292,15 @@ namespace Donut
 
 		if (entity.hasComponent<SpriteRendererComponent>())
 		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4,4 });
 			bool is_opened = ImGui::TreeNodeEx((void*)(typeid(SpriteRendererComponent).hash_code()), treenode_flags, "SpriteRendererComponent");
-			ImGui::SameLine();
+			ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
 			if (ImGui::Button("+"))
 			{
 				// the string that as parameter is only a identifier, not the text to render in the UI
 				ImGui::OpenPopup("ComponentSettings");
 			}
+			ImGui::PopStyleVar();
 
 			bool component_removed = false;
 			if (ImGui::BeginPopup("ComponentSettings"))

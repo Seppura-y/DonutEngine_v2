@@ -23,10 +23,14 @@ namespace Donut
 
 		void destroyEntity(Entity entity);
 	private:
+		template<typename T>
+		void onComponentAdded(Entity entity, T& component);
+	private:
 		entt::registry registry_;
 		uint32_t viewport_width_ = 0;
 		uint32_t viewport_height_ = 0;
 
+		friend class Entity;
 		friend class SceneHierarchyPanel;
 	};
 }

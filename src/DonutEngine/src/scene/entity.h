@@ -49,6 +49,7 @@ namespace Donut
 		{
 			DN_CORE_ASSERT(!hasComponent<T>(), "Entity already has component!");
 			auto& component = scene_->getRegistry().emplace<T>(entity_handle_, std::forward<Args>(args)...);
+			scene_->onComponentAdded<T>(*this, component);
 			return component;
 		}
 
