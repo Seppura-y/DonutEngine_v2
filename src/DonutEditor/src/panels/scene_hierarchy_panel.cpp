@@ -142,6 +142,7 @@ namespace Donut
 	void SceneHierarchyPanel::setContext(const Ref<Scene>& scene)
 	{
 		context_ = scene;
+		selection_context_ = {};
 	}
 
 	void SceneHierarchyPanel::onImGuiRender()
@@ -294,7 +295,7 @@ namespace Donut
 
 			if (component.camera_.getProjectionType() == SceneCamera::ProjectionType::Perspective)
 			{
-				float perspective_fov = glm::degrees(camera.getPerspectiveVerticalFov());
+				float perspective_fov = camera.getPerspectiveVerticalFov();
 				if (ImGui::DragFloat("FOV", &perspective_fov), 0.1f)
 				{
 					camera.setPerspectiveVerticalFov(perspective_fov);

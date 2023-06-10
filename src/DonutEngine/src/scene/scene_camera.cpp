@@ -52,7 +52,7 @@ namespace Donut
         }
         else if (projection_type_ == ProjectionType::Perspective)
         {
-            projection_ = glm::perspective(perspective_fov_, aspect_ratio_, perspective_near_, perspective_far_);
+            projection_ = glm::perspective(glm::radians(perspective_fov_), aspect_ratio_, perspective_near_, perspective_far_);
         }
     }
 }

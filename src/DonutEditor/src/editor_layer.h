@@ -19,6 +19,12 @@ namespace Donut
 		virtual void onEvent(Donut::Event& ev) override;
 
 	private:
+		bool onKeyPressed(KeyPressedEvent& ev);
+
+		void newScene();
+		void openScene();
+		void saveSceneAs();
+	private:
 		struct ProfileResult
 		{
 			const char* name_;

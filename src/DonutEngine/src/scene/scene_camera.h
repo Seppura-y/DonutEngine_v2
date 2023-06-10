@@ -35,7 +35,7 @@ namespace Donut
 		float getPerspectiveFarClip() const { return perspective_far_; }
 		float getPerspectiveNearClip() const { return perspective_near_; }
 
-		void setPerspectiveVerticalFov(float fov) { perspective_fov_ = glm::radians(fov); recalculateProjection(); }
+		void setPerspectiveVerticalFov(float fov) { perspective_fov_ = fov; recalculateProjection(); }
 		void setPerspectiveFarClip(float far_clip) { perspective_far_ = far_clip; recalculateProjection(); }
 		void setPerspectiveNearClip(float near_clip) { perspective_near_ = near_clip; recalculateProjection(); }
 	private:
@@ -47,7 +47,7 @@ namespace Donut
 		float orthographic_near_ = -1.0f;
 		float orthographic_far_ = 1.0f;
 
-		float perspective_fov_ = glm::radians(45.0f);
+		float perspective_fov_ = 45.0f;
 		float perspective_near_ = -1.0f;
 		float perspective_far_ = 1.0f;
 		

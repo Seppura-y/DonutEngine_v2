@@ -10,6 +10,8 @@
 
 #include "core/key_codes.h"
 
+#include "utils/platform_utils.h"
+
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -118,8 +120,8 @@ void Donut::EditorLayer::onAttach()
 
 
 	scene_hierarchy_panel_.setContext(active_scene_);
-	SceneSerializer serializer(active_scene_);
-	serializer.deserialize("assets/scenes/example.yaml");
+	//SceneSerializer serializer(active_scene_);
+	//serializer.deserialize("assets/scenes/example.yaml");
 }
 
 void Donut::EditorLayer::onDetach()
@@ -186,6 +188,72 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 void Donut::EditorLayer::onEvent(Donut::Event& ev)
 {
 	camera_controller_.onEvent(ev);
+
+	EventDispatcher dispatcher(ev);
+	dispatcher.dispatch<KeyPressedEvent>(DN_BIND_EVENT_FN(EditorLayer::onKeyPressed));
+}
+
+bool Donut::EditorLayer::onKeyPressed(KeyPressedEvent& ev)
+{
+	// shortcuts
+	if (ev.getRepeatCount() > 0)
+	{
+		return false;
+	}
+	switch (ev.getKeyCode())
+	{
+	case DN_KEY_S:
+		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
+		{
+			saveSceneAs();
+		}
+		break;
+	case DN_KEY_N:
+		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
+		{
+			newScene();
+		}
+		break;
+	case DN_KEY_O:
+		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
+		{
+			openScene();
+		}
+		break;
+	}
+	return false;
+}
+
+void Donut::EditorLayer::newScene()
+{
+	active_scene_ = createRef<Scene>();
+	active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+	scene_hierarchy_panel_.setContext(active_scene_);
+}
+
+void Donut::EditorLayer::openScene()
+{
+	std::string filepath = FileDialogs::openFile("Donut Scene (*.yaml)\0*.yaml\0");
+
+	if (!filepath.empty())
+	{
+		active_scene_ = createRef<Scene>();
+		active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+		scene_hierarchy_panel_.setContext(active_scene_);
+
+		SceneSerializer serializer(active_scene_);
+		serializer.deserialize(filepath);
+	}
+}
+
+void Donut::EditorLayer::saveSceneAs()
+{
+	std::string filepath = FileDialogs::openFile("Donut Scene (*.yaml)\0*.yaml\0");
+	if (!filepath.empty())
+	{
+		SceneSerializer serializer(active_scene_);
+		serializer.serialize(filepath);
+	}
 }
 
 void Donut::EditorLayer::onImGuiRender()
@@ -248,15 +316,36 @@ void Donut::EditorLayer::onImGuiRender()
 			// which we can't undo at the moment without finer window depth/z control.
 			//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-			if (ImGui::MenuItem("Serialize"))
+			if (ImGui::MenuItem("New","Ctrl+N"))
 			{
-
+				active_scene_ = createRef<Scene>();
+				active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+				scene_hierarchy_panel_.setContext(active_scene_);
 			}
 
-			if (ImGui::MenuItem("Deserialize"))
+			if (ImGui::MenuItem("Open...", "Ctrl+O"))
 			{
-				SceneSerializer serializer(active_scene_);
-				serializer.deserialize("assets/scenes/example.yaml");
+				std::string filepath = FileDialogs::openFile("Donut Scene (*.yaml)\0*.yaml\0");
+
+				if (!filepath.empty())
+				{
+					active_scene_ = createRef<Scene>();
+					active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+					scene_hierarchy_panel_.setContext(active_scene_);
+
+					SceneSerializer serializer(active_scene_);
+					serializer.deserialize(filepath);
+				}
+			}
+
+			if (ImGui::MenuItem("Save As...", "Ctrl+S"))
+			{
+				std::string filepath = FileDialogs::openFile("Donut Scene (*.yaml)\0*.yaml\0");
+				if (!filepath.empty())
+				{
+					SceneSerializer serializer(active_scene_);
+					serializer.serialize(filepath);
+				}
 			}
 
 			if (ImGui::MenuItem("Exit")) Donut::Application::getInstance().close();
