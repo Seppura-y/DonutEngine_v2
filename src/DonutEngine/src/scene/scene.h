@@ -31,6 +31,7 @@ namespace Donut
 		uint32_t viewport_height_ = 0;
 
 		friend class Entity;
+		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
 	};
 }

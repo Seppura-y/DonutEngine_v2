@@ -115,6 +115,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw3.lib   #为什么这些库不能从DonutEngine流转过来，实际上在DonutEngine中通过PUBLIC链接的库会流转到引用它的目标中
     glad.lib
     imgui.lib
+    yaml-cpp.lib
 )
 
 set_property(TARGET ${PROJECT_NAME}

@@ -96,7 +96,7 @@ namespace Donut
 				// because the API already did that.
 				//auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				Renderer2D::drawRectangle(transform.getTransform(), sprite.color);
+				Renderer2D::drawRectangle(transform.getTransform(), sprite.color_);
 			}
 
 			Renderer2D::endScene();

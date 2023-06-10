@@ -5,9 +5,10 @@ project(DonutEngine LANGUAGES CXX)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glad)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp)
 # add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/spdlog)
 # add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glm)
-set_property(TARGET glad glfw imgui PROPERTY FOLDER "Dependencies")
+set_property(TARGET glad glfw imgui yaml-cpp PROPERTY FOLDER "Dependencies")
 
 set(DN_SHARED OFF CACHE BOOL "Build shared library?")
 
@@ -315,6 +316,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/stb_image
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/entt/include
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp/include
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp
 
 )
 
@@ -330,6 +333,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     glfw3.lib
     glad.lib
     imgui.lib
+    yaml-cpp.lib
 )
 set_property(TARGET ${PROJECT_NAME}
 	PROPERTY

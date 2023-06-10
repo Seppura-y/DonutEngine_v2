@@ -6,6 +6,7 @@
 #include "platform/opengl/opengl_texture.h"
 
 #include "scene/scriptable_entity.h"
+#include "scene/scene_serializer.h"
 
 #include "core/key_codes.h"
 
@@ -52,70 +53,73 @@ void Donut::EditorLayer::onAttach()
 
 
 	active_scene_ = createRef<Scene>();
-	auto rect = active_scene_->createEntity("Test Rect");
-	rect.addComponent<SpriteRendererComponent>(glm::vec4{ 1.0f });
+	//auto rect = active_scene_->createEntity("Test Rect");
+	//rect.addComponent<SpriteRendererComponent>(glm::vec4{ 1.0f });
 
-	rect_entity_ = rect;
+	//rect_entity_ = rect;
 
-	auto rect2 = active_scene_->createEntity("Rect 2");
-	rect2.addComponent<SpriteRendererComponent>(glm::vec4{ 1.0f , 0.0f, 0.0f, 1.0f });
+	//auto rect2 = active_scene_->createEntity("Rect 2");
+	//rect2.addComponent<SpriteRendererComponent>(glm::vec4{ 1.0f , 0.0f, 0.0f, 1.0f });
 
-	auto& trans = rect2.getComponent<TransformComponent>().getTransform();
-	trans = glm::translate(trans, glm::vec3{ 1.0f, 2.0f, 0.0f });
+	//auto& trans = rect2.getComponent<TransformComponent>().getTransform();
+	//trans = glm::translate(trans, glm::vec3{ 1.0f, 2.0f, 0.0f });
 
-	fst_camera_ = active_scene_->createEntity("First Camera");
-	fst_camera_.addComponent<CameraComponent>();
+	//fst_camera_ = active_scene_->createEntity("First Camera");
+	//fst_camera_.addComponent<CameraComponent>();
 
-	sec_camera_ = active_scene_->createEntity("Second Camera");
-	auto& camera_component = sec_camera_.addComponent<CameraComponent>();
-	camera_component.is_primary_ = false;
+	//sec_camera_ = active_scene_->createEntity("Second Camera");
+	//auto& camera_component = sec_camera_.addComponent<CameraComponent>();
+	//camera_component.is_primary_ = false;
 
 
-	class CameraController : public ScriptableEntity
-	{
-	public:
-		void onCreate()
-		{
-			auto& translation = getComponent<TransformComponent>().translation_;
-			translation.x = rand() % 10 - 5.0f;
-		}
+	//class CameraController : public ScriptableEntity
+	//{
+	//public:
+	//	void onCreate()
+	//	{
+	//		auto& translation = getComponent<TransformComponent>().translation_;
+	//		translation.x = rand() % 10 - 5.0f;
+	//	}
 
-		void onDestroy()
-		{
+	//	void onDestroy()
+	//	{
 
-		}
+	//	}
 
-		void onUpdate(Timestep ts)
-		{
-			auto& translation = getComponent<TransformComponent>().translation_;
-			float speed = 5.0f;
-			
-			if (Input::isKeyPressed(DN_KEY_A))
-			{
-				translation.x -= speed * ts;
-			}
-			if (Input::isKeyPressed(DN_KEY_D))
-			{
-				translation.x += speed * ts;
-			}
-			if (Input::isKeyPressed(DN_KEY_W))
-			{
-				translation.y += speed * ts;
-			}
-			if (Input::isKeyPressed(DN_KEY_S))
-			{
-				translation.y -= speed * ts;
-			}
-		}
+	//	void onUpdate(Timestep ts)
+	//	{
+	//		auto& translation = getComponent<TransformComponent>().translation_;
+	//		float speed = 5.0f;
+	//		
+	//		if (Input::isKeyPressed(DN_KEY_A))
+	//		{
+	//			translation.x -= speed * ts;
+	//		}
+	//		if (Input::isKeyPressed(DN_KEY_D))
+	//		{
+	//			translation.x += speed * ts;
+	//		}
+	//		if (Input::isKeyPressed(DN_KEY_W))
+	//		{
+	//			translation.y += speed * ts;
+	//		}
+	//		if (Input::isKeyPressed(DN_KEY_S))
+	//		{
+	//			translation.y -= speed * ts;
+	//		}
+	//	}
 
-	private:
+	//private:
 
-	};
+	//};
 
-	fst_camera_.addComponent<NativeScriptComponent>().bind<CameraController>();
-	sec_camera_.addComponent<NativeScriptComponent>().bind<CameraController>();
+	//fst_camera_.addComponent<NativeScriptComponent>().bind<CameraController>();
+	//sec_camera_.addComponent<NativeScriptComponent>().bind<CameraController>();
+
 
 	scene_hierarchy_panel_.setContext(active_scene_);
+	SceneSerializer serializer(active_scene_);
+	serializer.deserialize("assets/scenes/example.yaml");
 }
 
 void Donut::EditorLayer::onDetach()
@@ -243,6 +247,17 @@ void Donut::EditorLayer::onImGuiRender()
 			// Disabling fullscreen would allow the window to be moved to the front of other windows, 
 			// which we can't undo at the moment without finer window depth/z control.
 			//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
+
+			if (ImGui::MenuItem("Serialize"))
+			{
+
+			}
+
+			if (ImGui::MenuItem("Deserialize"))
+			{
+				SceneSerializer serializer(active_scene_);
+				serializer.deserialize("assets/scenes/example.yaml");
+			}
 
 			if (ImGui::MenuItem("Exit")) Donut::Application::getInstance().close();
 			ImGui::EndMenu();

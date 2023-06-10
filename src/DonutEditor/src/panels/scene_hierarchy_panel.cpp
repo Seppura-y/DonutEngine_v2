@@ -317,7 +317,7 @@ namespace Donut
 
 		drawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 		{
-			auto& color = component.color;
+			auto& color = component.color_;
 			ImGui::ColorEdit4("Color", glm::value_ptr(color));
 		});
 
