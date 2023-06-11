@@ -139,6 +139,21 @@ namespace Donut
 		registry_.destroy(entity);
 	}
 
+	Entity Scene::getPrimaryCameraEntity()
+	{
+		auto view = registry_.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			const auto& camera = view.get<CameraComponent>(entity);
+			if (camera.is_primary_)
+			{
+				return Entity{ entity, this };
+			}
+		}
+
+		return {};
+	}
+
 	template<typename T>
 	void Scene::onComponentAdded(Entity entity, T& component)
 	{

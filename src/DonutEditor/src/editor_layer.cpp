@@ -12,6 +12,9 @@
 
 #include "utils/platform_utils.h"
 
+#include "ImGuizmo.h"
+#include "math/math.h"
+
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -220,6 +223,35 @@ bool Donut::EditorLayer::onKeyPressed(KeyPressedEvent& ev)
 			openScene();
 		}
 		break;
+
+	case DN_KEY_U:
+		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
+		{
+			gizmo_type_ = -1;
+		}
+		break;
+
+	case DN_KEY_I:
+		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
+		{
+			gizmo_type_ = ImGuizmo::OPERATION::TRANSLATE;
+		}
+		break;
+
+	case DN_KEY_J:
+		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
+		{
+			gizmo_type_ = ImGuizmo::OPERATION::ROTATE;
+		}
+		break;
+
+	case DN_KEY_K:
+		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
+		{
+			gizmo_type_ = ImGuizmo::OPERATION::SCALE;
+		}
+		break;
+
 	}
 	return false;
 }
@@ -422,6 +454,52 @@ void Donut::EditorLayer::onImGuiRender()
 
 	uint32_t textureID = framebuffer_->getColorAttachmentID();
 	ImGui::Image((void*)textureID, ImVec2{ viewport_size_.x, viewport_size_.y}, ImVec2{0.0f, 1.0f}, ImVec2{1.0f,0.0f});
+
+	// Gizmos
+	Entity selectedEntity = scene_hierarchy_panel_.getSelectedEntity();
+	if (selectedEntity && gizmo_type_ != -1)
+	{
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist();
+
+		float windowWidth = (float)ImGui::GetWindowWidth();
+		float windowHeight = (float)ImGui::GetWindowHeight();
+		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+		// Camera
+		auto cameraEntity = active_scene_->getPrimaryCameraEntity();
+		const auto& camera = cameraEntity.getComponent<CameraComponent>().camera_;
+		const glm::mat4& cameraProjection = camera.getProjection();
+		glm::mat4 cameraView = glm::inverse(cameraEntity.getComponent<TransformComponent>().getTransform());
+
+		// Entity transform
+		auto& tc = selectedEntity.getComponent<TransformComponent>();
+		glm::mat4 transform = tc.getTransform();
+
+		// Snapping
+		bool snap = Input::isKeyPressed(Key::LeftControl);
+		float snapValue = 0.5f; // Snap to 0.5m for translation/scale
+		// Snap to 45 degrees for rotation
+		if (gizmo_type_ == ImGuizmo::OPERATION::ROTATE)
+			snapValue = 45.0f;
+
+		float snapValues[3] = { snapValue, snapValue, snapValue };
+
+		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+			(ImGuizmo::OPERATION)gizmo_type_, ImGuizmo::LOCAL, glm::value_ptr(transform),
+			nullptr, snap ? snapValues : nullptr);
+
+		if (ImGuizmo::IsUsing())
+		{
+			glm::vec3 translation, rotation, scale;
+			Math::DecomposeTransform(transform, translation, rotation, scale);
+
+			glm::vec3 deltaRotation = rotation - tc.rotation_;
+			tc.translation_ = translation;
+			tc.rotation_ += deltaRotation;
+			tc.scale_ = scale;
+		}
+	}
 
 	ImGui::End();
 	ImGui::PopStyleVar();

@@ -65,6 +65,7 @@ namespace Donut
 
 		SceneHierarchyPanel scene_hierarchy_panel_;
 
+		int gizmo_type_ = -1;
 	};
 }
 #endif

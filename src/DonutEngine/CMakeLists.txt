@@ -145,8 +145,29 @@ FILE(GLOB ${PROJECT_NAME}_STB_IMAGE_HEADER
 )
 
 FILE(GLOB ${PROJECT_NAME}_STB_IMAGE_SRC
-    ${CMAKE_CURRENT_LIST_DIR}/src/renderer/stb_image.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/stb_image/stb_image.cpp
 )
+
+#####################################################################################################
+# imguizmo
+FILE(GLOB ${PROJECT_NAME}_IMGUIZMO_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/ImGuizmo/ImGuizmo.h
+)
+
+FILE(GLOB ${PROJECT_NAME}_IMGUIZMO_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/ImGuizmo/ImGuizmo.cpp
+)
+
+#####################################################################################################
+# math
+FILE(GLOB ${PROJECT_NAME}_MATH_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/src/math/*.h
+)
+
+FILE(GLOB ${PROJECT_NAME}_MATH_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/src/math/*.cpp
+)
+
 
 #####################################################################################################
 # assets
@@ -187,6 +208,7 @@ source_group("src\\DonutEngine\\Renderer" FILES ${${PROJECT_NAME}_RENDERER_HEADE
 source_group("src\\DonutEngine\\ImGui" FILES ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC})
 source_group("src\\DonutEngine\\Scene" FILES ${${PROJECT_NAME}_SCENE_HEADER} ${${PROJECT_NAME}_SCENE_SRC})
 source_group("src\\DonutEngine\\Utils" FILES ${${PROJECT_NAME}_UTILS_HEADER} ${${PROJECT_NAME}_UTILS_SRC})
+source_group("src\\DonutEngine\\Math" FILES ${${PROJECT_NAME}_MATH_HEADER} ${${PROJECT_NAME}_MATH_SRC})
 
 source_group("src\\DonutEngine\\Platform\\OpenGL" FILES ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC})
 source_group("src\\DonutEngine\\Platform\\Windows" FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
@@ -196,6 +218,8 @@ source_group("src\\Debug" FILES ${${PROJECT_NAME}_DEBUG_HEADER} ${${PROJECT_NAME
 source_group("src\\glm" FILES ${${PROJECT_NAME}_GLM_HEADER})
 
 source_group("src\\stb_image" FILES ${${PROJECT_NAME}_STB_IMAGE_HEADER} ${${PROJECT_NAME}_STB_IMAGE_SRC})
+
+source_group("src\\imguizmo" FILES ${${PROJECT_NAME}_IMGUIZMO_HEADER} ${${PROJECT_NAME}_IMGUIZMO_SRC})
 
 source_group("assets\\shaders"  FILES ${${PROJECT_NAME}_SHADERS} )
 source_group("assets\\textures" FILES ${${PROJECT_NAME}_TEXTURES} )
@@ -213,6 +237,9 @@ else()
     set(CONFIG_TYPE STATIC)
 endif()
 
+set_source_files_properties(${${PROJECT_NAME}_IMGUIZMO_SRC} PROPERTIES 
+    COMPILE_FLAGS "/Y-"
+)
 
 # Add the library
 if (WIN32) 
@@ -229,7 +256,9 @@ if (WIN32)
         ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC}
         ${${PROJECT_NAME}_SCENE_HEADER} ${${PROJECT_NAME}_SCENE_SRC}
         ${${PROJECT_NAME}_UTILS_HEADER} ${${PROJECT_NAME}_UTILS_SRC}
-        
+        ${${PROJECT_NAME}_IMGUIZMO_HEADER} ${${PROJECT_NAME}_IMGUIZMO_SRC}
+        ${${PROJECT_NAME}_MATH_HEADER} ${${PROJECT_NAME}_MATH_SRC}
+
         ${${PROJECT_NAME}_GLM_HEADER}
 
         ${${PROJECT_NAME}_DEBUG_HEADER} ${${PROJECT_NAME}_DEBUG_SRC}
@@ -330,6 +359,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/entt/include
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp/include
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/ImGuizmo
 
 )
 

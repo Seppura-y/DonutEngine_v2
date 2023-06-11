@@ -18,6 +18,8 @@ namespace Donut
 
 		void onImGuiRender();
 
+		Entity getSelectedEntity() const { return selection_context_; }
+
 	private:
 		void drawComponents(Entity entity);
 		void drawEntityNode(Entity& entity);

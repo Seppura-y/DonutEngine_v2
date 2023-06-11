@@ -4,6 +4,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 #include "renderer/texture.h"
 #include "renderer/camera.h"
 #include "scene/scene_camera.h"
@@ -43,9 +46,11 @@ namespace Donut
 
 		glm::mat4 getTransform() const
 		{
-			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), rotation_.x, { 1, 0, 0 })
-				* glm::rotate(glm::mat4(1.0f), rotation_.y, { 0, 1, 0 })
-				* glm::rotate(glm::mat4(1.0f), rotation_.z, { 0, 0, 1 });
+			//glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), rotation_.x, { 1, 0, 0 })
+			//	* glm::rotate(glm::mat4(1.0f), rotation_.y, { 0, 1, 0 })
+			//	* glm::rotate(glm::mat4(1.0f), rotation_.z, { 0, 0, 1 });
+
+			glm::mat4 rotation = glm::toMat4(glm::quat(rotation_));
 
 			glm::mat4 scale = glm::scale(glm::mat4(1.0f), scale_);
 

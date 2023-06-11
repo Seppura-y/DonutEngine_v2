@@ -8,6 +8,7 @@
 #include "core/application.h"
 //#include "events/mouse_event.h"
 
+#include "ImGuizmo.h"
 
 #include <glfw/glfw3.h>
 #include <glad/glad.h>
@@ -118,6 +119,7 @@ namespace Donut
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiLayer::end()
