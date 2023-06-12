@@ -52,6 +52,7 @@ void Donut::EditorLayer::onAttach()
 	DN_PROFILE_FUNCTION();
 
 	Donut::FramebufferSpecification framebuffer_spec;
+	framebuffer_spec.attachments_specifications_ = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
 	framebuffer_spec.width_ = 1280;
 	framebuffer_spec.height_ = 720;
 	framebuffer_ = Donut::Framebuffer::createFramebuffer(framebuffer_spec);
