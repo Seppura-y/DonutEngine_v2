@@ -80,8 +80,8 @@ namespace Donut
 	void EditorCamera::updateView()
 	{
 		// 2D模式下，禁用X Y轴的旋转
-		yaw_ = 0.0f;
-		pitch_ = 0.0f;
+		//yaw_ = 0.0f;
+		//pitch_ = 0.0f;
 
 
 		position_ = calculatePosition();
