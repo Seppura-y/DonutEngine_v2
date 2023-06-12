@@ -4,9 +4,12 @@
 #include "entt.hpp"
 #include "core/timestep.h"
 
+
+
 namespace Donut
 {
 	class Entity;
+	class EditorCamera;
 
 	class Scene
 	{
@@ -14,7 +17,9 @@ namespace Donut
 		Scene();
 		~Scene();
 
-		void onUpdate(Timestep ts);
+		void onUpdateRuntime(Timestep ts);
+		void onUpdateEditor(Timestep ts, EditorCamera& camera);
+
 		void onViewportResize(uint32_t width, uint32_t height);
 
 		Entity createEntity(const std::string& tag = std::string());

@@ -2,7 +2,11 @@
 #include "scene.h"
 #include "components.h"
 #include "renderer/renderer_2d.h"
+
+#include "renderer/editor_camera.h"
+
 #include "scene/entity.h"
+
 
 #include <glm/glm.hpp>
 
@@ -50,7 +54,7 @@ namespace Donut
 
 	}
 
-	void Scene::onUpdate(Timestep ts)
+	void Scene::onUpdateRuntime(Timestep ts)
 	{
 		// Update scripts
 		{
@@ -101,6 +105,24 @@ namespace Donut
 
 			Renderer2D::endScene();
 		}
+	}
+
+	void Scene::onUpdateEditor(Timestep ts, EditorCamera& camera)
+	{
+		Renderer2D::beginScene(camera);
+
+		auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto entity : group)
+		{
+			// return a tuple that consturct with the references value, and the tuple return as value
+			// so we don't need to use '&' to receive the return value.
+			// because the API already did that.
+			//auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			Renderer2D::drawRectangle(transform.getTransform(), sprite.color_);
+		}
+
+		Renderer2D::endScene();
 	}
 
 	void Scene::onViewportResize(uint32_t width, uint32_t height)

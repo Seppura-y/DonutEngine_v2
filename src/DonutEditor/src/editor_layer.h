@@ -2,6 +2,7 @@
 #define EDITOR_LAYER_H
 #include "donut.h"
 #include "renderer/subtexture.h"
+#include "renderer/editor_camera.h"
 #include "panels/scene_hierarchy_panel.h"
 namespace Donut
 {
@@ -66,6 +67,8 @@ namespace Donut
 		SceneHierarchyPanel scene_hierarchy_panel_;
 
 		int gizmo_type_ = -1;
+		
+		EditorCamera editor_camera_;
 	};
 }
 #endif

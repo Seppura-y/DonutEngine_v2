@@ -5,6 +5,7 @@
 #include "renderer/texture.h"
 #include "renderer/subtexture.h"
 #include "renderer/camera.h"
+#include "renderer/editor_camera.h"
 
 namespace Donut
 {
@@ -20,6 +21,7 @@ namespace Donut
 		/// <param name="transform">摄像机自身的转换矩阵</param>
 		static void beginScene(const Camera& camera, const glm::mat4& transform);
 		static void beginScene(const OrthographicCamera& camera);
+		static void beginScene(const EditorCamera& camera);
 		static void endScene();
 		static void flush();
 

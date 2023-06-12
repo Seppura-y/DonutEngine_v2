@@ -142,6 +142,21 @@ namespace Donut
 		s_data.texture_index_ = 1;
 	}
 
+	void Renderer2D::beginScene(const EditorCamera& camera)
+	{
+		DN_PROFILE_FUNCTION();
+
+		glm::mat4 view_projection = camera.getViewProjection();
+
+		s_data.single_shader_->bind();
+		s_data.single_shader_->setMat4("u_viewProjectionMatrix", view_projection);
+
+		s_data.rect_indices_count_ = 0;
+		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
+
+		s_data.texture_index_ = 1;
+	}
+
 	void Renderer2D::endScene()
 	{
 		DN_PROFILE_FUNCTION();

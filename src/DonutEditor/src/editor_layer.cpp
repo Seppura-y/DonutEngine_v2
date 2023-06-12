@@ -125,6 +125,8 @@ void Donut::EditorLayer::onAttach()
 	scene_hierarchy_panel_.setContext(active_scene_);
 	//SceneSerializer serializer(active_scene_);
 	//serializer.deserialize("assets/scenes/example.yaml");
+
+	editor_camera_ = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 }
 
 void Donut::EditorLayer::onDetach()
@@ -146,6 +148,8 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 		camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
 
 		active_scene_->onViewportResize(viewport_size_.x, viewport_size_.y);
+
+		editor_camera_.setViewportSize(viewport_size_.x, viewport_size_.y);
 	}
 
 	//framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
@@ -155,6 +159,7 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 	{
 		camera_controller_.onUpdate(ts);
 	}
+	editor_camera_.onUpdate(ts);
 
 	Donut::Renderer2D::resetStatistics();
 
@@ -167,7 +172,8 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 
 	//Renderer2D::beginScene(camera_controller_.getCamera());
 
-	active_scene_->onUpdate(ts);
+	//active_scene_->onUpdateRuntime(ts);
+	active_scene_->onUpdateEditor(ts,editor_camera_);
 
 	//Renderer2D::endScene();
 
@@ -191,6 +197,7 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 void Donut::EditorLayer::onEvent(Donut::Event& ev)
 {
 	camera_controller_.onEvent(ev);
+	editor_camera_.onEvent(ev);
 
 	EventDispatcher dispatcher(ev);
 	dispatcher.dispatch<KeyPressedEvent>(DN_BIND_EVENT_FN(EditorLayer::onKeyPressed));
@@ -456,47 +463,50 @@ void Donut::EditorLayer::onImGuiRender()
 	ImGui::Image((void*)textureID, ImVec2{ viewport_size_.x, viewport_size_.y}, ImVec2{0.0f, 1.0f}, ImVec2{1.0f,0.0f});
 
 	// Gizmos
-	Entity selectedEntity = scene_hierarchy_panel_.getSelectedEntity();
-	if (selectedEntity && gizmo_type_ != -1)
+	Entity selected_entity = scene_hierarchy_panel_.getSelectedEntity();
+	if (selected_entity && gizmo_type_ != -1)
 	{
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
 
-		float windowWidth = (float)ImGui::GetWindowWidth();
-		float windowHeight = (float)ImGui::GetWindowHeight();
-		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+		float window_width = (float)ImGui::GetWindowWidth();
+		float window_height = (float)ImGui::GetWindowHeight();
+		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, window_width, window_height);
 
 		// Camera
-		auto cameraEntity = active_scene_->getPrimaryCameraEntity();
-		const auto& camera = cameraEntity.getComponent<CameraComponent>().camera_;
-		const glm::mat4& cameraProjection = camera.getProjection();
-		glm::mat4 cameraView = glm::inverse(cameraEntity.getComponent<TransformComponent>().getTransform());
+		//auto camera_entity = active_scene_->getPrimaryCameraEntity();
+		//const auto& camera = camera_entity.getComponent<CameraComponent>().camera_;
+		//const glm::mat4& camera_projection = camera.getProjection();
+		//glm::mat4 camera_view = glm::inverse(camera_entity.getComponent<TransformComponent>().getTransform());
+
+		const glm::mat4& camera_projection = editor_camera_.getProjection();
+		glm::mat4 camera_view = editor_camera_.getViewMatrix();
 
 		// Entity transform
-		auto& tc = selectedEntity.getComponent<TransformComponent>();
+		auto& tc = selected_entity.getComponent<TransformComponent>();
 		glm::mat4 transform = tc.getTransform();
 
 		// Snapping
 		bool snap = Input::isKeyPressed(Key::LeftControl);
-		float snapValue = 0.5f; // Snap to 0.5m for translation/scale
+		float snap_value = 0.5f; // Snap to 0.5m for translation/scale
 		// Snap to 45 degrees for rotation
 		if (gizmo_type_ == ImGuizmo::OPERATION::ROTATE)
-			snapValue = 45.0f;
+			snap_value = 45.0f;
 
-		float snapValues[3] = { snapValue, snapValue, snapValue };
+		float snap_values[3] = { snap_value, snap_value, snap_value };
 
-		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+		ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
 			(ImGuizmo::OPERATION)gizmo_type_, ImGuizmo::LOCAL, glm::value_ptr(transform),
-			nullptr, snap ? snapValues : nullptr);
+			nullptr, snap ? snap_values : nullptr);
 
 		if (ImGuizmo::IsUsing())
 		{
 			glm::vec3 translation, rotation, scale;
 			Math::DecomposeTransform(transform, translation, rotation, scale);
 
-			glm::vec3 deltaRotation = rotation - tc.rotation_;
+			glm::vec3 delta_rotation = rotation - tc.rotation_;
 			tc.translation_ = translation;
-			tc.rotation_ += deltaRotation;
+			tc.rotation_ += delta_rotation;
 			tc.scale_ = scale;
 		}
 	}
