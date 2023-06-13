@@ -16,6 +16,8 @@ namespace Donut
 		void invalidate();
 		virtual void resize(uint32_t width, uint32_t height) override;
 
+		virtual int readPixel(uint32_t attachment, int x, int y) override;
+
 		virtual void bind() override;
 		virtual void unBind() override;
 

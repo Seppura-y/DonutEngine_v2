@@ -10,6 +10,7 @@ namespace Donut
 		None = 0,
 
 		RGBA8,
+		RED_INTEGER,
 		
 		DEPTH24STENCIL8,
 
@@ -57,6 +58,7 @@ namespace Donut
 		virtual void unBind() = 0;
 
 		virtual void resize(uint32_t width, uint32_t height) = 0;
+		virtual int readPixel(uint32_t attachment, int x, int y) = 0;
 		
 		virtual const FramebufferSpecification& getSpecification() const = 0;
 

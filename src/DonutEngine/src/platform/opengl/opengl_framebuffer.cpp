@@ -25,22 +25,22 @@ namespace Donut
 			glBindTexture(textureTarget(multisampled), id);
 		}
 
-		static void attachColorTexture(uint32_t id, int samples, GLenum format, uint32_t width, uint32_t height, int index)
+		static void attachColorTexture(uint32_t id, int samples, GLenum internal_format, GLenum format, uint32_t width, uint32_t height, int index)
 		{
 			bool multisampled = samples > 1;
 			if (multisampled)
 			{
-				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_FALSE);
 			}
 			else
 			{
 				glTexImage2D(
 					GL_TEXTURE_2D,
 					0,
-					format,			//internal format (how the opengl store the data)
+					internal_format,			//internal format (how the opengl store the data)
 					width, height,
 					0,
-					GL_RGBA,		//access format (how the opengl access tha data)
+					format,		//access format (how the opengl access tha data)
 					GL_UNSIGNED_BYTE,
 					nullptr
 				);
@@ -148,6 +148,21 @@ namespace Donut
 							color_attachments_[i],
 							specification_.samples_,
 							GL_RGBA8,
+							GL_RGBA,
+							specification_.width_,
+							specification_.height_,
+							i
+						);
+						break;
+					}
+
+					case FramebufferTextureFormat::RED_INTEGER:
+					{
+						Utils::attachColorTexture(
+							color_attachments_[i],
+							specification_.samples_,
+							GL_R32I,
+							GL_RED_INTEGER,
 							specification_.width_,
 							specification_.height_,
 							i
@@ -222,6 +237,17 @@ namespace Donut
 		specification_.width_ = width;
 		specification_.height_ = height;
 		invalidate();
+	}
+
+	int OpenGLFramebuffer::readPixel(uint32_t attachment, int x, int y)
+	{
+		DN_CORE_ASSERT(attachment < color_attachments_.size(), "invalid attachment id");
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment);
+
+		int pixel_data;
+		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixel_data);
+
+		return pixel_data;
 	}
 
 	void OpenGLFramebuffer::bind()

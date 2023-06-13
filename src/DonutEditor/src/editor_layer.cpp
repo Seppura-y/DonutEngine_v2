@@ -55,7 +55,7 @@ void Donut::EditorLayer::onAttach()
 	framebuffer_spec.attachments_specifications_ = 
 	{
 		FramebufferTextureFormat::RGBA8,
-		FramebufferTextureFormat::RGBA8,
+		FramebufferTextureFormat::RED_INTEGER,
 		FramebufferTextureFormat::Depth 
 	};
 	framebuffer_spec.width_ = 1280;
@@ -182,6 +182,21 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 	active_scene_->onUpdateEditor(ts,editor_camera_);
 
 	//Renderer2D::endScene();
+
+	auto [x, y] = ImGui::GetMousePos();
+	x -= viewport_bounds_[0].x;
+	y -= viewport_bounds_[0].y;
+	glm::vec2 viewport_size = viewport_bounds_[1] - viewport_bounds_[0];
+	y = viewport_size.y - y;
+
+	int mouse_x = (int)x;
+	int mouse_y = (int)y;
+
+	if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < (int)viewport_size_.x && mouse_y < (int)viewport_size_.y)
+	{
+		int pixel_data = framebuffer_->readPixel(1, mouse_x, mouse_y);
+		DN_CORE_WARN("Pixel data = {0}", pixel_data);
+	}
 
 
 	if (Donut::Input::isMouseButtonPressed(DN_MOUSE_BUTTON_LEFT))
@@ -448,6 +463,17 @@ void Donut::EditorLayer::onImGuiRender()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
 	ImGui::Begin("Viewport");
 
+	// get viewport position include tab bar
+	auto viewport_offset = ImGui::GetCursorPos();
+	auto window_size = ImGui::GetWindowSize();
+	ImVec2 min_bound = ImGui::GetWindowPos();
+	min_bound.x += viewport_offset.x;
+	min_bound.y += viewport_offset.y;
+
+	ImVec2 max_bound = { min_bound.x + window_size.x, min_bound.y + window_size.y };
+	viewport_bounds_[0] = { min_bound.x, min_bound.y };
+	viewport_bounds_[1] = { max_bound.x, max_bound.y };
+
 	is_viewport_focused_ = ImGui::IsWindowFocused();
 	is_viewport_hovered_ = ImGui::IsWindowHovered();
 	Application::getInstance().getImGuiLayer()->setBlockEvents(!(is_viewport_focused_ && is_viewport_hovered_));
@@ -465,7 +491,7 @@ void Donut::EditorLayer::onImGuiRender()
 		}
 	}
 
-	uint32_t textureID = framebuffer_->getColorAttachmentID(1);
+	uint32_t textureID = framebuffer_->getColorAttachmentID();
 	ImGui::Image((void*)textureID, ImVec2{ viewport_size_.x, viewport_size_.y}, ImVec2{0.0f, 1.0f}, ImVec2{1.0f,0.0f});
 
 	// Gizmos
