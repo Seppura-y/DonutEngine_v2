@@ -99,7 +99,7 @@ namespace Donut
 			samplers[i] = i;
 		}
 
-		s_data.single_shader_ = Shader::createShader("assets/shaders/c5_batch_texture_rendering.glsl");
+		s_data.single_shader_ = Shader::createShader("assets/shaders/c6_batch_texture_rendering_v2.glsl");
 		s_data.single_shader_->bind();
 		s_data.single_shader_->setIntArray("u_textures", samplers, s_data.max_texture_slots_);
 
