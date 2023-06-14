@@ -6,6 +6,7 @@
 #include "renderer/subtexture.h"
 #include "renderer/camera.h"
 #include "renderer/editor_camera.h"
+#include "scene/components.h"
 
 namespace Donut
 {
@@ -40,8 +41,10 @@ namespace Donut
 		static void drawRectangle(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Subtexture>& subtexture, float tiling_factor = 1.0f, glm::vec4& tincolor = glm::vec4(1.0f));
 		static void drawRectangle(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Subtexture>& subtexture, float tiling_factor = 1.0f, glm::vec4& tincolor = glm::vec4(1.0f));
 	
-		static void drawRectangle(const glm::mat4 transform, const glm::vec4& color);
-		static void drawRectangle(const glm::mat4 transform, const Ref<Texture2D>& texture, float tiling_factor = 1.0f, const glm::vec4& tint_color = glm::vec4(1.0f));
+		static void drawRectangle(const glm::mat4 transform, const glm::vec4& color, int entity_id = -1);
+		static void drawRectangle(const glm::mat4 transform, const Ref<Texture2D>& texture, float tiling_factor = 1.0f, const glm::vec4& tint_color = glm::vec4(1.0f), int entity_id = -1);
+	
+		static void drawSprite(const glm::mat4& trnasform, SpriteRendererComponent& component, int entity_id);
 	public:
 		struct Statistics
 		{

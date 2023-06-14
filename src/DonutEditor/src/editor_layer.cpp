@@ -193,6 +193,8 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 	if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < (int)viewport_size_.x && mouse_y < (int)viewport_size_.y)
 	{
 		int pixel_data = framebuffer_->readPixel(1, mouse_x, mouse_y);
+
+		hovered_entity_ = pixel_data == -1 ? Entity() : Entity((entt::entity)pixel_data, active_scene_.get());
 		DN_CORE_WARN("Pixel data = {0}", pixel_data);
 	}
 
@@ -416,6 +418,14 @@ void Donut::EditorLayer::onImGuiRender()
 	scene_hierarchy_panel_.onImGuiRender();
 
 	ImGui::Begin("Stats");
+
+	std::string name = "None";
+	if (hovered_entity_)
+	{
+		name = hovered_entity_.getComponent<TagComponent>().tag_;
+	}
+
+	ImGui::Text("Hovered Entity : %s", name.c_str());
 
 	auto stats = Donut::Renderer2D::getStatistics();
 	ImGui::Text("Renderer2D Stats:");

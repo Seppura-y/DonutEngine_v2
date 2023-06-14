@@ -76,7 +76,7 @@ namespace Donut
 		}
 
 		inline uint32_t getStride() const { return stride_; }
-		inline const std::vector<BufferElement>& getBufferElements() { return elements_; }
+		inline const std::vector<BufferElement>& getBufferElements() const { return elements_; }
 
 		std::vector<BufferElement>::iterator begin() { return elements_.begin(); }
 		std::vector<BufferElement>::iterator end() { return elements_.end(); }

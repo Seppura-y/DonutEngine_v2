@@ -70,6 +70,8 @@ namespace Donut
 		int gizmo_type_ = -1;
 		
 		EditorCamera editor_camera_;
+
+		Donut::Entity hovered_entity_;
 	};
 }
 #endif

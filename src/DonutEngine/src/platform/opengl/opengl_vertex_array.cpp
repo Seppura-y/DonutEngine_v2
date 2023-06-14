@@ -41,27 +41,69 @@ namespace Donut
 	{
 		DN_PROFILE_FUNCTION();
 
-		//DN_CORE_ASSERT(buffer->getLayout().getBufferElements().size(), "vertex buffer is empty!");
+		DN_CORE_ASSERT((buffer->getLayout().getBufferElements().size()) > 0 , "vertex buffer is empty!");
 
 		glBindVertexArray(object_id_);
 		buffer->bind();
 
-		int index = 0;
 		const auto& lay = buffer->getLayout();
-		for (auto& element : lay)
+		for (const auto& element : lay)
 		{
-			glEnableVertexAttribArray(index);
-
-			glVertexAttribPointer(index,
-				element.getComponentCount(),
-				shaderDataTypeToGLenumType(element.type_),
-				element.normalized_ ? GL_TRUE : GL_FALSE,
-				lay.getStride(),
-				(const void*)element.offset_
-			);
-
-			index++;
+			switch (element.type_)
+			{
+			case ShaderDataType::Float:
+			case ShaderDataType::Float2:
+			case ShaderDataType::Float3:
+			case ShaderDataType::Float4:
+			{
+				glEnableVertexAttribArray(vertex_buffer_index_);
+				glVertexAttribPointer(vertex_buffer_index_,
+					element.getComponentCount(),
+					shaderDataTypeToGLenumType(element.type_),
+					element.normalized_ ? GL_TRUE : GL_FALSE,
+					lay.getStride(),
+					(const void*)element.offset_);
+				vertex_buffer_index_++;
+				break;
+			}
+			case ShaderDataType::Int:
+			case ShaderDataType::Int2:
+			case ShaderDataType::Int3:
+			case ShaderDataType::Int4:
+			case ShaderDataType::Bool:
+			{
+				glEnableVertexAttribArray(vertex_buffer_index_);
+				glVertexAttribIPointer(vertex_buffer_index_,
+					element.getComponentCount(),
+					shaderDataTypeToGLenumType(element.type_),
+					lay.getStride(),
+					(const void*)element.offset_);
+				vertex_buffer_index_++;
+				break;
+			}
+			case ShaderDataType::Mat3:
+			case ShaderDataType::Mat4:
+			{
+				uint8_t count = element.getComponentCount();
+				for (uint8_t i = 0; i < count; i++)
+				{
+					glEnableVertexAttribArray(vertex_buffer_index_);
+					glVertexAttribPointer(vertex_buffer_index_,
+						count,
+						shaderDataTypeToGLenumType(element.type_),
+						element.normalized_ ? GL_TRUE : GL_FALSE,
+						lay.getStride(),
+						(const void*)(sizeof(float) * count * i));
+					glVertexAttribDivisor(vertex_buffer_index_, 1);
+					vertex_buffer_index_++;
+				}
+				break;
+			}
+			default:
+				DN_CORE_ASSERT(false, "Unknown ShaderDataType!");
+			}
 		}
+
 		vertex_buffers_.push_back(buffer);
 	}
 
