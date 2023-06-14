@@ -18,6 +18,8 @@ namespace Donut
 
 		virtual int readPixel(uint32_t attachment, int x, int y) override;
 
+		virtual void clearAttachment(uint32_t index, int value) override;
+
 		virtual void bind() override;
 		virtual void unBind() override;
 

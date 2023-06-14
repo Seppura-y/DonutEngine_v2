@@ -86,6 +86,50 @@ namespace Donut
 			return false;
 		}
 
+		static GLenum texFormatToGLTextureFormat(FramebufferTextureFormat format)
+		{
+			switch (format)
+			{
+				case FramebufferTextureFormat::RED_INTEGER:
+				{
+					return GL_RED_INTEGER;
+				}
+				case FramebufferTextureFormat::RGBA8:
+				{
+					return GL_RGBA8;
+				}
+
+				default:
+				{
+					DN_CORE_ASSERT(false, "texFormatToGLTextureFormat -- unknown format");
+					return GL_NONE;
+				}
+
+			}
+		}
+
+		static GLenum texFormatToGLTexureDataType(FramebufferTextureFormat format)
+		{
+			switch (format)
+			{
+				case FramebufferTextureFormat::RED_INTEGER:
+				{
+					return GL_INT;
+				}
+				case FramebufferTextureFormat::RGBA8:
+				{
+					return GL_FLOAT;
+				}
+
+				default:
+				{
+					DN_CORE_ASSERT(false, "texFormatToGLTextureFormat -- unknown format");
+					return GL_NONE;
+				}
+
+			}
+		}
+
 	}
 
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification& spec)
@@ -248,6 +292,25 @@ namespace Donut
 		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixel_data);
 
 		return pixel_data;
+	}
+
+	void OpenGLFramebuffer::clearAttachment(uint32_t index, int value)
+	{
+		DN_CORE_ASSERT(index < color_attachments_.size(), "clearAttachment -- invalid index!");
+		auto format = color_attachment_specifications_[index].texture_format_;
+		switch (format)
+		{
+			case FramebufferTextureFormat::RED_INTEGER:
+			{
+				glClearTexImage(color_attachments_[index], 0,
+					Utils::texFormatToGLTextureFormat(format),
+					GL_INT,
+					&value
+				);
+				break;
+			}
+		}
+		
 	}
 
 	void OpenGLFramebuffer::bind()

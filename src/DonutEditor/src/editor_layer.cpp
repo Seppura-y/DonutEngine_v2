@@ -176,12 +176,10 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 		Donut::RenderCommand::clear();
 	}
 
-	//Renderer2D::beginScene(camera_controller_.getCamera());
+	// clear framebuffer value to -1, which is the default entity id for blank area
+	framebuffer_->clearAttachment(1, -1);
 
-	//active_scene_->onUpdateRuntime(ts);
 	active_scene_->onUpdateEditor(ts,editor_camera_);
-
-	//Renderer2D::endScene();
 
 	auto [x, y] = ImGui::GetMousePos();
 	x -= viewport_bounds_[0].x;
