@@ -222,6 +222,7 @@ void Donut::EditorLayer::onEvent(Donut::Event& ev)
 
 	EventDispatcher dispatcher(ev);
 	dispatcher.dispatch<KeyPressedEvent>(DN_BIND_EVENT_FN(EditorLayer::onKeyPressed));
+	dispatcher.dispatch<MouseButtonPressedEvent>(DN_BIND_EVENT_FN(EditorLayer::onMouseButtonPressed));
 }
 
 bool Donut::EditorLayer::onKeyPressed(KeyPressedEvent& ev)
@@ -280,6 +281,20 @@ bool Donut::EditorLayer::onKeyPressed(KeyPressedEvent& ev)
 		}
 		break;
 
+	}
+	return false;
+}
+
+bool Donut::EditorLayer::onMouseButtonPressed(MouseButtonPressedEvent& ev)
+{
+	if (ev.getMouseButton() == Mouse::ButtonLeft)
+	{
+		if (is_viewport_hovered_
+			&& !ImGuizmo::IsOver()	// gizmo 被entity遮挡时，不会因点击而丢失选中状态
+			&& !Input::isKeyPressed(Key::LeftAlt))	// 按alt调整镜头时，不会丢失选中目标
+		{
+			scene_hierarchy_panel_.setSelectedEntity(hovered_entity_);
+		}
 	}
 	return false;
 }
@@ -472,15 +487,13 @@ void Donut::EditorLayer::onImGuiRender()
 	ImGui::Begin("Viewport");
 
 	// get viewport position include tab bar
-	auto viewport_offset = ImGui::GetCursorPos();
-	auto window_size = ImGui::GetWindowSize();
-	ImVec2 min_bound = ImGui::GetWindowPos();
-	min_bound.x += viewport_offset.x;
-	min_bound.y += viewport_offset.y;
+	auto viewport_min_region = ImGui::GetWindowContentRegionMin();
+	auto viewport_max_region = ImGui::GetWindowContentRegionMax();
+	
+	auto viewport_offset = ImGui::GetWindowPos();
 
-	ImVec2 max_bound = { min_bound.x + window_size.x, min_bound.y + window_size.y };
-	viewport_bounds_[0] = { min_bound.x, min_bound.y };
-	viewport_bounds_[1] = { max_bound.x, max_bound.y };
+	viewport_bounds_[0] = { viewport_min_region.x + viewport_offset.x, viewport_min_region.y + viewport_offset.y };
+	viewport_bounds_[1] = { viewport_max_region.x + viewport_offset.x, viewport_max_region.y + viewport_offset.y };
 
 	is_viewport_focused_ = ImGui::IsWindowFocused();
 	is_viewport_hovered_ = ImGui::IsWindowHovered();
@@ -511,7 +524,12 @@ void Donut::EditorLayer::onImGuiRender()
 
 		float window_width = (float)ImGui::GetWindowWidth();
 		float window_height = (float)ImGui::GetWindowHeight();
-		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, window_width, window_height);
+		ImGuizmo::SetRect(
+			viewport_bounds_[0].x,
+			viewport_bounds_[0].y,
+			viewport_bounds_[1].x - viewport_bounds_[0].x,
+			viewport_bounds_[1].y - viewport_bounds_[0].y
+		);
 
 		// Camera
 		//auto camera_entity = active_scene_->getPrimaryCameraEntity();

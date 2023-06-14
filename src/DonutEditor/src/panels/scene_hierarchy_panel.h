@@ -20,6 +20,8 @@ namespace Donut
 
 		Entity getSelectedEntity() const { return selection_context_; }
 
+		void setSelectedEntity(Entity entity);
+
 	private:
 		void drawComponents(Entity entity);
 		void drawEntityNode(Entity& entity);

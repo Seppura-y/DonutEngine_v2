@@ -181,6 +181,11 @@ namespace Donut
 		ImGui::End();
 	}
 
+	void SceneHierarchyPanel::setSelectedEntity(Entity entity)
+	{
+		selection_context_ = entity;
+	}
+
 	void SceneHierarchyPanel::drawComponents(Entity entity)
 	{
 		// allow overlap to draw a overlap button which is used to delete the overlapped component
