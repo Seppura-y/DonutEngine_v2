@@ -5,6 +5,8 @@
 
 #include "renderer/render_command.h"
 
+#include "renderer/uniform_buffer.h"
+
 #include "platform/opengl/opengl_shader.h"
 #include "platform/opengl/opengl_vertex_array.h"
 #include "platform/opengl/opengl_texture.h"
@@ -49,6 +51,14 @@ namespace Donut
 
 		glm::vec4 rect_vertex_positions_[4];
 		Renderer2D::Statistics statistics_;
+
+		struct CameraData
+		{
+			glm::mat4 view_projection_;
+		};
+
+		CameraData camera_buffer;
+		Ref<UniformBuffer> camera_uniform_buffer;
 	};
 
 	static Renderer2DData s_data;
@@ -102,9 +112,9 @@ namespace Donut
 			samplers[i] = i;
 		}
 
-		s_data.single_shader_ = Shader::createShader("assets/shaders/c6_batch_texture_rendering_v2.glsl");
-		s_data.single_shader_->bind();
-		s_data.single_shader_->setIntArray("u_textures", samplers, s_data.max_texture_slots_);
+		s_data.single_shader_ = Shader::createShader("assets/shaders/c7_spirv_shader.glsl");
+		//s_data.single_shader_->bind();
+		//s_data.single_shader_->setIntArray("u_textures", samplers, s_data.max_texture_slots_);
 
 		s_data.texture_slots_[0] = s_data.white_texture_;
 
@@ -112,6 +122,8 @@ namespace Donut
 		s_data.rect_vertex_positions_[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
 		s_data.rect_vertex_positions_[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 		s_data.rect_vertex_positions_[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+
+		s_data.camera_uniform_buffer = UniformBuffer::create(sizeof(Renderer2DData::CameraData), 0);
 	}
 
 	void Renderer2D::shutdown()
@@ -123,10 +135,13 @@ namespace Donut
 	{
 		DN_PROFILE_FUNCTION();
 
-		glm::mat4 view_projection = camera.getProjection() * glm::inverse(transform);
+		//glm::mat4 view_projection = camera.getProjection() * glm::inverse(transform);
 
-		s_data.single_shader_->bind();
-		s_data.single_shader_->setMat4("u_viewProjectionMatrix", view_projection);
+		//s_data.single_shader_->bind();
+		//s_data.single_shader_->setMat4("u_viewProjectionMatrix", view_projection);
+
+		s_data.camera_buffer.view_projection_ = camera.getProjection() * glm::inverse(transform);
+		s_data.camera_uniform_buffer->setData(&s_data.camera_buffer, sizeof(Renderer2DData::CameraData));
 
 		s_data.rect_indices_count_ = 0;
 		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
@@ -149,10 +164,13 @@ namespace Donut
 	{
 		DN_PROFILE_FUNCTION();
 
-		glm::mat4 view_projection = camera.getViewProjection();
+		//glm::mat4 view_projection = camera.getViewProjection();
 
-		s_data.single_shader_->bind();
-		s_data.single_shader_->setMat4("u_viewProjectionMatrix", view_projection);
+		//s_data.single_shader_->bind();
+		//s_data.single_shader_->setMat4("u_viewProjectionMatrix", view_projection);
+
+		s_data.camera_buffer.view_projection_ = camera.getViewProjection();
+		s_data.camera_uniform_buffer->setData(&s_data.camera_buffer, sizeof(Renderer2DData::CameraData));
 
 		s_data.rect_indices_count_ = 0;
 		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
@@ -181,6 +199,7 @@ namespace Donut
 		{
 			s_data.texture_slots_[i]->bind(i);
 		}
+		s_data.single_shader_->bind();
 		RenderCommand::drawIndices(s_data.rectangle_va_, s_data.rect_indices_count_);
 		s_data.statistics_.drawcalls_++;
 	}

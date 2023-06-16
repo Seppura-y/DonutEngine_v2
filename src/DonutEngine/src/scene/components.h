@@ -82,6 +82,7 @@ namespace Donut
 		CameraComponent(const CameraComponent&) = default;
 	};
 
+
 	struct NativeScriptComponent_Version1
 	{
 		ScriptableEntity* instance_ = nullptr;

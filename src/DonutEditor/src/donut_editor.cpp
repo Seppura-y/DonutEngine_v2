@@ -9,7 +9,8 @@ namespace Donut
 	{
 	public:
 
-		DonutEditor()
+		DonutEditor(ApplicationCommandLineArgs args)
+			: Application("Donut Editor", args)
 		{
 			pushLayer(new Donut::EditorLayer());
 		}
@@ -25,7 +26,7 @@ namespace Donut
 }
 
 
-Donut::Application* Donut::createApplication()
+Donut::Application* Donut::createApplication(ApplicationCommandLineArgs args)
 {
-	return new Donut::DonutEditor();
+	return new Donut::DonutEditor(args);
 }

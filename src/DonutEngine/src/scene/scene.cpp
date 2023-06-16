@@ -194,7 +194,11 @@ namespace Donut
 	template<>
 	void Scene::onComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
 	{
-		component.camera_.setViewportSize(viewport_width_, viewport_height_);
+		//component.camera_.setViewportSize(viewport_width_, viewport_height_);
+		if (viewport_width_ > 0 && viewport_height_ > 0)
+		{
+			component.camera_.setViewportSize(viewport_width_, viewport_height_);
+		}
 	}
 
 	template<>
@@ -214,4 +218,5 @@ namespace Donut
 	{
 
 	}
+
 }

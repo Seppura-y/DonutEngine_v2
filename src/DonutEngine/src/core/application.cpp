@@ -38,7 +38,8 @@ namespace Donut
 		return 0;
 	}
 
-	Application::Application()
+	Application::Application(const std::string& name, ApplicationCommandLineArgs args)
+		: commandline_args_(args)
 	{
 		DN_PROFILE_FUNCTION();
 		s_instance_ = this;

@@ -108,16 +108,52 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 #========================================= LINKING LIBRARIES =========================================#
 target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/../../lib
+    $ENV{VULKAN_SDK}/Lib
 )
+
+# target_link_libraries(${PROJECT_NAME} PRIVATE
+#     user32.lib
+#     dwmapi.lib
+#     DonutEngine.lib
+#     glfw3.lib   #为什么这些库不能从DonutEngine流转过来，实际上在DonutEngine中通过PUBLIC链接的库会流转到引用它的目标中
+#     glad.lib
+#     imgui.lib
+#     yaml-cpp.lib
+# )
+
+# target_link_libraries(${PROJECT_NAME} PRIVATE
+#     user32.lib
+#     dwmapi.lib
+#     DonutEngine.lib
+#     glfw3.lib
+#     glad.lib
+#     imgui.lib
+#     yaml-cpp.lib
+
+#     # vulkan-1.lib
+#     # VkLayer_utils.lib
+
+
+#     shaderc_shared.lib
+#     spirv-cross-core.lib
+#     spirv-cross-glsl.lib
+# )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     user32.lib
     dwmapi.lib
     DonutEngine.lib
-    glfw3.lib   #为什么这些库不能从DonutEngine流转过来，实际上在DonutEngine中通过PUBLIC链接的库会流转到引用它的目标中
+    glfw3.lib
     glad.lib
     imgui.lib
     yaml-cpp.lib
+
+    # vulkan-1.lib
+    # VkLayer_utils.lib
+
+    shaderc_sharedd.lib
+    spirv-cross-cored.lib
+    spirv-cross-glsld.lib
 )
 
 set_property(TARGET ${PROJECT_NAME}

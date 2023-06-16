@@ -13,10 +13,23 @@
 
 namespace Donut
 {
+	struct ApplicationCommandLineArgs
+	{
+		int count_ = 0;
+		char** args_ = nullptr;
+
+		const char* operator[](int index) const
+		{
+			DN_CORE_ASSERT(index < count_, "invalid index");
+			return args_[index];
+		}
+	};
+
 	class DONUT_API Application
 	{
 	public:
-		Application();
+		//Application();
+		Application(const std::string& name = "DonutEngine", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
 		virtual ~Application();
 
 		void run();
@@ -33,6 +46,8 @@ namespace Donut
 		ImGuiLayer* getImGuiLayer() { return imgui_layer_; }
 
 		void initWindow(WindowProps props = WindowProps());
+
+		ApplicationCommandLineArgs getCommandLineArgs() const { return commandline_args_; }
 	private:
 		bool onWindowClose(WindowCloseEvent& ev);
 		bool onWindowResize(WindowResizeEvent& ev);
@@ -46,9 +61,11 @@ namespace Donut
 		float last_frame_time_ = 0.0f;
 
 		bool is_minimized_ = false;
+
+		ApplicationCommandLineArgs commandline_args_;
 	};
 
 	// To be defined in client
-	Application* createApplication();
+	Application* createApplication(ApplicationCommandLineArgs args);
 }
 #endif

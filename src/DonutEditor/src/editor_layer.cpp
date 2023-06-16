@@ -132,6 +132,14 @@ void Donut::EditorLayer::onAttach()
 	//SceneSerializer serializer(active_scene_);
 	//serializer.deserialize("assets/scenes/example.yaml");
 
+	auto commandline_args = Application::getInstance().getCommandLineArgs();
+	if (commandline_args.count_ > 1)
+	{
+		auto scene_filepath = commandline_args[1];
+		SceneSerializer serializer(active_scene_);
+		serializer.deserialize(scene_filepath);
+	}
+
 	editor_camera_ = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 }
 

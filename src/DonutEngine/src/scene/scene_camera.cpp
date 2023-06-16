@@ -32,6 +32,7 @@ namespace Donut
 
     void SceneCamera::setViewportSize(uint32_t width, uint32_t height)
     {
+        DN_CORE_ASSERT(width > 0 && height > 0, "invalid width or height values");
         aspect_ratio_ = (float)width / (float)height;
         recalculateProjection();
     }

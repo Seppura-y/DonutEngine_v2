@@ -360,13 +360,33 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp/include
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/ImGuizmo
+    $ENV{VULKAN_SDK}/Include
 
 )
 
 #========================================= LINKING LIBRARIES =========================================#
 target_link_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/../../lib
+    $ENV{VULKAN_SDK}/Lib
 )
+
+# target_link_libraries(${PROJECT_NAME} PUBLIC
+#     user32.lib
+#     opengl32.lib
+#     dwmapi.lib
+#     glfw3.lib
+#     glad.lib
+#     imgui.lib
+#     yaml-cpp.lib
+
+#     # vulkan-1.lib
+#     # VkLayer_utils.lib
+
+
+#     shaderc_shared.lib
+#     spirv-cross-core.lib
+#     spirv-cross-glsl.lib
+# )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     user32.lib
@@ -376,7 +396,15 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     glad.lib
     imgui.lib
     yaml-cpp.lib
+
+    # vulkan-1.lib
+    # VkLayer_utils.lib
+
+    shaderc_sharedd.lib
+    spirv-cross-cored.lib
+    spirv-cross-glsld.lib
 )
+
 set_property(TARGET ${PROJECT_NAME}
 	PROPERTY
 	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"

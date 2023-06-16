@@ -16,6 +16,8 @@
 #include <utility>
 #include <algorithm>
 
+#include <filesystem>
+
 #include "core/logger.h"
 #include "debug/instrumentor.h"
 
