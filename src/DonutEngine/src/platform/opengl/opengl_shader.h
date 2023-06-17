@@ -43,7 +43,7 @@ namespace Donut
 	private:
 		std::string readFile(const std::string& filepath);
 		std::unordered_map<GLenum, std::string> preProcess(const std::string& source);
-		//void compileShaders(const std::unordered_map<GLenum, std::string>& shader_sources);
+		void compileShaders(const std::unordered_map<GLenum, std::string>& shader_sources);
 
 		void compileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shader_sources);
 		void compileOrGetOpenGLBinaries();

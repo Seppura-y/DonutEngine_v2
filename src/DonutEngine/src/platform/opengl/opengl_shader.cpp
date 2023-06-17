@@ -19,16 +19,16 @@ namespace Donut
 
 	namespace Utils {
 
-		static GLenum shaderTypeFromString(const std::string& type)
-		{
-			if (type == "vertex")
-				return GL_VERTEX_SHADER;
-			if (type == "fragment" || type == "pixel")
-				return GL_FRAGMENT_SHADER;
+		//static GLenum shaderTypeFromString(const std::string& type)
+		//{
+		//	if (type == "vertex")
+		//		return GL_VERTEX_SHADER;
+		//	if (type == "fragment" || type == "pixel")
+		//		return GL_FRAGMENT_SHADER;
 
-			DN_CORE_ASSERT(false, "Unknown shader type!");
-			return 0;
-		}
+		//	DN_CORE_ASSERT(false, "Unknown shader type!");
+		//	return 0;
+		//}
 
 		static GLenum getShaderType(const std::string& type)
 		{
@@ -76,7 +76,7 @@ namespace Donut
 				std::filesystem::create_directories(cacheDirectory);
 		}
 
-		static const char* GLShaderStageCachedOpenGLFileExtension(uint32_t stage)
+		static const char* glShaderStageCachedOpenGLFileExtension(uint32_t stage)
 		{
 			switch (stage)
 			{
@@ -87,7 +87,7 @@ namespace Donut
 			return "";
 		}
 
-		static const char* GLShaderStageCachedVulkanFileExtension(uint32_t stage)
+		static const char* glShaderStageCachedVulkanFileExtension(uint32_t stage)
 		{
 			switch (stage)
 			{
@@ -122,7 +122,7 @@ namespace Donut
 	
 		auto last_slash = filepath.find_last_of("/\\");
 		last_slash = last_slash == std::string::npos ? 0 : last_slash + 1;
-		auto last_dot = filepath.rfind(".");
+		auto last_dot = filepath.rfind('.');
 		auto count = last_dot == std::string::npos ? filepath.size() - last_slash : last_dot - last_slash;
 		name_ = filepath.substr(last_slash, count);
 	}
@@ -190,86 +190,86 @@ namespace Donut
 
 			size_t next_line_pos = source.find_first_not_of("\r\n", eol);
 			pos = source.find(type_token, next_line_pos);
-			shader_sources[Utils::getShaderType(type)] = source.substr(next_line_pos,
-				pos - (next_line_pos == std::string::npos ? source.size() - 1 : next_line_pos));
+			shader_sources[Utils::getShaderType(type)] = (pos == std::string::npos) ?
+				source.substr(next_line_pos) : source.substr(next_line_pos, pos - next_line_pos);
 		}
 
 		return shader_sources;
 	}
 
-	//void OpenGLShader::compileShaders(const std::unordered_map<GLenum, std::string>& shader_sources)
-	//{
-	//	DN_PROFILE_FUNCTION();
+	void OpenGLShader::compileShaders(const std::unordered_map<GLenum, std::string>& shader_sources)
+	{
+		DN_PROFILE_FUNCTION();
 
-	//	GLuint program = glCreateProgram();
-	//	DN_CORE_ASSERT(shader_sources.size() <= 2, "we only support 2 shaders for now");
-	//	std::array<GLenum, 2> glShaderIDs;
-	//	int shader_index = 0;
-	//	//std::vector<GLenum> glShaderIDs(shader_sources.size());
-	//	for (auto& kv : shader_sources)
-	//	{
-	//		GLenum type = kv.first;
-	//		const std::string& source = kv.second;
+		GLuint program = glCreateProgram();
+		DN_CORE_ASSERT(shader_sources.size() <= 2, "we only support 2 shaders for now");
+		std::array<GLenum, 2> glShaderIDs;
+		int shader_index = 0;
+		//std::vector<GLenum> glShaderIDs(shader_sources.size());
+		for (auto& kv : shader_sources)
+		{
+			GLenum type = kv.first;
+			const std::string& source = kv.second;
 
-	//		GLuint shader = glCreateShader(type);
+			GLuint shader = glCreateShader(type);
 
-	//		const GLchar* sourceCStr = source.c_str();
-	//		glShaderSource(shader, 1, &sourceCStr, 0);
+			const GLchar* sourceCStr = source.c_str();
+			glShaderSource(shader, 1, &sourceCStr, 0);
 
-	//		glCompileShader(shader);
+			glCompileShader(shader);
 
-	//		GLint isCompiled = 0;
-	//		glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
-	//		if (isCompiled == GL_FALSE)
-	//		{
-	//			GLint maxLength = 0;
-	//			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+			GLint isCompiled = 0;
+			glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+			if (isCompiled == GL_FALSE)
+			{
+				GLint maxLength = 0;
+				glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
 
-	//			std::vector<GLchar> infoLog(maxLength);
-	//			glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
+				std::vector<GLchar> infoLog(maxLength);
+				glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
 
-	//			glDeleteShader(shader);
+				glDeleteShader(shader);
 
-	//			DN_CORE_ERROR("{0}", infoLog.data());
-	//			DN_CORE_ASSERT(false, "Shader compilation failure!");
-	//			break;
-	//		}
+				DN_CORE_ERROR("{0}", infoLog.data());
+				DN_CORE_ASSERT(false, "Shader compilation failure!");
+				break;
+			}
 
-	//		glAttachShader(program, shader);
-	//		glShaderIDs[shader_index++] = shader;
-	//	}
+			glAttachShader(program, shader);
+			glShaderIDs[shader_index++] = shader;
+		}
 
-	//	shader_id_ = program;
+		shader_id_ = program;
 
-	//	// Link our program
-	//	glLinkProgram(program);
+		// Link our program
+		glLinkProgram(program);
 
-	//	// Note the different functions here: glGetProgram* instead of glGetShader*.
-	//	GLint isLinked = 0;
-	//	glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked);
-	//	if (isLinked == GL_FALSE)
-	//	{
-	//		GLint maxLength = 0;
-	//		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+		// Note the different functions here: glGetProgram* instead of glGetShader*.
+		GLint isLinked = 0;
+		glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked);
+		if (isLinked == GL_FALSE)
+		{
+			GLint maxLength = 0;
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 
-	//		// The maxLength includes the NULL character
-	//		std::vector<GLchar> infoLog(maxLength);
-	//		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+			// The maxLength includes the NULL character
+			std::vector<GLchar> infoLog(maxLength);
+			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
 
-	//		// We don't need the program anymore.
-	//		glDeleteProgram(program);
+			// We don't need the program anymore.
+			glDeleteProgram(program);
 
-	//		for (auto id : glShaderIDs)
-	//			glDeleteShader(id);
+			for (auto id : glShaderIDs)
+				glDeleteShader(id);
 
-	//		DN_CORE_ERROR("{0}", infoLog.data());
-	//		DN_CORE_ASSERT(false, "Shader link failure!");
-	//		return;
-	//	}
+			DN_CORE_ERROR("{0}", infoLog.data());
+			DN_CORE_ASSERT(false, "Shader link failure!");
+			return;
+		}
 
-	//	for (auto id : glShaderIDs)
-	//		glDetachShader(program, id);
-	//}
+		for (auto id : glShaderIDs)
+			glDetachShader(program, id);
+	}
 
 	void OpenGLShader::compileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shader_sources)
 	{
@@ -277,7 +277,7 @@ namespace Donut
 
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;
-		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
+		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_3);
 		const bool optimize = true;
 		if (optimize)
 		{
@@ -291,7 +291,7 @@ namespace Donut
 		for (auto&& [stage, source] : shader_sources)
 		{
 			std::filesystem::path shader_filepath = filepath_;
-			std::filesystem::path cache_path = cache_dir / (shader_filepath.filename().string() + Utils::GLShaderStageCachedVulkanFileExtension(stage));
+			std::filesystem::path cache_path = cache_dir / (shader_filepath.filename().string() + Utils::glShaderStageCachedVulkanFileExtension(stage));
 			std::ifstream in(cache_path, std::ios::in | std::ios::binary);
 			if (in.is_open())
 			{
@@ -351,7 +351,7 @@ namespace Donut
 		for (auto&& [stage, spirv] : vulkan_spirv_)
 		{
 			std::filesystem::path shader_filepath = filepath_;
-			std::filesystem::path cache_path = cache_dir / (shader_filepath.filename().string() + Utils::GLShaderStageCachedOpenGLFileExtension(stage));
+			std::filesystem::path cache_path = cache_dir / (shader_filepath.filename().string() + Utils::glShaderStageCachedOpenGLFileExtension(stage));
 
 			std::ifstream in(cache_path, std::ios::in | std::ios::binary);
 			if (in.is_open())
@@ -362,6 +362,7 @@ namespace Donut
 
 				auto& data = shader_data[stage];
 				data.resize(size / sizeof(uint32_t));
+				in.read((char*)data.data(), size);
 			}
 			else
 			{
@@ -370,7 +371,13 @@ namespace Donut
 				auto& source = opengl_source_codes_[stage];
 
 				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::glShaderStageToShaderC(stage), filepath_.c_str());
+				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
+				{
+					DN_CORE_ERROR(module.GetErrorMessage());
+					DN_CORE_ASSERT(false, "");
+				}
 
+				shader_data[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
 				std::ofstream out(cache_path, std::ios::out | std::ios::binary);
 				if (out.is_open())
 				{
@@ -400,7 +407,7 @@ namespace Donut
 
 		GLint is_linked;
 		glGetProgramiv(program, GL_LINK_STATUS, &is_linked);
-		if (is_linked)
+		if (is_linked == GL_FALSE)
 		{
 			GLint max_length;
 			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &max_length);

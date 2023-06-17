@@ -180,7 +180,8 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 	{
 		DN_PROFILE_SCOPE("RenderCommand::clear");
 		framebuffer_->bind();
-		Donut::RenderCommand::setClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		//Donut::RenderCommand::setClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		Donut::RenderCommand::setClearColor({ 0.0f, 0.0f, 0.0f, 0.0f });
 		Donut::RenderCommand::clear();
 	}
 

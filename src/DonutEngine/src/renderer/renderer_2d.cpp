@@ -113,6 +113,7 @@ namespace Donut
 		}
 
 		s_data.single_shader_ = Shader::createShader("assets/shaders/c7_spirv_shader.glsl");
+		//s_data.single_shader_ = Shader::createShader("assets/shaders/c6_batch_texture_rendering_v2.glsl");
 		//s_data.single_shader_->bind();
 		//s_data.single_shader_->setIntArray("u_textures", samplers, s_data.max_texture_slots_);
 
@@ -182,8 +183,6 @@ namespace Donut
 	{
 		DN_PROFILE_FUNCTION();
 
-		uint32_t data_size = (uint8_t*)s_data.rect_vertex_buffer_ptr_ - (uint8_t*)s_data.rect_vertex_buffer_base_;
-		s_data.rectangle_vb_->setData(s_data.rect_vertex_buffer_base_, data_size);
 
 		flush();
 	}
@@ -194,6 +193,11 @@ namespace Donut
 		{
 			return;
 		}
+
+		uint32_t data_size = (uint32_t)((uint8_t*)s_data.rect_vertex_buffer_ptr_ - (uint8_t*)s_data.rect_vertex_buffer_base_);
+		s_data.rectangle_vb_->setData(s_data.rect_vertex_buffer_base_, data_size);
+
+
 		// bind textures
 		for (uint32_t i = 0; i < s_data.texture_index_; i++)
 		{

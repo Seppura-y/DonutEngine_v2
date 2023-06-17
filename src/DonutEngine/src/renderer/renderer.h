@@ -29,7 +29,7 @@ namespace Donut
 
 		static SceneData* scene_data_;
 
-		static RendererAPI::RendererAPIType s_type_;
+		static inline RendererAPI::RendererAPIType s_type_ = RendererAPI::RendererAPIType::OpenGL;
 
 	};
 }
