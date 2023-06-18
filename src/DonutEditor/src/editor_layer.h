@@ -27,6 +27,7 @@ namespace Donut
 
 		void newScene();
 		void openScene();
+		void openScene(const std::filesystem::path& path);
 		void saveSceneAs();
 	private:
 		struct ProfileResult

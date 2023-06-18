@@ -3,6 +3,8 @@
 
 #include <filesystem>
 
+#include "renderer/texture.h"
+
 namespace Donut
 {
     class ContentBrowserPanel
@@ -14,6 +16,9 @@ namespace Donut
 
     private:
         std::filesystem::path current_dir_;
+
+        Ref<Texture2D> dir_icon_;
+        Ref<Texture2D> file_icon_;
     };
 }
 #endif

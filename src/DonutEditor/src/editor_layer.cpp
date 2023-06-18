@@ -21,6 +21,8 @@
 
 #include <chrono>
 
+extern const std::filesystem::path g_asset_path = "assets";
+
 static const uint32_t tile_width = 24;
 static const char* map_tiles =
 "WWWWWWWWWWWWWWWWWWWWWWWW"
@@ -321,13 +323,18 @@ void Donut::EditorLayer::openScene()
 
 	if (!filepath.empty())
 	{
-		active_scene_ = createRef<Scene>();
-		active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
-		scene_hierarchy_panel_.setContext(active_scene_);
-
-		SceneSerializer serializer(active_scene_);
-		serializer.deserialize(filepath);
+		openScene(filepath);
 	}
+}
+
+void Donut::EditorLayer::openScene(const std::filesystem::path& path)
+{
+	active_scene_ = createRef<Scene>();
+	active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+	scene_hierarchy_panel_.setContext(active_scene_);
+
+	SceneSerializer serializer(active_scene_);
+	serializer.deserialize(path.string());
 }
 
 void Donut::EditorLayer::saveSceneAs()
@@ -524,6 +531,16 @@ void Donut::EditorLayer::onImGuiRender()
 
 	uint32_t textureID = framebuffer_->getColorAttachmentID();
 	ImGui::Image((void*)textureID, ImVec2{ viewport_size_.x, viewport_size_.y}, ImVec2{0.0f, 1.0f}, ImVec2{1.0f,0.0f});
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+		{
+			const wchar_t* path = (const wchar_t*)payload->Data;
+			openScene(std::filesystem::path(g_asset_path) / path);
+		}
+		ImGui::EndDragDropTarget();
+	}
 
 	// Gizmos
 	Entity selected_entity = scene_hierarchy_panel_.getSelectedEntity();
