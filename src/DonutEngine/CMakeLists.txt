@@ -407,7 +407,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 
 set_property(TARGET ${PROJECT_NAME}
 	PROPERTY
-	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
 )
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")

@@ -4,6 +4,8 @@
 #include "renderer/subtexture.h"
 #include "renderer/editor_camera.h"
 #include "panels/scene_hierarchy_panel.h"
+#include "panels/content_browser_panel.h"
+
 namespace Donut
 {
 	class EditorLayer : public Donut::Layer
@@ -67,6 +69,7 @@ namespace Donut
 		bool is_first_cam_ = true;
 
 		SceneHierarchyPanel scene_hierarchy_panel_;
+		ContentBrowserPanel content_browser_panel_;
 
 		int gizmo_type_ = -1;
 		

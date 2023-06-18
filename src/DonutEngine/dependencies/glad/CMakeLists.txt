@@ -32,7 +32,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 set_property(TARGET ${PROJECT_NAME}
 	PROPERTY
-	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "")

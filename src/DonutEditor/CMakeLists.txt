@@ -158,7 +158,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 set_property(TARGET ${PROJECT_NAME}
 	PROPERTY
-	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
 )
 
 foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)

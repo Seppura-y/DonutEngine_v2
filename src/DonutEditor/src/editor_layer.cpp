@@ -440,6 +440,7 @@ void Donut::EditorLayer::onImGuiRender()
 	}
 
 	scene_hierarchy_panel_.onImGuiRender();
+	content_browser_panel_.onImGuiRender();
 
 	ImGui::Begin("Stats");
 
