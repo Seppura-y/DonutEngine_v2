@@ -5,10 +5,14 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <filesystem>
+
 #include "../DonutEngine/src/scene/components.h"
 
 namespace Donut
 {
+	extern const std::filesystem::path g_asset_path = "assets";
+
 	template<typename T, typename UIFunction>
 	static void drawComponent(const std::string& name, Entity entity, UIFunction function)
 	{
@@ -325,6 +329,22 @@ namespace Donut
 		{
 			auto& color = component.color_;
 			ImGui::ColorEdit4("Color", glm::value_ptr(color));
+
+			ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+					const wchar_t* path = (const wchar_t*)payload->Data;
+					std::filesystem::path texture_path = std::filesystem::path(g_asset_path) / path;
+					component.texture_ = Texture2D::createTexture(texture_path.string());
+				}
+				ImGui::EndDragDropTarget();
+			}
+
+
+
+			ImGui::DragFloat("Tiling Factor", &component.tiling_factor_, 0.1f, 0.0f, 100.0f);
 		});
 
 	}

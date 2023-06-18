@@ -719,7 +719,15 @@ namespace Donut
 
 	void Renderer2D::drawSprite(const glm::mat4& transform, SpriteRendererComponent& component, int entity_id)
 	{
-		drawRectangle(transform, component.color_, entity_id);
+		if (component.texture_)
+		{
+			drawRectangle(transform, component.texture_, component.tiling_factor_, component.color_, entity_id);
+		}
+		else
+		{
+			drawRectangle(transform, component.color_, entity_id);
+		}
+
 	}
 
 	void Renderer2D::resetStatistics()
