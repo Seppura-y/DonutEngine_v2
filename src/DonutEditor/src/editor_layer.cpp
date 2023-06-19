@@ -53,6 +53,8 @@ void Donut::EditorLayer::onAttach()
 {
 	DN_PROFILE_FUNCTION();
 
+	play_icon_ = Texture2D::createTexture("assets/icons/PlayButton.png");
+	stop_icon_ = Texture2D::createTexture("assets/icons/StopButton.png");
 	Donut::FramebufferSpecification framebuffer_spec;
 	framebuffer_spec.attachments_specifications_ = 
 	{
@@ -171,11 +173,11 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 	//framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 	//camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
 
-	if (is_viewport_focused_)
-	{
-		camera_controller_.onUpdate(ts);
-	}
-	editor_camera_.onUpdate(ts);
+	//if (is_viewport_focused_)
+	//{
+	//	camera_controller_.onUpdate(ts);
+	//}
+	//editor_camera_.onUpdate(ts);
 
 	Donut::Renderer2D::resetStatistics();
 
@@ -190,7 +192,27 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 	// clear framebuffer value to -1, which is the default entity id for blank area
 	framebuffer_->clearAttachment(1, -1);
 
-	active_scene_->onUpdateEditor(ts,editor_camera_);
+	switch (scene_state_)
+	{
+		case SceneState::Edit:
+		{
+			if (is_viewport_focused_)
+			{
+				camera_controller_.onUpdate(ts);
+			}
+
+			editor_camera_.onUpdate(ts);
+
+			active_scene_->onUpdateEditor(ts, editor_camera_);
+			break;
+		}
+		case SceneState::Play:
+		{
+			active_scene_->onUpdateRuntime(ts);
+			break;
+		}
+	}
+	//active_scene_->onUpdateEditor(ts,editor_camera_);
 
 	auto [x, y] = ImGui::GetMousePos();
 	x -= viewport_bounds_[0].x;
@@ -345,6 +367,44 @@ void Donut::EditorLayer::saveSceneAs()
 		SceneSerializer serializer(active_scene_);
 		serializer.serialize(filepath);
 	}
+}
+
+void Donut::EditorLayer::onSceneStop()
+{
+	scene_state_ = SceneState::Edit;
+}
+
+void Donut::EditorLayer::onScenePlay()
+{
+	scene_state_ = SceneState::Play;
+}
+
+void Donut::EditorLayer::uiToolbar()
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+	auto& colors = ImGui::GetStyle().Colors;
+	const auto& hovered_color = colors[ImGuiCol_ButtonHovered];
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(hovered_color.x, hovered_color.y, hovered_color.z, 0.5f));
+	const auto& active_color = colors[ImGuiCol_ButtonActive];
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(active_color.x, active_color.y, active_color.z, 0.5f));
+
+	ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+	float size = ImGui::GetWindowHeight() - 4.0f;
+	Ref<Texture2D> icon = scene_state_ == SceneState::Edit ? play_icon_ : stop_icon_;
+	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+	if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+	{
+		if (scene_state_ == SceneState::Edit)
+			onScenePlay();
+		else if (scene_state_ == SceneState::Play)
+			onSceneStop();
+	}
+	ImGui::PopStyleVar(2);
+	ImGui::PopStyleColor(3);
+	ImGui::End();
 }
 
 void Donut::EditorLayer::onImGuiRender()
@@ -599,6 +659,7 @@ void Donut::EditorLayer::onImGuiRender()
 	ImGui::End();
 	ImGui::PopStyleVar();
 
+	uiToolbar();
 
 	ImGui::End();
 }

@@ -29,6 +29,10 @@ namespace Donut
 		void openScene();
 		void openScene(const std::filesystem::path& path);
 		void saveSceneAs();
+
+		void onSceneStop();
+		void onScenePlay();
+		void uiToolbar();
 	private:
 		struct ProfileResult
 		{
@@ -77,6 +81,17 @@ namespace Donut
 		EditorCamera editor_camera_;
 
 		Donut::Entity hovered_entity_;
+
+		enum class SceneState
+		{
+			Edit = 0,
+			Play = 1
+		};
+
+		SceneState scene_state_ = SceneState::Edit;
+
+		Donut::Ref<Texture2D> play_icon_;
+		Donut::Ref<Texture2D> stop_icon_;
 	};
 }
 #endif
