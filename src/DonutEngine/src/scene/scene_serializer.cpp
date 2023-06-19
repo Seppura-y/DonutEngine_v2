@@ -184,11 +184,16 @@ namespace Donut
 
 	bool SceneSerializer::deserialize(const std::string& filepath)
 	{
-		std::ifstream ifs(filepath);
-		std::stringstream str_stream;
-		str_stream << ifs.rdbuf();
+		YAML::Node data;
+		try
+		{
+			data = YAML::LoadFile(filepath);
+		}
+		catch(YAML::ParserException e)
+		{
+			return false;
+		}
 
-		YAML::Node data = YAML::Load(str_stream.str());
 		if (!data["Scene"])
 		{
 			return false;

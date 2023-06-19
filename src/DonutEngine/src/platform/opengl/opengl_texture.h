@@ -23,6 +23,8 @@ namespace Donut
 
 		virtual void bind(uint32_t slot = 0) const override;
 
+		virtual bool isLoaded() const override { return is_loaded_; }
+
 		virtual bool operator==(const Texture& other) const override
 		{
 			return object_id_ == ((OpenGLTexture2D&)other).object_id_;
@@ -37,6 +39,8 @@ namespace Donut
 		std::string file_path_;
 
 		GLenum internal_format_, data_format_;
+
+		bool is_loaded_ = false;
 	};
 }
 

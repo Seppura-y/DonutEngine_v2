@@ -37,37 +37,49 @@ namespace Donut
 			DN_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string& path)");
 
 			data = stbi_load(file_path_.c_str(), &width, &height, &channels, 0);
-			DN_CORE_ASSERT(data, "failed to load image");
 		}
 
-		if (channels == 3)
+		if (data)
 		{
-			internal_format_ = GL_RGB8;
-			data_format_ = GL_RGB;
+			is_loaded_ = true;
+
+			width_ = width;
+			height_ = height;
+
+			GLenum internal_format = 0, data_format = 0;
+			if (channels == 4)
+			{
+				internal_format = GL_RGBA8;
+				data_format = GL_RGBA;
+			}
+			else if (channels == 3)
+			{
+				internal_format = GL_RGB8;
+				data_format = GL_RGB;
+			}
+		
+			internal_format_ = internal_format;
+			data_format_ = data_format;
+
+			DN_CORE_ASSERT(internal_format_ & data_format_, "image format is not supported!");
+
+			width_ = width;
+			height_ = height;
+			channels_ = channels;
+
+			glCreateTextures(GL_TEXTURE_2D, 1, &object_id_);
+			glTextureStorage2D(object_id_, 1, internal_format_, width_, height_);
+
+			glTextureParameteri(object_id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			glTextureParameteri(object_id_, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+			glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data);
+
+			stbi_image_free(data);
 		}
-		else if (channels == 4)
-		{
-			internal_format_ = GL_RGBA8;
-			data_format_ = GL_RGBA;
-		}
-		DN_CORE_ASSERT(internal_format_ & data_format_, "image format is not supported!");
-
-		width_ = width;
-		height_ = height;
-		channels_ = channels;
-
-		glCreateTextures(GL_TEXTURE_2D, 1, &object_id_);
-		glTextureStorage2D(object_id_, 1, internal_format_, width_, height_);
-
-		glTextureParameteri(object_id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTextureParameteri(object_id_, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-		glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data);
-
-		stbi_image_free(data);
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D()

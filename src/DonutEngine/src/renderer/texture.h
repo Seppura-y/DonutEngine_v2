@@ -21,6 +21,8 @@ namespace Donut
 
 		virtual void bind(uint32_t slot = 0) const = 0;
 
+		virtual bool isLoaded() const = 0;
+
 		virtual bool operator==(const Texture& other) const = 0;
 	private:
 

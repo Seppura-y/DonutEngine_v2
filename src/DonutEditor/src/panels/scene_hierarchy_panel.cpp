@@ -337,7 +337,15 @@ namespace Donut
 				{
 					const wchar_t* path = (const wchar_t*)payload->Data;
 					std::filesystem::path texture_path = std::filesystem::path(g_asset_path) / path;
-					component.texture_ = Texture2D::createTexture(texture_path.string());
+					Ref<Texture2D> texture = Texture2D::createTexture(texture_path.string());
+					if (texture->isLoaded())
+					{
+						component.texture_ = texture;
+					}
+					else
+					{
+						DN_CORE_WARN("Could not load texture {0}", texture_path.filename().string());
+					}
 				}
 				ImGui::EndDragDropTarget();
 			}

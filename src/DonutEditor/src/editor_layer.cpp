@@ -351,12 +351,20 @@ void Donut::EditorLayer::openScene()
 
 void Donut::EditorLayer::openScene(const std::filesystem::path& path)
 {
-	active_scene_ = createRef<Scene>();
-	active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
-	scene_hierarchy_panel_.setContext(active_scene_);
+	if (path.extension().string() != ".yaml")
+	{
+		DN_CORE_WARN("Could not load {0} - not a scene file", path.filename().string());
+		return;
+	}
 
-	SceneSerializer serializer(active_scene_);
-	serializer.deserialize(path.string());
+	Ref<Scene> new_scene = createRef<Scene>();
+	SceneSerializer serializer(new_scene);
+	if (serializer.deserialize(path.string()))
+	{
+		active_scene_ = new_scene;
+		active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+		scene_hierarchy_panel_.setContext(active_scene_);
+	}
 }
 
 void Donut::EditorLayer::saveSceneAs()
