@@ -134,8 +134,9 @@ namespace Donut
 
 	static void serializeEntity(YAML::Emitter& out, Entity entity)
 	{
+		DN_CORE_ASSERT(entity.hasComponent<IDComponent>(), "Error at serializeEntity : entity does not have IDComponent");
 		out << YAML::BeginMap;
-		out << YAML::Key << "Entity" << YAML::Value << "12323443545";
+		out << YAML::Key << "Entity" << YAML::Value << entity.getUUID();
 
 		if (entity.hasComponent<TagComponent>())
 		{
@@ -299,7 +300,7 @@ namespace Donut
 
 				DN_CORE_TRACE("Deserializing entity with ID = {0}, name = {1}", uuid, name);
 
-				Entity deserialized_entity = scene_->createEntity(name);
+				Entity deserialized_entity = scene_->createEntityWithUUID(uuid, name);
 				
 				auto transform_component = entity["TransformComponent"];
 				if (transform_component)

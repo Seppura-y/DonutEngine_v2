@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "scene.h"
 #include "components.h"
+#include "scriptable_entity.h"
+
 #include "renderer/renderer_2d.h"
 
 #include "renderer/editor_camera.h"
@@ -109,6 +111,7 @@ namespace Donut
 			}
 		}
 
+		// Update Renderer
 		Camera* main_camera = nullptr;
 		glm::mat4 camera_transform;
 		{
@@ -182,12 +185,18 @@ namespace Donut
 		}
 	}
 
-	Entity Scene::createEntity(const std::string& tag)
+	Entity& Scene::createEntity(const std::string& tag)
+	{
+		return createEntityWithUUID(UUID(), tag);
+	}
+
+	Entity& Scene::createEntityWithUUID(UUID id, const std::string& tag)
 	{
 		Entity entity = { registry_.create(), this };
+		entity.addComponent<IDComponent>(id);
 		entity.addComponent<TransformComponent>();
 
-		auto t = entity.addComponent<TagComponent>(tag);
+		auto& t = entity.addComponent<TagComponent>(tag);
 		t.tag_ = tag.empty() ? "entity" : tag;
 		return entity;
 	}
@@ -265,6 +274,12 @@ namespace Donut
 	{
 		// you never suppose to not have a specializaion for this function
 		static_assert(false);
+	}
+
+	template<>
+	void Scene::onComponentAdded<IDComponent>(Entity entity, IDComponent& component)
+	{
+
 	}
 
 	template<>

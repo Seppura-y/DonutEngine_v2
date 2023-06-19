@@ -522,12 +522,14 @@ void Donut::EditorLayer::onImGuiRender()
 	ImGui::Begin("Stats");
 
 	std::string name = "None";
+	uint64_t id = 0;
 	if (hovered_entity_)
 	{
 		name = hovered_entity_.getComponent<TagComponent>().tag_;
+		id = hovered_entity_.getComponent<IDComponent>().id_;
 	}
 
-	ImGui::Text("Hovered Entity : %s", name.c_str());
+	ImGui::Text("Hovered Entity : %s : %d", name.c_str(), id);
 
 	auto stats = Donut::Renderer2D::getStatistics();
 	ImGui::Text("Renderer2D Stats:");

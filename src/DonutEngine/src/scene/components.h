@@ -1,19 +1,30 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
+#include "scene/scene_camera.h"
+#include "core/uuid.h"
+
+#include "renderer/texture.h"
+#include "renderer/camera.h"
+
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "renderer/texture.h"
-#include "renderer/camera.h"
-#include "scene/scene_camera.h"
-#include "scene/scriptable_entity.h"
 
 namespace Donut
 {
+	struct IDComponent
+	{
+		UUID id_;
+
+		IDComponent() = default;
+		IDComponent(const IDComponent&) = default;
+	};
+
 	struct TagComponent
 	{
 		std::string tag_;
@@ -82,7 +93,7 @@ namespace Donut
 		CameraComponent(const CameraComponent&) = default;
 	};
 
-
+	class ScriptableEntity;
 	struct NativeScriptComponent_Version1
 	{
 		ScriptableEntity* instance_ = nullptr;

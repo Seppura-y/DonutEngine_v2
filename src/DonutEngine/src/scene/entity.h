@@ -1,9 +1,11 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <entt.hpp>
-
+#include "core/uuid.h"
 #include "scene.h"
+#include "components.h"
+
+#include <entt.hpp>
 
 namespace Donut
 {
@@ -15,6 +17,8 @@ namespace Donut
 
 		Entity(entt::entity handle, Scene* scene);
 		~Entity();
+
+		UUID getUUID() { return getComponent<IDComponent>().id_; }
 
 		operator bool() const
 		{

@@ -1,9 +1,10 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "entt.hpp"
+#include "core/uuid.h"
 #include "core/timestep.h"
 
+#include <entt.hpp>
 
 class b2World;
 
@@ -23,7 +24,8 @@ namespace Donut
 
 		void onViewportResize(uint32_t width, uint32_t height);
 
-		Entity createEntity(const std::string& tag = std::string());
+		Entity& createEntity(const std::string& tag = std::string());
+		Entity& createEntityWithUUID(UUID id, const std::string& tag = std::string());
 		entt::entity createEntity();
 		entt::registry& getRegistry() { return registry_; }
 

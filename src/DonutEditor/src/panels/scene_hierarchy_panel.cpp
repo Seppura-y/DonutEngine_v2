@@ -17,8 +17,8 @@ namespace Donut
 	static void drawComponent(const std::string& name, Entity entity, UIFunction function)
 	{
 		// allow overlap to draw a overlap button which is used to delete the overlapped component
-		const ImGuiTreeNodeFlags treenode_flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed 
-			| ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
+		const ImGuiTreeNodeFlags treenode_flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed
+			| ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
 		if (entity.hasComponent<T>())
 		{
 			auto& component = entity.getComponent<T>();
@@ -207,7 +207,7 @@ namespace Donut
 		}
 
 		ImGui::SameLine();
-		ImGui::PushItemWidth(-1);
+		//ImGui::PushItemWidth(-1);
 
 		if (ImGui::Button("Add Component"))
 		{
