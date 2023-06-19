@@ -7,11 +7,28 @@
 
 #include "scene/entity.h"
 
+#include <box2d/b2_world.h>
+#include <box2d/b2_body.h>
+#include <box2d/b2_fixture.h>
+#include <box2d/b2_polygon_shape.h>
 
 #include <glm/glm.hpp>
 
 namespace Donut
 {
+	static b2BodyType rigidbody2DTypeToBox2DBody(Rigidbody2DComponent::BodyType body_type)
+	{
+		switch (body_type)
+		{
+			case Rigidbody2DComponent::BodyType::Static: return b2_staticBody;
+			case Rigidbody2DComponent::BodyType::Dynamic: return b2_dynamicBody;
+			case Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
+		}
+
+		DN_CORE_ASSERT(false, "Unknown body type");
+		return b2_staticBody;
+	}
+
 	Scene::Scene()
 	{
 #if ENTT_TEST_CODE
@@ -69,6 +86,27 @@ namespace Donut
 
 					nsc.instance_->onUpdate(ts);
 				});
+		}
+
+		// Update physics
+		{
+			const int32_t velocity_iterations = 6;
+			const int32_t position_iterations = 2;
+			physics_world_->Step(ts, velocity_iterations, position_iterations);
+
+			auto view = registry_.view<Rigidbody2DComponent>();
+			for (auto it : view)
+			{
+				Entity entity = { it, this };
+				auto& transform = entity.getComponent<TransformComponent>();
+				auto& rigidbody_2d = entity.getComponent<Rigidbody2DComponent>();
+
+				b2Body* body = (b2Body*)rigidbody_2d.runtime_body_;
+				const auto& position = body->GetPosition();
+				transform.translation_.x = position.x;
+				transform.translation_.y = position.y;
+				transform.rotation_.z = body->GetAngle();
+			}
 		}
 
 		Camera* main_camera = nullptr;
@@ -179,6 +217,49 @@ namespace Donut
 		return {};
 	}
 
+	void Scene::onRuntimeStart()
+	{
+		physics_world_ = new b2World({ 0.0f, -9.8f });
+
+		auto view = registry_.view<Rigidbody2DComponent>();
+		for (auto it : view)
+		{
+			Entity entity = { it, this };
+			auto& transform = entity.getComponent<TransformComponent>();
+			auto& rigidbody_2d = entity.getComponent<Rigidbody2DComponent>();
+
+			b2BodyDef body_def;
+			body_def.type = rigidbody2DTypeToBox2DBody(rigidbody_2d.type_);
+			body_def.position.Set(transform.translation_.x, transform.translation_.y);
+			body_def.angle = transform.rotation_.z;
+
+			b2Body* body = physics_world_->CreateBody(&body_def);
+			body->SetFixedRotation(rigidbody_2d.fixed_rotation_);
+			rigidbody_2d.runtime_body_ = body;
+			if (entity.hasComponent<BoxCollider2DComponent>())
+			{
+				auto& box_collider_2d = entity.getComponent<BoxCollider2DComponent>();
+
+				b2PolygonShape box_shape;
+				box_shape.SetAsBox(box_collider_2d.size_.x * transform.scale_.x, box_collider_2d.size_.y * transform.scale_.y);
+
+				b2FixtureDef fixture_def;
+				fixture_def.shape = &box_shape;
+				fixture_def.density = box_collider_2d.density_;
+				fixture_def.friction = box_collider_2d.friction_;
+				fixture_def.restitution = box_collider_2d.restitution_;
+				fixture_def.restitutionThreshold = box_collider_2d.restitution_threshold_;
+				body->CreateFixture(&fixture_def);
+			}
+		}
+	}
+
+	void Scene::onRuntimeStop()
+	{
+		delete physics_world_;
+		physics_world_ = nullptr;
+	}
+
 	template<typename T>
 	void Scene::onComponentAdded(Entity entity, T& component)
 	{
@@ -216,6 +297,18 @@ namespace Donut
 
 	template<>
 	void Scene::onComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::onComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::onComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component)
 	{
 
 	}

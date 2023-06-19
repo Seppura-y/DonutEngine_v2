@@ -6,9 +6,10 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glad)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/Box2d)
 # add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/spdlog)
 # add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glm)
-set_property(TARGET glad glfw imgui yaml-cpp PROPERTY FOLDER "Dependencies")
+set_property(TARGET glad glfw imgui yaml-cpp Box2D PROPERTY FOLDER "Dependencies")
 
 set(DN_SHARED OFF CACHE BOOL "Build shared library?")
 
@@ -360,6 +361,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp/include
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/ImGuizmo
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/Box2d/include
     $ENV{VULKAN_SDK}/Include
 
 )
@@ -396,6 +398,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     glad.lib
     imgui.lib
     yaml-cpp.lib
+
+    Box2D.lib
 
     # vulkan-1.lib
     # VkLayer_utils.lib

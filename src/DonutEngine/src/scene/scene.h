@@ -5,6 +5,7 @@
 #include "core/timestep.h"
 
 
+class b2World;
 
 namespace Donut
 {
@@ -29,6 +30,9 @@ namespace Donut
 		void destroyEntity(Entity entity);
 
 		Entity getPrimaryCameraEntity();
+
+		void onRuntimeStart();
+		void onRuntimeStop();
 	private:
 		template<typename T>
 		void onComponentAdded(Entity entity, T& component);
@@ -36,6 +40,8 @@ namespace Donut
 		entt::registry registry_;
 		uint32_t viewport_width_ = 0;
 		uint32_t viewport_height_ = 0;
+
+		b2World* physics_world_ = nullptr;
 
 		friend class Entity;
 		friend class SceneSerializer;

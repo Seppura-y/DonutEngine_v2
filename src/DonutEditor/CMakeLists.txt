@@ -148,6 +148,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     imgui.lib
     yaml-cpp.lib
 
+    Box2D.lib
+
     # vulkan-1.lib
     # VkLayer_utils.lib
 

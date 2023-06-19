@@ -120,5 +120,37 @@ namespace Donut
 			destroyScript = [](NativeScriptComponent* nsc) {delete nsc->instance_; nsc->instance_ = nullptr; };
 		}
 	};
+
+
+	struct Rigidbody2DComponent
+	{
+		enum class BodyType { Static = 0, Dynamic, Kinematic };
+		BodyType type_ = BodyType::Static;
+		bool fixed_rotation_ = false;
+
+		// Storage for runtime
+		void* runtime_body_ = nullptr;
+
+		Rigidbody2DComponent() = default;
+		Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
+	};
+
+	struct BoxCollider2DComponent
+	{
+		glm::vec2 offset_ = { 0.0f, 0.0f };
+		glm::vec2 size_ = { 0.5f, 0.5f };
+
+		// TODO(Yan): move into physics material in the future maybe
+		float density_ = 1.0f;					//密度
+		float friction_ = 0.5f;					//摩擦
+		float restitution_ = 0.0f;				//弹性系数
+		float restitution_threshold_ = 0.5f;	//反弹触发阈值？
+
+		// Storage for runtime
+		void* runtime_fixture_ = nullptr;
+
+		BoxCollider2DComponent() = default;
+		BoxCollider2DComponent(const BoxCollider2DComponent&) = default;
+	};
 }
 #endif

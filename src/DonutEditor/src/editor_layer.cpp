@@ -380,11 +380,13 @@ void Donut::EditorLayer::saveSceneAs()
 void Donut::EditorLayer::onSceneStop()
 {
 	scene_state_ = SceneState::Edit;
+	active_scene_->onRuntimeStop();
 }
 
 void Donut::EditorLayer::onScenePlay()
 {
 	scene_state_ = SceneState::Play;
+	active_scene_->onRuntimeStart();
 }
 
 void Donut::EditorLayer::uiToolbar()
