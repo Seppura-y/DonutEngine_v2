@@ -35,6 +35,9 @@ namespace Donut
 
 		void onRuntimeStart();
 		void onRuntimeStop();
+
+		static Ref<Scene> copyScene(Ref<Scene> other);
+		void duplicateEntity(Entity entity);
 	private:
 		template<typename T>
 		void onComponentAdded(Entity entity, T& component);

@@ -152,25 +152,29 @@ namespace Donut
 	void SceneHierarchyPanel::onImGuiRender()
 	{
 		ImGui::Begin("Scene Hierarchy");
-		context_->registry_.each([&](auto entity_id)
-			{
-				Entity entity{ entity_id, context_.get() };
-				drawEntityNode(entity);
-			});
 
-		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+		if (context_)
 		{
-			selection_context_ = {};
-		}
+			context_->registry_.each([&](auto entity_id)
+				{
+					Entity entity{ entity_id, context_.get() };
+			drawEntityNode(entity);
+				});
 
-		if (ImGui::BeginPopupContextWindow(0, 1, false))
-		{
-			if (ImGui::MenuItem("Create Empty Entity"))
+			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 			{
-				context_->createEntity("Empty Entity");
+				selection_context_ = {};
 			}
 
-			ImGui::EndPopup();
+			if (ImGui::BeginPopupContextWindow(0, 1, false))
+			{
+				if (ImGui::MenuItem("Create Empty Entity"))
+				{
+					context_->createEntity("Empty Entity");
+				}
+
+				ImGui::EndPopup();
+			}
 		}
 
 		ImGui::End();

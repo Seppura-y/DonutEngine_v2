@@ -19,6 +19,7 @@ namespace Donut
 		~Entity();
 
 		UUID getUUID() { return getComponent<IDComponent>().id_; }
+		const std::string& getName() { return getComponent<TagComponent>().tag_; }
 
 		operator bool() const
 		{
@@ -53,6 +54,14 @@ namespace Donut
 		{
 			DN_CORE_ASSERT(!hasComponent<T>(), "Entity already has component!");
 			auto& component = scene_->getRegistry().emplace<T>(entity_handle_, std::forward<Args>(args)...);
+			scene_->onComponentAdded<T>(*this, component);
+			return component;
+		}
+
+		template<typename T, typename... Args>
+		T& addOrReplaceComponent(Args&&... args)
+		{
+			T& component = scene_->registry_.emplace_or_replace<T>(entity_handle_, std::forward<Args>(args)...);
 			scene_->onComponentAdded<T>(*this, component);
 			return component;
 		}

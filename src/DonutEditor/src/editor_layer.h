@@ -28,10 +28,17 @@ namespace Donut
 		void newScene();
 		void openScene();
 		void openScene(const std::filesystem::path& path);
+
+		void saveScene();
 		void saveSceneAs();
+
+		void serializeScene(Ref<Scene> scene, const std::filesystem::path& path);
 
 		void onSceneStop();
 		void onScenePlay();
+
+		void onDuplicateEntity();
+
 		void uiToolbar();
 	private:
 		struct ProfileResult
@@ -67,6 +74,10 @@ namespace Donut
 		bool is_viewport_hovered_ = false;
 
 		Donut::Ref<Donut::Scene> active_scene_;
+		Donut::Ref<Donut::Scene> editor_scene_;
+
+		std::filesystem::path editor_scene_path_;
+
 		Donut::Entity rect_entity_;
 
 		Donut::Entity fst_camera_;

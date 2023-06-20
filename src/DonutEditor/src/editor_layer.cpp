@@ -270,7 +270,18 @@ bool Donut::EditorLayer::onKeyPressed(KeyPressedEvent& ev)
 	case DN_KEY_S:
 		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
 		{
-			saveSceneAs();
+			if (Input::isKeyPressed(DN_KEY_LEFT_ALT) || Input::isKeyPressed(DN_KEY_RIGHT_ALT))
+			{
+				saveSceneAs();
+				break;
+			}
+			saveScene();
+		}
+		break;
+	case DN_KEY_D:
+		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
+		{
+			onDuplicateEntity();
 		}
 		break;
 	case DN_KEY_N:
@@ -337,10 +348,16 @@ void Donut::EditorLayer::newScene()
 	active_scene_ = createRef<Scene>();
 	active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 	scene_hierarchy_panel_.setContext(active_scene_);
+	editor_scene_path_ = std::filesystem::path();
 }
 
 void Donut::EditorLayer::openScene()
 {
+	if (scene_state_ != SceneState::Edit)
+	{
+		onSceneStop();
+	}
+
 	std::string filepath = FileDialogs::openFile("Donut Scene (*.yaml)\0*.yaml\0");
 
 	if (!filepath.empty())
@@ -361,9 +378,24 @@ void Donut::EditorLayer::openScene(const std::filesystem::path& path)
 	SceneSerializer serializer(new_scene);
 	if (serializer.deserialize(path.string()))
 	{
-		active_scene_ = new_scene;
-		active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
-		scene_hierarchy_panel_.setContext(active_scene_);
+		editor_scene_ = new_scene;
+		editor_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+		scene_hierarchy_panel_.setContext(editor_scene_);
+
+		active_scene_ = editor_scene_;
+		editor_scene_path_ = path;
+	}
+}
+
+void Donut::EditorLayer::saveScene()
+{
+	if (!editor_scene_path_.empty())
+	{
+		serializeScene(active_scene_, editor_scene_path_);
+	}
+	else
+	{
+		saveSceneAs();
 	}
 }
 
@@ -372,21 +404,47 @@ void Donut::EditorLayer::saveSceneAs()
 	std::string filepath = FileDialogs::openFile("Donut Scene (*.yaml)\0*.yaml\0");
 	if (!filepath.empty())
 	{
-		SceneSerializer serializer(active_scene_);
-		serializer.serialize(filepath);
+		serializeScene(active_scene_, filepath);
+		editor_scene_path_ = filepath;
 	}
+}
+
+void Donut::EditorLayer::serializeScene(Ref<Scene> scene, const std::filesystem::path& path)
+{
+	SceneSerializer serializer(scene);
+	serializer.serialize(path.string());
 }
 
 void Donut::EditorLayer::onSceneStop()
 {
 	scene_state_ = SceneState::Edit;
 	active_scene_->onRuntimeStop();
+
+	active_scene_ = editor_scene_;
+	scene_hierarchy_panel_.setContext(active_scene_);
 }
 
 void Donut::EditorLayer::onScenePlay()
 {
 	scene_state_ = SceneState::Play;
+	active_scene_ = Scene::copyScene(editor_scene_);
+
 	active_scene_->onRuntimeStart();
+	scene_hierarchy_panel_.setContext(active_scene_);
+}
+
+void Donut::EditorLayer::onDuplicateEntity()
+{
+	if (scene_state_ != SceneState::Edit)
+	{
+		return;
+	}
+
+	Entity selected_entity = scene_hierarchy_panel_.getSelectedEntity();
+	if (selected_entity)
+	{
+		editor_scene_->duplicateEntity(selected_entity);
+	}
 }
 
 void Donut::EditorLayer::uiToolbar()

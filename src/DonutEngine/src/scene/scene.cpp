@@ -31,6 +31,30 @@ namespace Donut
 		return b2_staticBody;
 	}
 
+	template<typename Component>
+	static void copyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& entt_map)
+	{
+		auto view = src.view<Component>();
+		for (auto entity : view)
+		{
+			UUID uuid = src.get<IDComponent>(entity).id_;
+			DN_CORE_ASSERT(entt_map.find(uuid) != entt_map.end(), "");
+			entt::entity dst_entt = entt_map.at(uuid);
+
+			auto& component = src.get<Component>(entity);
+			dst.emplace_or_replace<Component>(dst_entt, component);
+		}
+	}
+
+	template<typename Component>
+	static void copyComponentIfExists(Entity dst, Entity src)
+	{
+		if (src.hasComponent<Component>())
+		{
+			dst.addOrReplaceComponent<Component>(src.getComponent<Component>());
+		}
+	}
+
 	Scene::Scene()
 	{
 #if ENTT_TEST_CODE
@@ -267,6 +291,51 @@ namespace Donut
 	{
 		delete physics_world_;
 		physics_world_ = nullptr;
+	}
+
+	Ref<Scene> Scene::copyScene(Ref<Scene> other)
+	{
+		Ref<Scene> new_scene = createRef<Scene>();
+
+		new_scene->viewport_width_ = other->viewport_width_;
+		new_scene->viewport_height_ = other->viewport_height_;
+
+		auto& src_scene_registry = other->registry_;
+		auto& dst_scene_registry = new_scene->registry_;
+		std::unordered_map<UUID, entt::entity> entt_map;
+
+		// create entities in new scene
+		auto id_view = src_scene_registry.view<IDComponent>();
+		for (auto entity : id_view)
+		{
+			UUID uuid = src_scene_registry.get<IDComponent>(entity).id_;
+			const auto& name = src_scene_registry.get<TagComponent>(entity).tag_;
+			Entity new_entity = new_scene->createEntityWithUUID(uuid, name);
+			entt_map[uuid] = (entt::entity)new_entity;
+		}
+
+		// copy components
+		copyComponent<TransformComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<SpriteRendererComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<CameraComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<NativeScriptComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<Rigidbody2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<BoxCollider2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		
+		return new_scene;
+	}
+
+	void Scene::duplicateEntity(Entity entity)
+	{
+		std::string name = entity.getName();
+		Entity new_entity = createEntity(name);
+
+		copyComponentIfExists<TransformComponent>(new_entity, entity);
+		copyComponentIfExists<SpriteRendererComponent>(new_entity, entity);
+		copyComponentIfExists<NativeScriptComponent>(new_entity, entity);
+		copyComponentIfExists<CameraComponent>(new_entity, entity);
+		copyComponentIfExists<Rigidbody2DComponent>(new_entity, entity);
+		copyComponentIfExists<BoxCollider2DComponent>(new_entity, entity);
 	}
 
 	template<typename T>
