@@ -198,6 +198,19 @@ namespace Donut
 			out << YAML::EndMap; // SpriteRendererComponent
 		}
 
+		if (entity.hasComponent<CircleRendererComponent>())
+		{
+			out << YAML::Key << "CircleRendererComponent";
+			out << YAML::BeginMap;
+
+			auto& circleRendererComponent = entity.getComponent<CircleRendererComponent>();
+			out << YAML::Key << "Color" << YAML::Value << circleRendererComponent.color_;
+			out << YAML::Key << "Thickness" << YAML::Value << circleRendererComponent.thickness_;
+			out << YAML::Key << "Fade" << YAML::Value << circleRendererComponent.fade_;
+
+			out << YAML::EndMap;
+		}
+
 		if (entity.hasComponent<Rigidbody2DComponent>())
 		{
 			out << YAML::Key << "Rigidbody2DComponent";
@@ -337,6 +350,15 @@ namespace Donut
 				{
 					auto& src = deserialized_entity.addComponent<SpriteRendererComponent>();
 					src.color_ = spriteRendererComponent["Color"].as<glm::vec4>();
+				}
+
+				auto circleRendererComponent = entity["CircleRendererComponent"];
+				if (circleRendererComponent)
+				{
+					auto& crc = deserialized_entity.addComponent<CircleRendererComponent>();
+					crc.color_ = circleRendererComponent["Color"].as<glm::vec4>();
+					crc.thickness_ = circleRendererComponent["Thickness"].as<float>();
+					crc.fade_ = circleRendererComponent["Fade"].as<float>();
 				}
 
 				auto rigidbody_2d_component = entity["Rigidbody2DComponent"];

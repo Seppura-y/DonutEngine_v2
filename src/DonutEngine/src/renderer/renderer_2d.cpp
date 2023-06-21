@@ -28,6 +28,17 @@ namespace Donut
 		int entity_id_;
 	};
 
+	struct CircleVertex
+	{
+		glm::vec3 world_position_;
+		glm::vec3 local_position_;
+		glm::vec4 color_;
+		float thickness_;
+		float fade_;
+
+		int entity_id_;
+	};
+
 	struct Renderer2DData
 	{
 		static const uint32_t max_rects_ = 20000;
@@ -35,16 +46,23 @@ namespace Donut
 		static const uint32_t max_indices_ = max_rects_ * 6;
 		static const uint32_t max_texture_slots_ = 32;
 
-		Ref<VertexArray> rectangle_va_;
-		Ref<VertexBuffer> rectangle_vb_;
-
 		Ref<Texture2D> white_texture_;
 
-		Ref<Shader> single_shader_;
+		Ref<VertexArray> rectangle_va_;
+		Ref<VertexBuffer> rectangle_vb_;
+		Ref<Shader> rectangle_shader_;
 
 		uint32_t rect_indices_count_ = 0;
 		RectangleVertex* rect_vertex_buffer_base_ = nullptr;
 		RectangleVertex* rect_vertex_buffer_ptr_ = nullptr;
+
+		Ref<VertexArray> circle_va_;
+		Ref<VertexBuffer> circle_vb_;
+		Ref<Shader> circle_shader_;
+
+		uint32_t circle_indices_count_ = 0;
+		CircleVertex* circle_vertex_buffer_base_ = nullptr;
+		CircleVertex* circle_vertex_buffer_ptr_ = nullptr;
 
 		std::array<Ref<Texture2D>, max_texture_slots_> texture_slots_;
 		uint32_t texture_index_ = 1;	//slot 0 for white texture
@@ -102,6 +120,22 @@ namespace Donut
 		s_data.rectangle_va_->setIndexBuffer(rectangle_ib);
 		delete[] rectangle_indices;
 
+		s_data.circle_va_ = VertexArray::create();
+
+		s_data.circle_vb_.reset(VertexBuffer::create(s_data.max_indices_ * sizeof(CircleVertex)));
+		s_data.circle_vb_->setLayout({
+			{ShaderDataType::Float3,	"a_WorldPosition"},
+			{ShaderDataType::Float3,	"a_LocalPosition"},
+			{ShaderDataType::Float4,	"a_Color"},
+			{ShaderDataType::Float,		"a_Thickness"},
+			{ShaderDataType::Float,		"a_Fade"},
+			{ShaderDataType::Int,		"a_EntityID"},
+		});
+		s_data.circle_va_->addVertexBuffer(s_data.circle_vb_);
+		s_data.circle_va_->setIndexBuffer(rectangle_ib);
+		s_data.circle_vertex_buffer_base_ = new CircleVertex[s_data.max_vertices_];
+
+
 		s_data.white_texture_ = Texture2D::createTexture(1, 1);
 		uint32_t white_texture_data = 0xffffffff;
 		s_data.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
@@ -112,7 +146,8 @@ namespace Donut
 			samplers[i] = i;
 		}
 
-		s_data.single_shader_ = Shader::createShader("assets/shaders/c7_spirv_shader.glsl");
+		s_data.circle_shader_ = Shader::createShader("assets/shaders/c8_circle_rendering.glsl");
+		s_data.rectangle_shader_ = Shader::createShader("assets/shaders/c7_spirv_shader.glsl");
 		//s_data.single_shader_ = Shader::createShader("assets/shaders/c6_batch_texture_rendering_v2.glsl");
 		//s_data.single_shader_->bind();
 		//s_data.single_shader_->setIntArray("u_textures", samplers, s_data.max_texture_slots_);
@@ -147,16 +182,22 @@ namespace Donut
 		s_data.rect_indices_count_ = 0;
 		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
 
+		s_data.circle_indices_count_ = 0;
+		s_data.circle_vertex_buffer_ptr_ = s_data.circle_vertex_buffer_base_;
+
 		s_data.texture_index_ = 1;
 	}
 
 	void Renderer2D::beginScene(const OrthographicCamera& camera)
 	{
-		s_data.single_shader_->bind();
-		s_data.single_shader_->setMat4("u_viewProjectionMatrix", camera.getViewProjectionMatrix());
+		s_data.rectangle_shader_->bind();
+		s_data.rectangle_shader_->setMat4("u_viewProjectionMatrix", camera.getViewProjectionMatrix());
 
 		s_data.rect_indices_count_ = 0;
 		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
+
+		s_data.circle_indices_count_ = 0;
+		s_data.circle_vertex_buffer_ptr_ = s_data.circle_vertex_buffer_base_;
 
 		s_data.texture_index_ = 1;
 	}
@@ -176,6 +217,9 @@ namespace Donut
 		s_data.rect_indices_count_ = 0;
 		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
 
+		s_data.circle_indices_count_ = 0;
+		s_data.circle_vertex_buffer_ptr_ = s_data.circle_vertex_buffer_base_;
+
 		s_data.texture_index_ = 1;
 	}
 
@@ -189,23 +233,38 @@ namespace Donut
 
 	void Renderer2D::flush()
 	{
-		if (s_data.rect_indices_count_ == 0)
+		if (s_data.rect_indices_count_)
 		{
-			return;
+			uint32_t data_size = (uint32_t)((uint8_t*)s_data.rect_vertex_buffer_ptr_ - (uint8_t*)s_data.rect_vertex_buffer_base_);
+			s_data.rectangle_vb_->setData(s_data.rect_vertex_buffer_base_, data_size);
+
+
+			// bind textures
+			for (uint32_t i = 0; i < s_data.texture_index_; i++)
+			{
+				s_data.texture_slots_[i]->bind(i);
+			}
+			s_data.rectangle_shader_->bind();
+			RenderCommand::drawIndices(s_data.rectangle_va_, s_data.rect_indices_count_);
+			s_data.statistics_.drawcalls_++;
 		}
 
-		uint32_t data_size = (uint32_t)((uint8_t*)s_data.rect_vertex_buffer_ptr_ - (uint8_t*)s_data.rect_vertex_buffer_base_);
-		s_data.rectangle_vb_->setData(s_data.rect_vertex_buffer_base_, data_size);
-
-
-		// bind textures
-		for (uint32_t i = 0; i < s_data.texture_index_; i++)
+		if (s_data.circle_indices_count_)
 		{
-			s_data.texture_slots_[i]->bind(i);
+			uint32_t data_size = (uint32_t)((uint8_t*)s_data.circle_vertex_buffer_ptr_ - (uint8_t*)s_data.circle_vertex_buffer_base_);
+			s_data.circle_vb_->setData(s_data.circle_vertex_buffer_base_, data_size);
+
+
+			// bind textures
+			//for (uint32_t i = 0; i < s_data.texture_index_; i++)
+			//{
+			//	s_data.texture_slots_[i]->bind(i);
+			//}
+			s_data.circle_shader_->bind();
+			RenderCommand::drawIndices(s_data.circle_va_, s_data.circle_indices_count_);
+			s_data.statistics_.drawcalls_++;
 		}
-		s_data.single_shader_->bind();
-		RenderCommand::drawIndices(s_data.rectangle_va_, s_data.rect_indices_count_);
-		s_data.statistics_.drawcalls_++;
+
 	}
 
 
@@ -728,6 +787,26 @@ namespace Donut
 			drawRectangle(transform, component.color_, entity_id);
 		}
 
+	}
+
+	void Renderer2D::drawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness, float fade, int entity_id)
+	{
+		DN_PROFILE_FUNCTION();
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			s_data.circle_vertex_buffer_ptr_->world_position_ = transform * s_data.rect_vertex_positions_[i];
+			s_data.circle_vertex_buffer_ptr_->local_position_ = s_data.rect_vertex_positions_[i] * 2.0f;
+			s_data.circle_vertex_buffer_ptr_->color_ = color;
+			s_data.circle_vertex_buffer_ptr_->thickness_ = thickness;
+			s_data.circle_vertex_buffer_ptr_->fade_ = fade;
+			s_data.circle_vertex_buffer_ptr_->entity_id_ = entity_id;
+			s_data.circle_vertex_buffer_ptr_++;
+		}
+
+		s_data.circle_indices_count_ += 6;
+
+		s_data.statistics_.rect_count_++;
 	}
 
 	void Renderer2D::resetStatistics()

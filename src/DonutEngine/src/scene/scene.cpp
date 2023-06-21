@@ -157,6 +157,41 @@ namespace Donut
 		{
 			Renderer2D::beginScene(main_camera->getProjection(), camera_transform);
 
+			{
+				auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+				for (auto entity : group)
+				{
+					// return a tuple that consturct with the references value, and the tuple return as value
+					// so we don't need to use '&' to receive the return value.
+					// because the API already did that.
+					//auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+					auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+					//Renderer2D::drawRectangle(transform.getTransform(), sprite.color_);
+					Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+				}
+			}
+
+
+			{
+				auto view = registry_.view<TransformComponent, CircleRendererComponent>();
+
+				//auto group = registry_.group<TransformComponent>(entt::get<CircleRendererComponent>);
+				for (auto entity : view)
+				{
+					auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
+					Renderer2D::drawCircle(transform.getTransform(), circle.color_, circle.thickness_, circle.fade_, (int)entity);
+				}
+			}
+
+			Renderer2D::endScene();
+		}
+	}
+
+	void Scene::onUpdateEditor(Timestep ts, EditorCamera& camera)
+	{
+		Renderer2D::beginScene(camera);
+
+		{
 			auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto entity : group)
 			{
@@ -168,25 +203,17 @@ namespace Donut
 				//Renderer2D::drawRectangle(transform.getTransform(), sprite.color_);
 				Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
 			}
-
-			Renderer2D::endScene();
 		}
-	}
 
-	void Scene::onUpdateEditor(Timestep ts, EditorCamera& camera)
-	{
-		Renderer2D::beginScene(camera);
-
-		auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto entity : group)
 		{
-			// return a tuple that consturct with the references value, and the tuple return as value
-			// so we don't need to use '&' to receive the return value.
-			// because the API already did that.
-			//auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			//Renderer2D::drawRectangle(transform.getTransform(), sprite.color_);
-			Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+			auto view = registry_.view<TransformComponent, CircleRendererComponent>();
+
+			//auto group = registry_.group<TransformComponent>(entt::get<CircleRendererComponent>);
+			for (auto entity : view)
+			{
+				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
+				Renderer2D::drawCircle(transform.getTransform(), circle.color_, circle.thickness_, circle.fade_, (int)entity);
+			}
 		}
 
 		Renderer2D::endScene();
@@ -317,6 +344,7 @@ namespace Donut
 		// copy components
 		copyComponent<TransformComponent>(dst_scene_registry, src_scene_registry, entt_map);
 		copyComponent<SpriteRendererComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<CircleRendererComponent>(dst_scene_registry, src_scene_registry, entt_map);
 		copyComponent<CameraComponent>(dst_scene_registry, src_scene_registry, entt_map);
 		copyComponent<NativeScriptComponent>(dst_scene_registry, src_scene_registry, entt_map);
 		copyComponent<Rigidbody2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
@@ -332,6 +360,7 @@ namespace Donut
 
 		copyComponentIfExists<TransformComponent>(new_entity, entity);
 		copyComponentIfExists<SpriteRendererComponent>(new_entity, entity);
+		copyComponentIfExists<CircleRendererComponent>(new_entity, entity);
 		copyComponentIfExists<NativeScriptComponent>(new_entity, entity);
 		copyComponentIfExists<CameraComponent>(new_entity, entity);
 		copyComponentIfExists<Rigidbody2DComponent>(new_entity, entity);
@@ -378,6 +407,13 @@ namespace Donut
 	{
 
 	}
+
+	template<>
+	void Scene::onComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& component)
+	{
+
+	}
+
 
 	template<>
 	void Scene::onComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)

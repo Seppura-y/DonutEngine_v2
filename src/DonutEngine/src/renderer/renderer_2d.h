@@ -45,6 +45,8 @@ namespace Donut
 		static void drawRectangle(const glm::mat4 transform, const Ref<Texture2D>& texture, float tiling_factor = 1.0f, const glm::vec4& tint_color = glm::vec4(1.0f), int entity_id = -1);
 	
 		static void drawSprite(const glm::mat4& trnasform, SpriteRendererComponent& component, int entity_id);
+
+		static void drawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness = 1.0f, float fade = 0.005f, int entity_id = -1);
 	public:
 		struct Statistics
 		{

@@ -83,6 +83,16 @@ namespace Donut
 
 	};
 
+	struct CircleRendererComponent
+	{
+		glm::vec4 color_{ 0.6f, 0.4f, 0.2f, 1.0f };
+		float thickness_ = 1.0f;
+		float fade_ = 0.005f;
+
+		CircleRendererComponent() = default;
+		CircleRendererComponent(const CircleRendererComponent&) = default;
+	};
+
 	struct CameraComponent
 	{
 		Donut::SceneCamera camera_;
