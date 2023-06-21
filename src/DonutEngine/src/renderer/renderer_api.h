@@ -25,7 +25,8 @@ namespace Donut
 		virtual void setClearColor(const glm::vec4& color) = 0;
 		virtual void clear() = 0;
 		virtual void drawIndices(const Donut::Ref<VertexArray>& vertex_array, uint32_t count = 0) = 0;
-
+		virtual void drawLines(const Donut::Ref<VertexArray>& va, uint32_t vertex_count) = 0;
+		virtual void setLineWidth(float width) = 0;
 		inline static RendererAPIType getApiType() { return type_; }
 	private:
 		static RendererAPIType type_;

@@ -30,6 +30,16 @@ namespace Donut
 		{
 			renderer_api_->drawIndices(va, count);
 		}
+
+		inline static void drawLines(const Ref<VertexArray>& va, uint32_t vertex_count)
+		{
+			renderer_api_->drawLines(va, vertex_count);
+		}
+
+		inline static void setLineWidth(float width)
+		{
+			renderer_api_->setLineWidth(width);
+		}
 	private:
 		static RendererAPI* renderer_api_;
 	};

@@ -202,6 +202,8 @@ namespace Donut
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 				//Renderer2D::drawRectangle(transform.getTransform(), sprite.color_);
 				Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+				Renderer2D::setLineWidth(5);
+				Renderer2D::drawRectangleWithLines(transform.getTransform(), glm::vec4(0.8, 0.5, 0.3, 1.0));
 			}
 		}
 
@@ -215,6 +217,8 @@ namespace Donut
 				Renderer2D::drawCircle(transform.getTransform(), circle.color_, circle.thickness_, circle.fade_, (int)entity);
 			}
 		}
+
+		Renderer2D::drawLine(glm::vec3(0.0f), glm::vec3(5.0f), glm::vec4(1, 0, 1, 1));
 
 		Renderer2D::endScene();
 	}

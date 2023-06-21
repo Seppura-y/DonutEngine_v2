@@ -39,6 +39,14 @@ namespace Donut
 		int entity_id_;
 	};
 
+	struct LineVertex
+	{
+		glm::vec3 position_;
+		glm::vec4 color_;
+
+		int entity_id_;
+	};
+
 	struct Renderer2DData
 	{
 		static const uint32_t max_rects_ = 20000;
@@ -48,6 +56,8 @@ namespace Donut
 
 		Ref<Texture2D> white_texture_;
 
+		////////////////////////////////////////////////////////////
+		// Rectangle
 		Ref<VertexArray> rectangle_va_;
 		Ref<VertexBuffer> rectangle_vb_;
 		Ref<Shader> rectangle_shader_;
@@ -56,6 +66,8 @@ namespace Donut
 		RectangleVertex* rect_vertex_buffer_base_ = nullptr;
 		RectangleVertex* rect_vertex_buffer_ptr_ = nullptr;
 
+		////////////////////////////////////////////////////////////
+		// Circle
 		Ref<VertexArray> circle_va_;
 		Ref<VertexBuffer> circle_vb_;
 		Ref<Shader> circle_shader_;
@@ -63,6 +75,18 @@ namespace Donut
 		uint32_t circle_indices_count_ = 0;
 		CircleVertex* circle_vertex_buffer_base_ = nullptr;
 		CircleVertex* circle_vertex_buffer_ptr_ = nullptr;
+
+		////////////////////////////////////////////////////////////
+		// Line
+		Ref<VertexArray> line_va_;
+		Ref<VertexBuffer> line_vb_;
+		Ref<Shader> line_shader_;
+
+		uint32_t line_vertex_count_ = 0;
+		LineVertex* line_vertex_buffer_base_ = nullptr;
+		LineVertex* line_vertex_buffer_ptr_ = nullptr;
+
+		float line_width_ = 2.0f;
 
 		std::array<Ref<Texture2D>, max_texture_slots_> texture_slots_;
 		uint32_t texture_index_ = 1;	//slot 0 for white texture
@@ -136,6 +160,19 @@ namespace Donut
 		s_data.circle_vertex_buffer_base_ = new CircleVertex[s_data.max_vertices_];
 
 
+		s_data.line_va_ = VertexArray::create();
+
+		s_data.line_vb_.reset(VertexBuffer::create(s_data.max_indices_ * sizeof(CircleVertex)));
+		s_data.line_vb_->setLayout({
+			{ShaderDataType::Float3,	"a_Position"},
+			{ShaderDataType::Float4,	"a_Color"},
+			{ShaderDataType::Int,		"a_EntityID"}
+		});
+		s_data.line_va_->addVertexBuffer(s_data.line_vb_);
+
+		s_data.line_vertex_buffer_base_ = new LineVertex[s_data.max_vertices_];
+
+
 		s_data.white_texture_ = Texture2D::createTexture(1, 1);
 		uint32_t white_texture_data = 0xffffffff;
 		s_data.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
@@ -148,6 +185,7 @@ namespace Donut
 
 		s_data.circle_shader_ = Shader::createShader("assets/shaders/c8_circle_rendering.glsl");
 		s_data.rectangle_shader_ = Shader::createShader("assets/shaders/c7_spirv_shader.glsl");
+		s_data.line_shader_ = Shader::createShader("assets/shaders/c9_line_rendering.glsl");
 		//s_data.single_shader_ = Shader::createShader("assets/shaders/c6_batch_texture_rendering_v2.glsl");
 		//s_data.single_shader_->bind();
 		//s_data.single_shader_->setIntArray("u_textures", samplers, s_data.max_texture_slots_);
@@ -185,6 +223,9 @@ namespace Donut
 		s_data.circle_indices_count_ = 0;
 		s_data.circle_vertex_buffer_ptr_ = s_data.circle_vertex_buffer_base_;
 
+		s_data.line_vertex_count_ = 0;
+		s_data.line_vertex_buffer_ptr_ = s_data.line_vertex_buffer_base_;
+
 		s_data.texture_index_ = 1;
 	}
 
@@ -198,6 +239,9 @@ namespace Donut
 
 		s_data.circle_indices_count_ = 0;
 		s_data.circle_vertex_buffer_ptr_ = s_data.circle_vertex_buffer_base_;
+
+		s_data.line_vertex_count_ = 0;
+		s_data.line_vertex_buffer_ptr_ = s_data.line_vertex_buffer_base_;
 
 		s_data.texture_index_ = 1;
 	}
@@ -219,6 +263,9 @@ namespace Donut
 
 		s_data.circle_indices_count_ = 0;
 		s_data.circle_vertex_buffer_ptr_ = s_data.circle_vertex_buffer_base_;
+
+		s_data.line_vertex_count_ = 0;
+		s_data.line_vertex_buffer_ptr_ = s_data.line_vertex_buffer_base_;
 
 		s_data.texture_index_ = 1;
 	}
@@ -265,6 +312,17 @@ namespace Donut
 			s_data.statistics_.drawcalls_++;
 		}
 
+
+		if (s_data.line_vertex_count_)
+		{
+			uint32_t data_size = (uint32_t)((uint8_t*)s_data.line_vertex_buffer_ptr_ - (uint8_t*)s_data.line_vertex_buffer_base_);
+			s_data.line_vb_->setData(s_data.line_vertex_buffer_base_, data_size);
+
+			s_data.line_shader_->bind();
+			RenderCommand::setLineWidth(s_data.line_width_);
+			RenderCommand::drawLines(s_data.line_va_, s_data.line_vertex_count_);
+			s_data.statistics_.drawcalls_++;
+		}
 	}
 
 
@@ -807,6 +865,58 @@ namespace Donut
 		s_data.circle_indices_count_ += 6;
 
 		s_data.statistics_.rect_count_++;
+	}
+
+	void Renderer2D::drawLine(const glm::vec3& p0, glm::vec3& p1, const glm::vec4& color, int entity_id)
+	{
+		s_data.line_vertex_buffer_ptr_->position_ = p0;
+		s_data.line_vertex_buffer_ptr_->color_ = color;
+		s_data.line_vertex_buffer_ptr_->entity_id_ = entity_id;
+		s_data.line_vertex_buffer_ptr_++;
+
+		s_data.line_vertex_buffer_ptr_->position_ = p1;
+		s_data.line_vertex_buffer_ptr_->color_ = color;
+		s_data.line_vertex_buffer_ptr_->entity_id_ = entity_id;
+		s_data.line_vertex_buffer_ptr_++;
+
+		s_data.line_vertex_count_ += 2;
+	}
+
+	void Renderer2D::drawRectangleWithLines(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entity_id)
+	{
+		glm::vec3 p0 = glm::vec3(position.x - size.x * 0.5f, position.y - size.y * 0.5f, position.z);
+		glm::vec3 p1 = glm::vec3(position.x + size.x * 0.5f, position.y - size.y * 0.5f, position.z);
+		glm::vec3 p2 = glm::vec3(position.x + size.x * 0.5f, position.y + size.y * 0.5f, position.z);
+		glm::vec3 p3 = glm::vec3(position.x - size.x * 0.5f, position.y + size.y * 0.5f, position.z);
+
+		drawLine(p0, p1, color);
+		drawLine(p1, p2, color);
+		drawLine(p2, p3, color);
+		drawLine(p3, p0, color);
+	}
+
+	void Renderer2D::drawRectangleWithLines(const glm::mat4& transform, const glm::vec4& color, int entity_id)
+	{
+		glm::vec3 line_vertices[4];
+		for (size_t i = 0; i < 4; i++)
+		{
+			line_vertices[i] = transform * s_data.rect_vertex_positions_[i];
+		}
+
+		drawLine(line_vertices[0], line_vertices[1], color);
+		drawLine(line_vertices[1], line_vertices[2], color);
+		drawLine(line_vertices[2], line_vertices[3], color);
+		drawLine(line_vertices[3], line_vertices[0], color);
+	}
+
+	float Renderer2D::getLineWidth()
+	{
+		return s_data.line_width_;
+	}
+
+	void Renderer2D::setLineWidth(float width)
+	{
+		s_data.line_width_ = width;
 	}
 
 	void Renderer2D::resetStatistics()
