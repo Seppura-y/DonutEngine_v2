@@ -13,6 +13,7 @@
 #include <box2d/b2_body.h>
 #include <box2d/b2_fixture.h>
 #include <box2d/b2_polygon_shape.h>
+#include <box2d/b2_circle_shape.h>
 
 #include <glm/glm.hpp>
 
@@ -202,8 +203,8 @@ namespace Donut
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 				//Renderer2D::drawRectangle(transform.getTransform(), sprite.color_);
 				Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
-				Renderer2D::setLineWidth(5);
-				Renderer2D::drawRectangleWithLines(transform.getTransform(), glm::vec4(0.8, 0.5, 0.3, 1.0));
+				//Renderer2D::setLineWidth(5);
+				//Renderer2D::drawRectangleWithLines(transform.getTransform(), glm::vec4(0.8, 0.5, 0.3, 1.0));
 			}
 		}
 
@@ -218,7 +219,7 @@ namespace Donut
 			}
 		}
 
-		Renderer2D::drawLine(glm::vec3(0.0f), glm::vec3(5.0f), glm::vec4(1, 0, 1, 1));
+		//Renderer2D::drawLine(glm::vec3(0.0f), glm::vec3(5.0f), glm::vec4(1, 0, 1, 1));
 
 		Renderer2D::endScene();
 	}
@@ -315,6 +316,23 @@ namespace Donut
 				fixture_def.restitutionThreshold = box_collider_2d.restitution_threshold_;
 				body->CreateFixture(&fixture_def);
 			}
+
+			if (entity.hasComponent<CircleCollider2DComponent>())
+			{
+				auto& circle_collider_2d = entity.getComponent<CircleCollider2DComponent>();
+
+				b2CircleShape circle_shape;
+				circle_shape.m_p.Set(circle_collider_2d.offset_.x, circle_collider_2d.offset_.y);
+				circle_shape.m_radius = circle_collider_2d.radius_;
+
+				b2FixtureDef fixture_def;
+				fixture_def.shape = &circle_shape;
+				fixture_def.density = circle_collider_2d.density_;
+				fixture_def.friction = circle_collider_2d.friction_;
+				fixture_def.restitution = circle_collider_2d.restitution_;
+				fixture_def.restitutionThreshold = circle_collider_2d.restitution_threshold_;
+				body->CreateFixture(&fixture_def);
+			}
 		}
 	}
 
@@ -353,6 +371,7 @@ namespace Donut
 		copyComponent<NativeScriptComponent>(dst_scene_registry, src_scene_registry, entt_map);
 		copyComponent<Rigidbody2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
 		copyComponent<BoxCollider2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<CircleCollider2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
 		
 		return new_scene;
 	}
@@ -369,6 +388,7 @@ namespace Donut
 		copyComponentIfExists<CameraComponent>(new_entity, entity);
 		copyComponentIfExists<Rigidbody2DComponent>(new_entity, entity);
 		copyComponentIfExists<BoxCollider2DComponent>(new_entity, entity);
+		copyComponentIfExists<CircleCollider2DComponent>(new_entity, entity);
 	}
 
 	template<typename T>
@@ -433,6 +453,12 @@ namespace Donut
 
 	template<>
 	void Scene::onComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::onComponentAdded<CircleCollider2DComponent>(Entity entity, CircleCollider2DComponent& component)
 	{
 
 	}

@@ -173,5 +173,21 @@ namespace Donut
 		BoxCollider2DComponent() = default;
 		BoxCollider2DComponent(const BoxCollider2DComponent&) = default;
 	};
+
+	struct CircleCollider2DComponent
+	{
+		glm::vec2 offset_ = { 0.0f, 0.0f };
+		float radius_ = 0.5f;
+
+		float density_ = 1.0f;
+		float friction_ = 0.5f;
+		float restitution_ = 0.0f;
+		float restitution_threshold_ = 0.5f;
+
+		void* runtime_fixture_ = nullptr;
+
+		CircleCollider2DComponent() = default;
+		CircleCollider2DComponent(const CircleCollider2DComponent&) = default;
+	};
 }
 #endif

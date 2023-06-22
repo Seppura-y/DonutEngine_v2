@@ -239,6 +239,22 @@ namespace Donut
 			out << YAML::EndMap;
 		}
 
+		if (entity.hasComponent<CircleCollider2DComponent>())
+		{
+			out << YAML::Key << "CircleCollider2DComponent";
+			out << YAML::BeginMap;
+
+			auto& box_collider_2d_component = entity.getComponent<CircleCollider2DComponent>();
+			out << YAML::Key << "Offset" << YAML::Value << box_collider_2d_component.offset_;
+			out << YAML::Key << "Radius" << YAML::Value << box_collider_2d_component.radius_;
+			out << YAML::Key << "Density" << YAML::Value << box_collider_2d_component.density_;
+			out << YAML::Key << "Friction" << YAML::Value << box_collider_2d_component.friction_;
+			out << YAML::Key << "Restitution" << YAML::Value << box_collider_2d_component.restitution_;
+			out << YAML::Key << "RestitutionThreshold" << YAML::Value << box_collider_2d_component.restitution_threshold_;
+
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 	}
 
@@ -379,6 +395,18 @@ namespace Donut
 					bc2d.friction_ = box_collider_2d_component["Friction"].as<float>();
 					bc2d.restitution_ = box_collider_2d_component["Restitution"].as<float>();
 					bc2d.restitution_threshold_ = box_collider_2d_component["RestitutionThreshold"].as<float>();
+				}
+
+				auto circle_collider_2d_component = entity["CircleCollider2DComponent"];
+				if (circle_collider_2d_component)
+				{
+					auto& cc2d = deserialized_entity.addComponent<CircleCollider2DComponent>();
+					cc2d.offset_ = circle_collider_2d_component["Offset"].as<glm::vec2>();
+					cc2d.radius_ = circle_collider_2d_component["Radius"].as<float>();
+					cc2d.density_ = circle_collider_2d_component["Density"].as<float>();
+					cc2d.friction_ = circle_collider_2d_component["Friction"].as<float>();
+					cc2d.restitution_ = circle_collider_2d_component["Restitution"].as<float>();
+					cc2d.restitution_threshold_ = circle_collider_2d_component["RestitutionThreshold"].as<float>();
 				}
 			}
 		}
