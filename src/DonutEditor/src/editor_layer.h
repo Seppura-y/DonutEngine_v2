@@ -40,6 +40,8 @@ namespace Donut
 		void onDuplicateEntity();
 
 		void uiToolbar();
+
+		void onOverlayRender();
 	private:
 		struct ProfileResult
 		{
@@ -100,6 +102,8 @@ namespace Donut
 		};
 
 		SceneState scene_state_ = SceneState::Edit;
+
+		bool show_physics_collider_ = false;
 
 		Donut::Ref<Texture2D> play_icon_;
 		Donut::Ref<Texture2D> stop_icon_;

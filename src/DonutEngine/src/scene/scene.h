@@ -38,6 +38,13 @@ namespace Donut
 
 		static Ref<Scene> copyScene(Ref<Scene> other);
 		void duplicateEntity(Entity entity);
+
+		template<typename... Components>
+		auto getAllEntitiesWith()
+		{
+			return registry_.view<Components...>();
+		}
+
 	private:
 		template<typename T>
 		void onComponentAdded(Entity entity, T& component);

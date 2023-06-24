@@ -245,6 +245,8 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 
 	}
 
+	onOverlayRender();
+
 	framebuffer_->unBind();
 }
 
@@ -475,6 +477,59 @@ void Donut::EditorLayer::uiToolbar()
 	ImGui::End();
 }
 
+void Donut::EditorLayer::onOverlayRender()
+{
+	if (scene_state_ == SceneState::Play)
+	{
+		Entity camera = active_scene_->getPrimaryCameraEntity();
+		Renderer2D::beginScene(camera.getComponent<CameraComponent>().camera_, camera.getComponent<TransformComponent>().getTransform());
+	}
+	else
+	{
+		Renderer2D::beginScene(editor_camera_);
+	}
+
+	if (show_physics_collider_)
+	{
+		// Box Colliders
+		{
+			auto view = active_scene_->getAllEntitiesWith<TransformComponent, BoxCollider2DComponent>();
+			for (auto entity : view)
+			{
+				auto [tc, bc2d] = view.get<TransformComponent, BoxCollider2DComponent>(entity);
+
+				glm::vec3 translation = tc.translation_ + glm::vec3(bc2d.offset_, 0.001f);
+				glm::vec3 scale = tc.scale_ * glm::vec3(bc2d.size_ * 2.0f, 1.0f);
+
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+					* glm::rotate(glm::mat4(1.0f), tc.rotation_.z, glm::vec3(0.0f, 0.0f, 1.0f))
+					* glm::scale(glm::mat4(1.0f), scale);
+
+				Renderer2D::drawRectangleWithLines(transform, glm::vec4(0, 1, 0, 1));
+			}
+		}
+
+		// Circle Colliders
+		{
+			auto view = active_scene_->getAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
+			for (auto entity : view)
+			{
+				auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2DComponent>(entity);
+
+				glm::vec3 translation = tc.translation_ + glm::vec3(cc2d.offset_, 0.001f);
+				glm::vec3 scale = tc.scale_ * glm::vec3(cc2d.radius_ * 2.0f);
+
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+					* glm::scale(glm::mat4(1.0f), scale);
+
+				Renderer2D::drawCircle(transform, glm::vec4(0, 1, 0, 1), 0.01f);
+			}
+		}
+	}
+
+	Renderer2D::endScene();
+}
+
 void Donut::EditorLayer::onImGuiRender()
 {
 	DN_PROFILE_FUNCTION();
@@ -628,6 +683,9 @@ void Donut::EditorLayer::onImGuiRender()
 
 	ImGui::End();
 
+	ImGui::Begin("settings");
+	ImGui::Checkbox("Show physics colliders", &show_physics_collider_);
+	ImGui::End();
 
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });

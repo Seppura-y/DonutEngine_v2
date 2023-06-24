@@ -323,7 +323,8 @@ namespace Donut
 
 				b2CircleShape circle_shape;
 				circle_shape.m_p.Set(circle_collider_2d.offset_.x, circle_collider_2d.offset_.y);
-				circle_shape.m_radius = circle_collider_2d.radius_;
+				//circle_shape.m_radius = circle_collider_2d.radius_;
+				circle_shape.m_radius = transform.scale_.x * circle_collider_2d.radius_;
 
 				b2FixtureDef fixture_def;
 				fixture_def.shape = &circle_shape;
