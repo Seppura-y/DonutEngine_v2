@@ -452,7 +452,8 @@ namespace Donut
 	void Scene::onComponentAdded(Entity entity, T& component)
 	{
 		// you never suppose to not have a specializaion for this function
-		static_assert(false);
+		//static_assert(false); // only support in visual c++ 
+		static_assert(sizeof(T) == 0);
 	}
 
 	template<>

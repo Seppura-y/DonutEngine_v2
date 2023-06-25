@@ -13,6 +13,12 @@ namespace Donut
 	private:
 
 	};
+
+	class Time
+	{
+	public:
+		static float getTime();
+	};
 }
 
 #endif

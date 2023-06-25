@@ -27,7 +27,8 @@ namespace Donut
 
 		virtual bool operator==(const Texture& other) const override
 		{
-			return object_id_ == ((OpenGLTexture2D&)other).object_id_;
+			//return object_id_ == ((OpenGLTexture2D&)other).object_id_;
+			return object_id_ == other.getObjectId();
 		}
 	private:
 		uint32_t width_;

@@ -302,6 +302,7 @@ namespace Donut
 		}
 		catch(YAML::ParserException e)
 		{
+			DN_CORE_ERROR("Failed to load .yaml file '{0}'\n   {1}", filepath, e.what());
 			return false;
 		}
 

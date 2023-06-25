@@ -18,7 +18,7 @@ namespace Donut
 	{
 		auto window = static_cast<GLFWwindow*>(Application::getInstance().getWindow().getNativeWindow());
 		auto state = glfwGetKey(window, keycode);
-		return state == GLFW_PRESS || state == GLFW_REPEAT;
+		return state == GLFW_PRESS;
 	}
 	bool WindowsInput::isMouseButtonPressedImpl(int button)
 	{

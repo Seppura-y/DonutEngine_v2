@@ -13,6 +13,8 @@
 #include "renderer/renderer.h"
 #include "renderer/renderer_2d.h"
 
+#include "utils/platform_utils.h"
+
 namespace Donut
 {
 #define BIND_EVENT_FN(x) std::bind(&Application::x,this,std::placeholders::_1)
@@ -76,7 +78,8 @@ namespace Donut
 		while (is_running_)
 		{
 			DN_PROFILE_SCOPE("runloop");
-			float time = (float)glfwGetTime();
+			//float time = (float)glfwGetTime();
+			float time = Time::getTime();
 			Timestep timestep = time - last_frame_time_;
 			last_frame_time_ = time;
 

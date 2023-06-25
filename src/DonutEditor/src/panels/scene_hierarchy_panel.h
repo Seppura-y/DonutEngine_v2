@@ -25,6 +25,9 @@ namespace Donut
 	private:
 		void drawComponents(Entity entity);
 		void drawEntityNode(Entity& entity);
+
+		template<typename T>
+		void displayAddComponentEntry(const std::string& entry_name);
 	private:
 		Ref<Scene> context_;
 		Entity selection_context_;

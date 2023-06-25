@@ -146,6 +146,8 @@ void Donut::EditorLayer::onAttach()
 	}
 
 	editor_camera_ = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
+
+	Renderer2D::setLineWidth(4.0f);
 }
 
 void Donut::EditorLayer::onDetach()
@@ -260,7 +262,10 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 void Donut::EditorLayer::onEvent(Donut::Event& ev)
 {
 	camera_controller_.onEvent(ev);
-	editor_camera_.onEvent(ev);
+	if (scene_state_ == SceneState::Edit)
+	{
+		editor_camera_.onEvent(ev);
+	}
 
 	EventDispatcher dispatcher(ev);
 	dispatcher.dispatch<KeyPressedEvent>(DN_BIND_EVENT_FN(EditorLayer::onKeyPressed));
@@ -591,6 +596,14 @@ void Donut::EditorLayer::onOverlayRender()
 				Renderer2D::drawCircle(transform, glm::vec4(0, 1, 0, 1), 0.01f);
 			}
 		}
+	}
+
+	// Selected entity outline
+	if (Entity selected_entity = scene_hierarchy_panel_.getSelectedEntity())
+	{
+		const TransformComponent& transform = selected_entity.getComponent<TransformComponent>();
+
+		Renderer2D::drawRectangleWithLines(transform.getTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
 	}
 
 	Renderer2D::endScene();

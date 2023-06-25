@@ -44,13 +44,15 @@ namespace Donut
 		for (auto& dir_entry : std::filesystem::directory_iterator(current_dir_))
 		{
 			const auto& path = dir_entry.path();
-			auto relative_path = std::filesystem::relative(path, g_asset_dir);
+			//auto relative_path = std::filesystem::relative(path, g_asset_dir);
 
 			// 逐个层级带斜杠的路径
 			//std::string filename = path.string();
 
 			// 只有当前路径，不带父目录
-			std::string filename = relative_path.filename().string();
+			//std::string filename = relative_path.filename().string();
+
+			std::string filename = path.filename().string();
 
 			ImGui::PushID(filename.c_str());
 			Ref<Texture2D> icon = dir_entry.is_directory() ? dir_icon_ : file_icon_;
@@ -60,6 +62,7 @@ namespace Donut
 			
 			if (ImGui::BeginDragDropSource())
 			{
+				auto relative_path = std::filesystem::relative(path, g_asset_dir);
 				const wchar_t* item_path = relative_path.c_str();
 
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM",

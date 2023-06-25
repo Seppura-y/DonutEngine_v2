@@ -60,4 +60,9 @@ namespace Donut
 		}
 		return std::string();
     }
+
+	float Time::getTime()
+	{
+		return glfwGetTime();
+	}
 }

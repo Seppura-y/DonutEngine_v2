@@ -220,68 +220,12 @@ namespace Donut
 
 		if (ImGui::BeginPopup("AddComponent"))
 		{
-			if (!selection_context_.hasComponent<CameraComponent>())
-			{
-				if (ImGui::MenuItem("Camera"))
-				{
-					selection_context_.addComponent<CameraComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			//if (!selection_context_.hasComponent<TransformComponent>())
-			//{
-			//	if (ImGui::MenuItem("Transform"))
-			//	{
-			//		selection_context_.addComponent<TransformComponent>();
-			//		ImGui::CloseCurrentPopup();
-			//	}
-			//}
-
-			if (!selection_context_.hasComponent<SpriteRendererComponent>())
-			{
-				if (ImGui::MenuItem("Sprite Renderer"))
-				{
-					selection_context_.addComponent<SpriteRendererComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			if (!selection_context_.hasComponent<CircleRendererComponent>())
-			{
-				if (ImGui::MenuItem("Circle Renderer"))
-				{
-					selection_context_.addComponent<CircleRendererComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			if (!selection_context_.hasComponent<Rigidbody2DComponent>())
-			{
-				if (ImGui::MenuItem("Rigidbody 2D"))
-				{
-					selection_context_.addComponent<Rigidbody2DComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			if (!selection_context_.hasComponent<BoxCollider2DComponent>())
-			{
-				if (ImGui::MenuItem("Box Collider 2D"))
-				{
-					selection_context_.addComponent<BoxCollider2DComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			if (!selection_context_.hasComponent<CircleCollider2DComponent>())
-			{
-				if (ImGui::MenuItem("Circle Collider 2D"))
-				{
-					selection_context_.addComponent<CircleCollider2DComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
+			displayAddComponentEntry<CameraComponent>("Camera");
+			displayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
+			displayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
+			displayAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
+			displayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
+			displayAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
 
 			ImGui::EndPopup();
 		}
@@ -501,6 +445,19 @@ namespace Donut
 			if (selection_context_ == entity)
 			{
 				selection_context_ = {};
+			}
+		}
+	}
+
+	template<typename T>
+	void SceneHierarchyPanel::displayAddComponentEntry(const std::string& entry_name)
+	{
+		if (!selection_context_.hasComponent<T>())
+		{
+			if (ImGui::MenuItem(entry_name.c_str()))
+			{
+				selection_context_.addComponent<T>();
+				ImGui::CloseCurrentPopup();
 			}
 		}
 	}
