@@ -32,28 +32,44 @@ namespace Donut
 		return b2_staticBody;
 	}
 
-	template<typename Component>
+	template<typename... Component>
 	static void copyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& entt_map)
 	{
-		auto view = src.view<Component>();
-		for (auto entity : view)
-		{
-			UUID uuid = src.get<IDComponent>(entity).id_;
-			DN_CORE_ASSERT(entt_map.find(uuid) != entt_map.end(), "");
-			entt::entity dst_entt = entt_map.at(uuid);
-
-			auto& component = src.get<Component>(entity);
-			dst.emplace_or_replace<Component>(dst_entt, component);
-		}
+		// Fold Expressions
+		([&]()
+			{
+				auto view = src.view<Component>();
+				for (auto src_entity : view)
+				{
+					entt::entity dst_entity = entt_map.at(src.get<IDComponent>(src_entity).id_);
+					auto& src_component = src.get<Component>(src_entity);
+					dst.emplace_or_replace<Component>(dst_entity, src_component);
+				}
+			}(), ...);
 	}
 
-	template<typename Component>
+	template<typename... Component>
+	static void copyComponent(ComponentGroup<Component...>, entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& entt_map)
+	{
+		copyComponent<Component...>(dst, src, entt_map);
+	}
+
+	template<typename... Component>
 	static void copyComponentIfExists(Entity dst, Entity src)
 	{
-		if (src.hasComponent<Component>())
+		([&]()
 		{
-			dst.addOrReplaceComponent<Component>(src.getComponent<Component>());
-		}
+			if (src.hasComponent<Component>())
+			{
+				dst.addOrReplaceComponent<Component>(src.getComponent<Component>());
+			}
+		}(), ...);
+	}
+
+	template<typename... Component>
+	static void copyComponentIfExists(ComponentGroup<Component...>, Entity dst, Entity src)
+	{
+		copyComponentIfExists<Component...>(dst, src);
 	}
 
 	Scene::Scene()
@@ -322,14 +338,7 @@ namespace Donut
 		}
 
 		// copy components
-		copyComponent<TransformComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<SpriteRendererComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<CircleRendererComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<CameraComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<NativeScriptComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<Rigidbody2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<BoxCollider2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<CircleCollider2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent(AllComponents{}, dst_scene_registry, src_scene_registry, entt_map);
 		
 		return new_scene;
 	}
@@ -339,14 +348,7 @@ namespace Donut
 		std::string name = entity.getName();
 		Entity new_entity = createEntity(name);
 
-		copyComponentIfExists<TransformComponent>(new_entity, entity);
-		copyComponentIfExists<SpriteRendererComponent>(new_entity, entity);
-		copyComponentIfExists<CircleRendererComponent>(new_entity, entity);
-		copyComponentIfExists<NativeScriptComponent>(new_entity, entity);
-		copyComponentIfExists<CameraComponent>(new_entity, entity);
-		copyComponentIfExists<Rigidbody2DComponent>(new_entity, entity);
-		copyComponentIfExists<BoxCollider2DComponent>(new_entity, entity);
-		copyComponentIfExists<CircleCollider2DComponent>(new_entity, entity);
+		copyComponentIfExists(AllComponents{}, new_entity, entity);
 	}
 
 	void Scene::onPhysics2DStart()
