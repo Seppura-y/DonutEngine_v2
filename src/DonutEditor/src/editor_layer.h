@@ -36,6 +36,7 @@ namespace Donut
 
 		void onSceneStop();
 		void onScenePlay();
+		void onSceneSimulate();
 
 		void onDuplicateEntity();
 
@@ -98,7 +99,8 @@ namespace Donut
 		enum class SceneState
 		{
 			Edit = 0,
-			Play = 1
+			Play = 1,
+			Simulate = 2
 		};
 
 		SceneState scene_state_ = SceneState::Edit;
@@ -107,6 +109,7 @@ namespace Donut
 
 		Donut::Ref<Texture2D> play_icon_;
 		Donut::Ref<Texture2D> stop_icon_;
+		Donut::Ref<Texture2D> simulate_icon_;
 	};
 }
 #endif

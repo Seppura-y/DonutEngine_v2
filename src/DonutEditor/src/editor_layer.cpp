@@ -55,6 +55,7 @@ void Donut::EditorLayer::onAttach()
 
 	play_icon_ = Texture2D::createTexture("assets/icons/PlayButton.png");
 	stop_icon_ = Texture2D::createTexture("assets/icons/StopButton.png");
+	simulate_icon_ = Texture2D::createTexture("assets/icons/SimulateButton.png");
 	Donut::FramebufferSpecification framebuffer_spec;
 	framebuffer_spec.attachments_specifications_ = 
 	{
@@ -66,8 +67,8 @@ void Donut::EditorLayer::onAttach()
 	framebuffer_spec.height_ = 720;
 	framebuffer_ = Donut::Framebuffer::createFramebuffer(framebuffer_spec);
 
-
-	active_scene_ = createRef<Scene>();
+	editor_scene_ = createRef<Scene>();
+	active_scene_ = editor_scene_;
 	//auto rect = active_scene_->createEntity("Test Rect");
 	//rect.addComponent<SpriteRendererComponent>(glm::vec4{ 1.0f });
 
@@ -209,6 +210,12 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 		case SceneState::Play:
 		{
 			active_scene_->onUpdateRuntime(ts);
+			break;
+		}
+		case SceneState::Simulate:
+		{
+			editor_camera_.onUpdate(ts);
+			active_scene_->onUpdateSimulation(ts, editor_camera_);
 			break;
 		}
 	}
@@ -419,8 +426,18 @@ void Donut::EditorLayer::serializeScene(Ref<Scene> scene, const std::filesystem:
 
 void Donut::EditorLayer::onSceneStop()
 {
+	DN_CORE_ASSERT(scene_state_ == SceneState::Play || scene_state_ == SceneState::Simulate);
+
+	if (scene_state_ == SceneState::Play)
+	{
+		active_scene_->onRuntimeStop();
+	}
+	else if (scene_state_ == SceneState::Simulate)
+	{
+		active_scene_->onSimulationStop();
+	}
+
 	scene_state_ = SceneState::Edit;
-	active_scene_->onRuntimeStop();
 
 	active_scene_ = editor_scene_;
 	scene_hierarchy_panel_.setContext(active_scene_);
@@ -428,10 +445,30 @@ void Donut::EditorLayer::onSceneStop()
 
 void Donut::EditorLayer::onScenePlay()
 {
+	if (scene_state_ == SceneState::Simulate)
+	{
+		onSceneStop();
+	}
+
 	scene_state_ = SceneState::Play;
 	active_scene_ = Scene::copyScene(editor_scene_);
 
 	active_scene_->onRuntimeStart();
+	scene_hierarchy_panel_.setContext(active_scene_);
+}
+
+void Donut::EditorLayer::onSceneSimulate()
+{
+	if (scene_state_ == SceneState::Play)
+	{
+		onSceneStop();
+	}
+
+	scene_state_ = SceneState::Simulate;
+
+	active_scene_ = Scene::copyScene(editor_scene_);
+	active_scene_->onSimulationStart();
+
 	scene_hierarchy_panel_.setContext(active_scene_);
 }
 
@@ -462,16 +499,41 @@ void Donut::EditorLayer::uiToolbar()
 
 	ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
-	float size = ImGui::GetWindowHeight() - 4.0f;
-	Ref<Texture2D> icon = scene_state_ == SceneState::Edit ? play_icon_ : stop_icon_;
-	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-	if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+	bool toolbar_enabled = (bool)active_scene_;
+
+	ImVec4 tint_color = ImVec4(1, 1, 1, 1);
+	if (!toolbar_enabled)
 	{
-		if (scene_state_ == SceneState::Edit)
-			onScenePlay();
-		else if (scene_state_ == SceneState::Play)
-			onSceneStop();
+		tint_color.w = 0.5f;
 	}
+
+	float size = ImGui::GetWindowHeight() - 4.0f;
+	{
+		Ref<Texture2D> icon = (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Simulate) ? play_icon_ : stop_icon_;
+		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
+		{
+			if (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Simulate)
+				onScenePlay();
+			else if (scene_state_ == SceneState::Play)
+				onSceneStop();
+		}
+	}
+
+	ImGui::SameLine();
+
+	{
+		Ref<Texture2D> icon = (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Play) ? simulate_icon_ : stop_icon_;
+		//ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
+		{
+			if (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Play)
+				onSceneSimulate();
+			else if (scene_state_ == SceneState::Simulate)
+				onSceneStop();
+		}
+	}
+
 	ImGui::PopStyleVar(2);
 	ImGui::PopStyleColor(3);
 	ImGui::End();
@@ -482,6 +544,10 @@ void Donut::EditorLayer::onOverlayRender()
 	if (scene_state_ == SceneState::Play)
 	{
 		Entity camera = active_scene_->getPrimaryCameraEntity();
+		if (!camera)
+		{
+			return;
+		}
 		Renderer2D::beginScene(camera.getComponent<CameraComponent>().camera_, camera.getComponent<TransformComponent>().getTransform());
 	}
 	else

@@ -19,8 +19,7 @@ namespace Donut
 		Scene();
 		~Scene();
 
-		void onUpdateRuntime(Timestep ts);
-		void onUpdateEditor(Timestep ts, EditorCamera& camera);
+
 
 		void onViewportResize(uint32_t width, uint32_t height);
 
@@ -35,6 +34,13 @@ namespace Donut
 
 		void onRuntimeStart();
 		void onRuntimeStop();
+		void onUpdateRuntime(Timestep ts);
+
+		void onSimulationStart();
+		void onSimulationStop();
+		void onUpdateSimulation(Timestep ts, EditorCamera& camera);
+
+		void onUpdateEditor(Timestep ts, EditorCamera& camera);
 
 		static Ref<Scene> copyScene(Ref<Scene> other);
 		void duplicateEntity(Entity entity);
@@ -48,6 +54,11 @@ namespace Donut
 	private:
 		template<typename T>
 		void onComponentAdded(Entity entity, T& component);
+
+		void onPhysics2DStart();
+		void onPhysics2DStop();
+
+		void renderScene(EditorCamera& camera);
 	private:
 		entt::registry registry_;
 		uint32_t viewport_width_ = 0;

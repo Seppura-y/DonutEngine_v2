@@ -188,40 +188,46 @@ namespace Donut
 		}
 	}
 
+	void Scene::onSimulationStart()
+	{
+		onPhysics2DStart();
+	}
+
+	void Scene::onSimulationStop()
+	{
+		onPhysics2DStop();
+	}
+
+	void Scene::onUpdateSimulation(Timestep ts, EditorCamera& camera)
+	{
+		// Update physics
+		{
+			const int32_t velocity_iterations = 6;
+			const int32_t position_iterations = 2;
+			physics_world_->Step(ts, velocity_iterations, position_iterations);
+
+			auto view = registry_.view<Rigidbody2DComponent>();
+			for (auto it : view)
+			{
+				Entity entity = { it, this };
+				auto& transform = entity.getComponent<TransformComponent>();
+				auto& rigidbody_2d = entity.getComponent<Rigidbody2DComponent>();
+
+				b2Body* body = (b2Body*)rigidbody_2d.runtime_body_;
+				const auto& position = body->GetPosition();
+				transform.translation_.x = position.x;
+				transform.translation_.y = position.y;
+				transform.rotation_.z = body->GetAngle();
+			}
+		}
+
+		// Render
+		renderScene(camera);
+	}
+
 	void Scene::onUpdateEditor(Timestep ts, EditorCamera& camera)
 	{
-		Renderer2D::beginScene(camera);
-
-		{
-			auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto entity : group)
-			{
-				// return a tuple that consturct with the references value, and the tuple return as value
-				// so we don't need to use '&' to receive the return value.
-				// because the API already did that.
-				//auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				//Renderer2D::drawRectangle(transform.getTransform(), sprite.color_);
-				Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
-				//Renderer2D::setLineWidth(5);
-				//Renderer2D::drawRectangleWithLines(transform.getTransform(), glm::vec4(0.8, 0.5, 0.3, 1.0));
-			}
-		}
-
-		{
-			auto view = registry_.view<TransformComponent, CircleRendererComponent>();
-
-			//auto group = registry_.group<TransformComponent>(entt::get<CircleRendererComponent>);
-			for (auto entity : view)
-			{
-				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
-				Renderer2D::drawCircle(transform.getTransform(), circle.color_, circle.thickness_, circle.fade_, (int)entity);
-			}
-		}
-
-		//Renderer2D::drawLine(glm::vec3(0.0f), glm::vec3(5.0f), glm::vec4(1, 0, 1, 1));
-
-		Renderer2D::endScene();
+		renderScene(camera);
 	}
 
 	void Scene::onViewportResize(uint32_t width, uint32_t height)
@@ -284,6 +290,67 @@ namespace Donut
 
 	void Scene::onRuntimeStart()
 	{
+		onPhysics2DStart();
+	}
+
+	void Scene::onRuntimeStop()
+	{
+		onPhysics2DStop();
+		//delete physics_world_;
+		//physics_world_ = nullptr;
+	}
+
+	Ref<Scene> Scene::copyScene(Ref<Scene> other)
+	{
+		Ref<Scene> new_scene = createRef<Scene>();
+
+		new_scene->viewport_width_ = other->viewport_width_;
+		new_scene->viewport_height_ = other->viewport_height_;
+
+		auto& src_scene_registry = other->registry_;
+		auto& dst_scene_registry = new_scene->registry_;
+		std::unordered_map<UUID, entt::entity> entt_map;
+
+		// create entities in new scene
+		auto id_view = src_scene_registry.view<IDComponent>();
+		for (auto entity : id_view)
+		{
+			UUID uuid = src_scene_registry.get<IDComponent>(entity).id_;
+			const auto& name = src_scene_registry.get<TagComponent>(entity).tag_;
+			Entity new_entity = new_scene->createEntityWithUUID(uuid, name);
+			entt_map[uuid] = (entt::entity)new_entity;
+		}
+
+		// copy components
+		copyComponent<TransformComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<SpriteRendererComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<CircleRendererComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<CameraComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<NativeScriptComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<Rigidbody2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<BoxCollider2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		copyComponent<CircleCollider2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
+		
+		return new_scene;
+	}
+
+	void Scene::duplicateEntity(Entity entity)
+	{
+		std::string name = entity.getName();
+		Entity new_entity = createEntity(name);
+
+		copyComponentIfExists<TransformComponent>(new_entity, entity);
+		copyComponentIfExists<SpriteRendererComponent>(new_entity, entity);
+		copyComponentIfExists<CircleRendererComponent>(new_entity, entity);
+		copyComponentIfExists<NativeScriptComponent>(new_entity, entity);
+		copyComponentIfExists<CameraComponent>(new_entity, entity);
+		copyComponentIfExists<Rigidbody2DComponent>(new_entity, entity);
+		copyComponentIfExists<BoxCollider2DComponent>(new_entity, entity);
+		copyComponentIfExists<CircleCollider2DComponent>(new_entity, entity);
+	}
+
+	void Scene::onPhysics2DStart()
+	{
 		physics_world_ = new b2World({ 0.0f, -9.8f });
 
 		auto view = registry_.view<Rigidbody2DComponent>();
@@ -337,59 +404,46 @@ namespace Donut
 		}
 	}
 
-	void Scene::onRuntimeStop()
+	void Scene::onPhysics2DStop()
 	{
 		delete physics_world_;
 		physics_world_ = nullptr;
 	}
 
-	Ref<Scene> Scene::copyScene(Ref<Scene> other)
+	void Scene::renderScene(EditorCamera& camera)
 	{
-		Ref<Scene> new_scene = createRef<Scene>();
+		Renderer2D::beginScene(camera);
 
-		new_scene->viewport_width_ = other->viewport_width_;
-		new_scene->viewport_height_ = other->viewport_height_;
-
-		auto& src_scene_registry = other->registry_;
-		auto& dst_scene_registry = new_scene->registry_;
-		std::unordered_map<UUID, entt::entity> entt_map;
-
-		// create entities in new scene
-		auto id_view = src_scene_registry.view<IDComponent>();
-		for (auto entity : id_view)
 		{
-			UUID uuid = src_scene_registry.get<IDComponent>(entity).id_;
-			const auto& name = src_scene_registry.get<TagComponent>(entity).tag_;
-			Entity new_entity = new_scene->createEntityWithUUID(uuid, name);
-			entt_map[uuid] = (entt::entity)new_entity;
+			auto group = registry_.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto entity : group)
+			{
+				// return a tuple that consturct with the references value, and the tuple return as value
+				// so we don't need to use '&' to receive the return value.
+				// because the API already did that.
+				//auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				//Renderer2D::drawRectangle(transform.getTransform(), sprite.color_);
+				Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+				//Renderer2D::setLineWidth(5);
+				//Renderer2D::drawRectangleWithLines(transform.getTransform(), glm::vec4(0.8, 0.5, 0.3, 1.0));
+			}
 		}
 
-		// copy components
-		copyComponent<TransformComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<SpriteRendererComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<CircleRendererComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<CameraComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<NativeScriptComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<Rigidbody2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<BoxCollider2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		copyComponent<CircleCollider2DComponent>(dst_scene_registry, src_scene_registry, entt_map);
-		
-		return new_scene;
-	}
+		{
+			auto view = registry_.view<TransformComponent, CircleRendererComponent>();
 
-	void Scene::duplicateEntity(Entity entity)
-	{
-		std::string name = entity.getName();
-		Entity new_entity = createEntity(name);
+			//auto group = registry_.group<TransformComponent>(entt::get<CircleRendererComponent>);
+			for (auto entity : view)
+			{
+				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
+				Renderer2D::drawCircle(transform.getTransform(), circle.color_, circle.thickness_, circle.fade_, (int)entity);
+			}
+		}
 
-		copyComponentIfExists<TransformComponent>(new_entity, entity);
-		copyComponentIfExists<SpriteRendererComponent>(new_entity, entity);
-		copyComponentIfExists<CircleRendererComponent>(new_entity, entity);
-		copyComponentIfExists<NativeScriptComponent>(new_entity, entity);
-		copyComponentIfExists<CameraComponent>(new_entity, entity);
-		copyComponentIfExists<Rigidbody2DComponent>(new_entity, entity);
-		copyComponentIfExists<BoxCollider2DComponent>(new_entity, entity);
-		copyComponentIfExists<CircleCollider2DComponent>(new_entity, entity);
+		//Renderer2D::drawLine(glm::vec3(0.0f), glm::vec3(5.0f), glm::vec4(1, 0, 1, 1));
+
+		Renderer2D::endScene();
 	}
 
 	template<typename T>
