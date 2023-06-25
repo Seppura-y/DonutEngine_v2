@@ -98,7 +98,7 @@ namespace Donut {
 			{
 				case GLFW_PRESS:
 				{
-					KeyPressedEvent event(key, 0);
+					KeyPressedEvent event(key, false);
 					data.event_callback(event);
 					break;
 				}
@@ -110,7 +110,7 @@ namespace Donut {
 				}
 				case GLFW_REPEAT:
 				{
-					KeyPressedEvent event(key, 1);
+					KeyPressedEvent event(key, true);
 					data.event_callback(event);
 					break;
 				}

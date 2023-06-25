@@ -20,21 +20,21 @@ namespace Donut {
 	class DONUT_API KeyPressedEvent : public KeyEvent
 	{
 	public:
-		KeyPressedEvent(int keycode, int repeatCount)
-			: KeyEvent(keycode), repeat_count_(repeatCount) {}
+		KeyPressedEvent(int keycode, bool is_repeat)
+			: KeyEvent(keycode), is_repeat_(is_repeat) {}
 
-		inline int getRepeatCount() const { return repeat_count_; }
+		inline int isRepeat() const { return is_repeat_; }
 
 		std::string toString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyPressedEvent: " << key_code_ << " (" << repeat_count_ << " repeats)";
+			ss << "KeyPressedEvent: " << key_code_ << " (" << is_repeat_ << " repeats)";
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(KeyPressed)
 	private:
-		int repeat_count_;
+		bool is_repeat_;
 	};
 
 	class DONUT_API KeyReleasedEvent : public KeyEvent

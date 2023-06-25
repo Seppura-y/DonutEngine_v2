@@ -270,7 +270,7 @@ void Donut::EditorLayer::onEvent(Donut::Event& ev)
 bool Donut::EditorLayer::onKeyPressed(KeyPressedEvent& ev)
 {
 	// shortcuts
-	if (ev.getRepeatCount() > 0)
+	if (ev.isRepeat() > 0)
 	{
 		return false;
 	}
