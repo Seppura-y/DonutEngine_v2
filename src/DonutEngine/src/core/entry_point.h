@@ -6,13 +6,15 @@
 
 #ifdef DN_PLATFORM_WINDOWS
 
-extern Donut::Application* Donut::createApplication(ApplicationCommandLineArgs args);	//Defined at client
+extern Donut::Application* Donut::createApplication(const ApplicationSpecification& spec); //Defined at client
 
 int main(int argc, char** argv)
 {
 	Donut::Logger::init();
 	DN_PROFILE_BEGIN_SESSION("Startup", "DonutProfile-Startup.json");
-	auto app = Donut::createApplication({argc, argv});
+	Donut::ApplicationSpecification spec;
+	spec.commandline_args_ = { argc, argv };
+	auto app = Donut::createApplication(spec);
 	DN_PROFILE_END_SESSION();
 
 	app->initWindow();

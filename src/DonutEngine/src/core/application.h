@@ -25,11 +25,18 @@ namespace Donut
 		}
 	};
 
+	struct ApplicationSpecification
+	{
+		std::string name_ = "Donut Application";
+		std::string working_dir_;
+		ApplicationCommandLineArgs commandline_args_;
+	};
+
 	class DONUT_API Application
 	{
 	public:
 		//Application();
-		Application(const std::string& name = "DonutEngine", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
+		Application(const ApplicationSpecification& spec);
 		virtual ~Application();
 
 		void run();
@@ -47,7 +54,8 @@ namespace Donut
 
 		void initWindow(WindowProps props = WindowProps());
 
-		ApplicationCommandLineArgs getCommandLineArgs() const { return commandline_args_; }
+		//ApplicationCommandLineArgs getCommandLineArgs() const { return commandline_args_; }
+		const ApplicationSpecification& getSpecification() const { return specification_; }
 	private:
 		bool onWindowClose(WindowCloseEvent& ev);
 		bool onWindowResize(WindowResizeEvent& ev);
@@ -62,10 +70,11 @@ namespace Donut
 
 		bool is_minimized_ = false;
 
-		ApplicationCommandLineArgs commandline_args_;
+		//ApplicationCommandLineArgs commandline_args_;
+		ApplicationSpecification specification_;
 	};
 
 	// To be defined in client
-	Application* createApplication(ApplicationCommandLineArgs args);
+	Application* createApplication(const ApplicationSpecification& args);
 }
 #endif

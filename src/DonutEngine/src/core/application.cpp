@@ -40,12 +40,17 @@ namespace Donut
 		return 0;
 	}
 
-	Application::Application(const std::string& name, ApplicationCommandLineArgs args)
-		: commandline_args_(args)
+	Application::Application(const ApplicationSpecification& spec)
+		: specification_(spec)
 	{
 		DN_PROFILE_FUNCTION();
 		s_instance_ = this;
-		window_ = std::unique_ptr<Window>(Window::create(WindowProps()));
+
+		if (!specification_.working_dir_.empty())
+		{
+			std::filesystem::current_path(specification_.working_dir_);
+		}
+		window_ = std::unique_ptr<Window>(Window::create(WindowProps(specification_.name_)));
 		window_->setEventCallback(BIND_EVENT_FN(onEvent));
 		//window_->setVSync(false);
 
