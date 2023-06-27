@@ -21,6 +21,8 @@ namespace Donut
 
 		virtual uint32_t getObjectId() const override;
 
+		virtual const std::string& getPath() const override { return file_path_; }
+
 		virtual void bind(uint32_t slot = 0) const override;
 
 		virtual bool isLoaded() const override { return is_loaded_; }

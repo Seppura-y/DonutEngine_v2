@@ -195,6 +195,13 @@ namespace Donut
 			auto& spriteRendererComponent = entity.getComponent<SpriteRendererComponent>();
 			out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.color_;
 
+			if (spriteRendererComponent.texture_)
+			{
+				out << YAML::Key << "TexturePath" << YAML::Value << spriteRendererComponent.texture_->getPath();
+			}
+
+			out << YAML::Key << "TillingFactor" << YAML::Value << spriteRendererComponent.tiling_factor_;
+
 			out << YAML::EndMap; // SpriteRendererComponent
 		}
 
@@ -367,6 +374,16 @@ namespace Donut
 				{
 					auto& src = deserialized_entity.addComponent<SpriteRendererComponent>();
 					src.color_ = spriteRendererComponent["Color"].as<glm::vec4>();
+
+					if (spriteRendererComponent["TexturePath"])
+					{
+						src.texture_ = Texture2D::createTexture(spriteRendererComponent["TexturePath"].as<std::string>());
+					}
+
+					if (spriteRendererComponent["TillingFactor"])
+					{
+						src.tiling_factor_ = spriteRendererComponent["TillingFactor"].as<float>();
+					}
 				}
 
 				auto circleRendererComponent = entity["CircleRendererComponent"];

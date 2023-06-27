@@ -19,6 +19,8 @@ namespace Donut
 
 		virtual uint32_t getObjectId() const = 0;
 
+		virtual const std::string& getPath() const = 0;
+
 		virtual void bind(uint32_t slot = 0) const = 0;
 
 		virtual bool isLoaded() const = 0;
