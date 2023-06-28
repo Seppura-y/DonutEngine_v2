@@ -889,10 +889,10 @@ namespace Donut
 		glm::vec3 p2 = glm::vec3(position.x + size.x * 0.5f, position.y + size.y * 0.5f, position.z);
 		glm::vec3 p3 = glm::vec3(position.x - size.x * 0.5f, position.y + size.y * 0.5f, position.z);
 
-		drawLine(p0, p1, color);
-		drawLine(p1, p2, color);
-		drawLine(p2, p3, color);
-		drawLine(p3, p0, color);
+		drawLine(p0, p1, color, entity_id);
+		drawLine(p1, p2, color, entity_id);
+		drawLine(p2, p3, color, entity_id);
+		drawLine(p3, p0, color, entity_id);
 	}
 
 	void Renderer2D::drawRectangleWithLines(const glm::mat4& transform, const glm::vec4& color, int entity_id)
@@ -903,10 +903,10 @@ namespace Donut
 			line_vertices[i] = transform * s_data.rect_vertex_positions_[i];
 		}
 
-		drawLine(line_vertices[0], line_vertices[1], color);
-		drawLine(line_vertices[1], line_vertices[2], color);
-		drawLine(line_vertices[2], line_vertices[3], color);
-		drawLine(line_vertices[3], line_vertices[0], color);
+		drawLine(line_vertices[0], line_vertices[1], color, entity_id);
+		drawLine(line_vertices[1], line_vertices[2], color, entity_id);
+		drawLine(line_vertices[2], line_vertices[3], color, entity_id);
+		drawLine(line_vertices[3], line_vertices[0], color, entity_id);
 	}
 
 	float Renderer2D::getLineWidth()
