@@ -1,7 +1,7 @@
 #ifndef UUID_H
 #define UUID_H
 
-#include <xhash>
+//#include <xhash>
 
 namespace Donut
 {
@@ -22,12 +22,14 @@ namespace Donut
 
 namespace std 
 {
+	template <typename T> struct hash;
 	template<>
 	struct hash<Donut::UUID>
 	{
 		std::size_t operator()(const Donut::UUID& uuid) const
 		{
-			return hash<uint64_t>()((uint64_t)uuid);
+			//return hash<uint64_t>()((uint64_t)uuid);
+			return (uint64_t)uuid;
 		}
 	};
 }
