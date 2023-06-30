@@ -15,6 +15,8 @@
 
 #include "utils/platform_utils.h"
 
+#include "scripting/script_engine.h"
+
 namespace Donut
 {
 #define BIND_EVENT_FN(x) std::bind(&Application::x,this,std::placeholders::_1)
@@ -56,6 +58,7 @@ namespace Donut
 
 		Renderer::init();
 		Renderer2D::init();
+		ScriptEngine::init();
 
 		imgui_layer_ = new ImGuiLayer();
 		pushOverlay(imgui_layer_);
@@ -65,7 +68,9 @@ namespace Donut
 
 	Application::~Application()
 	{
-
+		DN_PROFILE_FUNCTION();
+		ScriptEngine::shutdown();
+		Renderer2D::shutdown();
 	}
 
 	void Application::initWindow(WindowProps props)

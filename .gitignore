@@ -25,6 +25,7 @@
 */res
 /dependencies/*
 */include/*
+*/Intermediates/
 
 
 # Donut files
@@ -36,6 +37,7 @@
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
+**.csproj
 
 # Directories
 bin
@@ -45,6 +47,7 @@ include
 dependencies
 forms
 scripts/__pycache__
+Resources
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
