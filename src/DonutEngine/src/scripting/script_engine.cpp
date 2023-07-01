@@ -101,6 +101,11 @@ namespace Donut {
 		}
 	}
 
+	static void CppFunc()
+	{
+		std::cout << "this is written in c++\n" << std::endl;
+	}
+
 	void ScriptEngine::initMono()
 	{
 		mono_set_assemblies_path("mono/lib");
@@ -115,8 +120,10 @@ namespace Donut {
 		s_data->app_domain_ = mono_domain_create_appdomain("DonutScriptRuntime", nullptr);
 		mono_domain_set(s_data->app_domain_, true);
 
+		mono_add_internal_call("Donut.Main::CppFunction", CppFunc);
+
 		// Move this maybe
-		s_data->core_assemply_ = loadCSharpAssembly("../src/DonutEditor/Resources/Scripts/DonutScriptTest.dll");
+		s_data->core_assemply_ = loadCSharpAssembly("../src/DonutEditor/Resources/Scripts/DonutScriptCore.dll");
 		//s_data->core_assemply_ = LoadCSharpAssembly("G:/2023/Code/Project/DonutEngine_v2/src/DonutEditor/Resources/Scripts/DonutScriptTest.dll");
 		printAssemblyTypes(s_data->core_assemply_);
 

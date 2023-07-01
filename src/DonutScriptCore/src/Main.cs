@@ -1,5 +1,5 @@
 using System;
-
+using System.Runtime.CompilerServices;
 
 namespace Donut
 {
@@ -9,6 +9,7 @@ namespace Donut
         public Main()
         {
             Console.WriteLine("Main constructor");
+            CppFunction();
         }
 
         public void PrintMessage()
@@ -30,5 +31,8 @@ namespace Donut
         {
             Console.WriteLine($"C# says: {message}");
         }
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern static void CppFunction();
     }
 }
