@@ -108,6 +108,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 #========================================= LINKING LIBRARIES =========================================#
 target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/../../lib
+    $<IF:$<CONFIG:Debug>,${CMAKE_CURRENT_LIST_DIR}/../../lib/mono/Debug,${CMAKE_CURRENT_LIST_DIR}/../../lib/mono/Release>
     $ENV{VULKAN_SDK}/Lib
 )
 
@@ -156,6 +157,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     shaderc_sharedd.lib
     spirv-cross-cored.lib
     spirv-cross-glsld.lib
+
+    libmono-static-sgen.lib
+    Ws2_32.lib
+    Winmm.lib
+    Version.lib
+    BCrypt.lib
 )
 
 set_property(TARGET ${PROJECT_NAME}
