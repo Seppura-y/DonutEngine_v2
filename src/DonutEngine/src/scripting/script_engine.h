@@ -8,25 +8,12 @@ extern"C"
 	typedef struct _MonoClass MonoClass;
 	typedef struct _MonoObject MonoObject;
 	typedef struct _MonoMethod MonoMethod;
+	typedef struct _MonoAssembly MonoAssembly;
+	typedef struct _MonoImage MonoImage;
 }
 
 namespace Donut
 {
-	class ScriptEngine
-	{
-	public:
-		static void init();
-		static void shutdown();
-
-		static void loadAssembly(const std::filesystem::path& filepath);
-	private:
-		static void initMono();
-		static void shutdownMono();
-		static MonoObject* instantiateClass(MonoClass* mono_class);
-
-		friend class ScriptClass;
-	};
-
 	class ScriptClass
 	{
 	public:
@@ -42,6 +29,42 @@ namespace Donut
 		std::string class_namespace_;
 		MonoClass* mono_class_ = nullptr;
 	};
+
+	class ScriptInstance
+	{
+	public:
+		ScriptInstance(Ref<ScriptClass> sricpt_class);
+
+		void invokeOnCreate();
+		void invokeOnUpdate(float ts);
+
+	private:
+		Ref<ScriptClass> script_class_;
+
+		MonoObject* instance_ = nullptr;
+		MonoMethod* onCreateMethod_ = nullptr;
+		MonoMethod* onUpdateMethod_ = nullptr;
+	};
+
+	class ScriptEngine
+	{
+	public:
+		static void init();
+		static void shutdown();
+
+		static void loadAssembly(const std::filesystem::path& filepath);
+
+		static std::unordered_map<std::string, Ref<ScriptClass>> getEntityClasses();
+	private:
+		static void initMono();
+		static void shutdownMono();
+		static MonoObject* instantiateClass(MonoClass* mono_class);
+		static void loadAssemblyClasses(MonoAssembly* assembly);
+
+		friend class ScriptClass;
+	};
+
+
 }
 
 #endif

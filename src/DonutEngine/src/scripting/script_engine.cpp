@@ -17,6 +17,8 @@ namespace Donut {
 		MonoImage* core_assembly_image_ = nullptr;
 
 		ScriptClass entity_class_;
+
+		std::unordered_map<std::string, Ref<ScriptClass>> entity_classes_;
 	};
 
 	static ScriptEngineData* s_data = nullptr;
@@ -121,8 +123,17 @@ namespace Donut {
 
 		initMono();
 		loadAssembly("../src/DonutEditor/Resources/Scripts/DonutScriptCore.dll");
+		loadAssemblyClasses(s_data->core_assemply_);
+		// for debug
+		Utils::printAssemblyTypes(s_data->core_assemply_);
 
 		ScriptGlue::registerFunctions();
+		
+		//MonoObject* instance = s_data->entity_class_.instantiate();
+		//MonoMethod* onCreateFunc = s_data->entity_class_.getMethod("onCreate", 0);
+		//s_data->entity_class_.invokeMethod(instance, onCreateFunc);
+		
+#if 0	// example for how to use the API
 
 		// 1. retrieve and instantiate class (with constructor)
 		s_data->entity_class_ = ScriptClass("Donut", "Entity");
@@ -159,6 +170,7 @@ namespace Donut {
 		s_data->entity_class_.invokeMethod(instance, print_custom_message_func, &string_param);
 
 		//HZ_CORE_ASSERT(false);
+#endif
 	}
 
 	void ScriptEngine::shutdown()
@@ -206,9 +218,11 @@ namespace Donut {
 		s_data->core_assemply_ = Utils::loadMonoAssembly(filepath);
 
 		s_data->core_assembly_image_ = mono_assembly_get_image(s_data->core_assemply_);
+	}
 
-		// for debug
-		Utils::printAssemblyTypes(s_data->core_assemply_);
+	std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::getEntityClasses()
+	{
+		return s_data->entity_classes_;
 	}
 
 	MonoObject* ScriptEngine::instantiateClass(MonoClass* mono_class)
@@ -219,6 +233,48 @@ namespace Donut {
 		return instance;
 	}
 
+	void ScriptEngine::loadAssemblyClasses(MonoAssembly* assembly)
+	{
+		s_data->entity_classes_.clear();
+
+		MonoImage* image = mono_assembly_get_image(assembly);
+		const MonoTableInfo* type_definitions_table = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
+		int32_t num_types = mono_table_info_get_rows(type_definitions_table);
+
+		MonoClass* entity_class = mono_class_from_name(s_data->core_assembly_image_, "Donut", "Entity");
+
+		for (int32_t i = 0; i < num_types; i++)
+		{
+			uint32_t cols[MONO_TYPEDEF_SIZE];
+			mono_metadata_decode_row(type_definitions_table, i, cols, MONO_TYPEDEF_SIZE);
+
+			const char* name_space = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
+			const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
+
+			std::string full_name;
+			if (strlen(name_space) != 0)
+			{
+				full_name = fmt::format("{}.{}", name_space, name);
+			}
+			else
+			{
+				full_name = name;
+			}
+
+			MonoClass* mono_class = mono_class_from_name(s_data->core_assembly_image_, name_space, name);
+
+			if (mono_class == entity_class)
+			{
+				continue;
+			}
+
+			bool is_entity = mono_class_is_subclass_of(mono_class, entity_class, false);
+			if (is_entity)
+			{
+				s_data->entity_classes_[full_name] = createRef<ScriptClass>(name_space, name);
+			}
+		}
+	}
 
 	ScriptClass::ScriptClass(const std::string& class_namespace, const std::string& class_name)
 		:class_namespace_(class_namespace), class_name_(class_name)
@@ -239,5 +295,29 @@ namespace Donut {
 	MonoObject* ScriptClass::invokeMethod(MonoObject* instance, MonoMethod* method, void** params)
 	{
 		return mono_runtime_invoke(method, instance, params, nullptr);
+	}
+
+
+
+
+
+	ScriptInstance::ScriptInstance(Ref<ScriptClass> sricpt_class)
+		: script_class_(sricpt_class)
+	{
+		instance_ = script_class_->instantiate();
+
+		onCreateMethod_ = script_class_->getMethod("onCreate", 0);
+		onUpdateMethod_ = script_class_->getMethod("onUpdate", 1);
+	}
+
+	void ScriptInstance::invokeOnCreate()
+	{
+		script_class_->invokeMethod(instance_, onCreateMethod_, nullptr);
+	}
+
+	void ScriptInstance::invokeOnUpdate(float ts)
+	{
+		void* param = &ts;
+		script_class_->invokeMethod(instance_, onUpdateMethod_, &param);
 	}
 }

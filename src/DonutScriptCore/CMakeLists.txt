@@ -13,6 +13,7 @@ set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../DonutEditor/Resources/Scripts/)
 
 add_library("DonutScriptCore" SHARED
     src/Main.cs
+    src/Player.cs
 )
 
 foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)
@@ -48,5 +49,4 @@ set_property(TARGET "DonutScriptCore" PROPERTY VS_DOTNET_REFERENCES
         "System.Xml"
         "System.Xml.Linq"
         "WindowsBase"
-        # .. etc ...
 )

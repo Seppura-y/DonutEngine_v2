@@ -8,6 +8,7 @@
 #include <filesystem>
 
 #include "../DonutEngine/src/scene/components.h"
+#include "../DonutEngine/src/scripting/script_engine.h"
 
 namespace Donut
 {
@@ -221,6 +222,7 @@ namespace Donut
 		if (ImGui::BeginPopup("AddComponent"))
 		{
 			displayAddComponentEntry<CameraComponent>("Camera");
+			displayAddComponentEntry<ScriptComponent>("Script");
 			displayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 			displayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
 			displayAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
@@ -316,8 +318,35 @@ namespace Donut
 				}
 			}
 		});
-	
 
+		drawComponent<ScriptComponent>("Script", entity, [](auto& component)
+			{
+				bool script_class_exists = false;
+				const auto& entity_classes = ScriptEngine::getEntityClasses();
+				if (entity_classes.find(component.name_) != entity_classes.end())
+				{
+					script_class_exists = true;
+				}
+
+				char buffer[64];
+				strcpy(buffer, component.name_.c_str());
+
+				if (!script_class_exists)
+				{
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0, 0, 1.0f));
+				}
+
+				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				{
+					component.name_ = buffer;
+				}
+
+				if (!script_class_exists)
+				{
+					ImGui::PopStyleColor();
+				}
+			});
+	
 		drawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 		{
 			auto& color = component.color_;

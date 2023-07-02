@@ -521,4 +521,9 @@ namespace Donut
 
 	}
 
+	template<>
+	void Scene::onComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
+	{
+
+	}
 }
