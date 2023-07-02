@@ -1,5 +1,14 @@
 #include "pch.h"
 #include "script_glue.h"
+#include "script_engine.h"
+
+#include "scene/entity.h"
+#include "scene/scene.h"
+
+#include "core/uuid.h"
+
+#include "core/key_codes.h"
+#include "core/input.h"
 
 #include <mono/metadata/object.h>
 
@@ -27,10 +36,38 @@ namespace Donut
 		return glm::dot(*parameter, *parameter);
 	}
 
+	static void entity_getTranslation(UUID uuid, glm::vec3* out_translation)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+
+		
+		Entity entity = scene->getEntityByUUID(uuid);
+		*out_translation = entity.getComponent<TransformComponent>().translation_;
+	}
+
+	static void entity_setTranslation(UUID uuid, glm::vec3* translation)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+
+		Entity entity = scene->getEntityByUUID(uuid);
+		entity.getComponent<TransformComponent>().translation_ = *translation;
+	}
+
+	static bool input_isKeydown(KeyCode keycode)
+	{
+		return Input::isKeyPressed(keycode);
+	}
+
 	void ScriptGlue::registerFunctions()
 	{
-		DN_ADD_INTERNAL_CALL(nativeLog);
-		DN_ADD_INTERNAL_CALL(nativeLog_Vector);
-		DN_ADD_INTERNAL_CALL(nativeLog_VectorDot);
+		//DN_ADD_INTERNAL_CALL(nativeLog);
+		//DN_ADD_INTERNAL_CALL(nativeLog_Vector);
+		//DN_ADD_INTERNAL_CALL(nativeLog_VectorDot);
+
+		DN_ADD_INTERNAL_CALL(entity_getTranslation);
+		DN_ADD_INTERNAL_CALL(entity_setTranslation);
+
+		DN_ADD_INTERNAL_CALL(input_isKeydown);
+
 	}
 }

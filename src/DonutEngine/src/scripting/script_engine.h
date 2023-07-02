@@ -35,7 +35,7 @@ namespace Donut
 	class ScriptInstance
 	{
 	public:
-		ScriptInstance(Ref<ScriptClass> sricpt_class);
+		ScriptInstance(Ref<ScriptClass> sricpt_class, Entity entity);
 
 		void invokeOnCreate();
 		void invokeOnUpdate(float ts);
@@ -44,6 +44,7 @@ namespace Donut
 		Ref<ScriptClass> script_class_;
 
 		MonoObject* instance_ = nullptr;
+		MonoMethod* constructor_ = nullptr;
 		MonoMethod* onCreateMethod_ = nullptr;
 		MonoMethod* onUpdateMethod_ = nullptr;
 	};
@@ -63,6 +64,8 @@ namespace Donut
 
 		static void onCreateEntity(Entity entity);
 		static void onUpdateEntity(Entity entity, float ts);
+
+		static Scene* getSceneContext();
 
 		static std::unordered_map<std::string, Ref<ScriptClass>> getEntityClasses();
 	private:

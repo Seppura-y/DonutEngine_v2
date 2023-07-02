@@ -287,6 +287,8 @@ namespace Donut
 
 		auto& t = entity.addComponent<TagComponent>(tag);
 		t.tag_ = tag.empty() ? "entity" : tag;
+
+		entt_map_[id] = entity;
 		return entity;
 	}
 
@@ -297,6 +299,7 @@ namespace Donut
 
 	void Scene::destroyEntity(Entity entity)
 	{
+		entt_map_.erase(entity.getUUID());
 		registry_.destroy(entity);
 	}
 
@@ -312,6 +315,15 @@ namespace Donut
 			}
 		}
 
+		return {};
+	}
+
+	Entity Scene::getEntityByUUID(UUID id)
+	{
+		if (entt_map_.find(id) != entt_map_.end())
+		{
+			return { entt_map_.at(id), this };
+		}
 		return {};
 	}
 

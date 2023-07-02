@@ -139,6 +139,8 @@ namespace Donut {
 		//MonoMethod* onCreateFunc = s_data->entity_class_.getMethod("onCreate", 0);
 		//s_data->entity_class_.invokeMethod(instance, onCreateFunc);
 		
+		// 1. retrieve and instantiate class (with constructor)
+		s_data->entity_class_ = ScriptClass("Donut", "Entity");
 #if 0	// example for how to use the API
 
 		// 1. retrieve and instantiate class (with constructor)
@@ -247,7 +249,7 @@ namespace Donut {
 		const auto& sc = entity.getComponent<ScriptComponent>();
 		if (ScriptEngine::isClassExists(sc.class_name_))
 		{
-			Ref<ScriptInstance> instance = createRef<ScriptInstance>(s_data->entity_classes_[sc.class_name_]);
+			Ref<ScriptInstance> instance = createRef<ScriptInstance>(s_data->entity_classes_[sc.class_name_], entity);
 			s_data->entity_instances_[entity.getUUID()] = instance;
 
 			instance->invokeOnCreate();
@@ -261,6 +263,11 @@ namespace Donut {
 
 		Ref<ScriptInstance> instance = s_data->entity_instances_[entity_uuid];
 		instance->invokeOnUpdate(ts);
+	}
+
+	Scene* ScriptEngine::getSceneContext()
+	{
+		return s_data->scene_context_;
 	}
 
 	std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::getEntityClasses()
@@ -344,13 +351,23 @@ namespace Donut {
 
 
 
-	ScriptInstance::ScriptInstance(Ref<ScriptClass> sricpt_class)
+	ScriptInstance::ScriptInstance(Ref<ScriptClass> sricpt_class, Entity entity)
 		: script_class_(sricpt_class)
 	{
 		instance_ = script_class_->instantiate();
 
+		//constructor_ = script_class_->getMethod(".ctor", 1);
+		
+		// need to get the constructor from the parent class (Entity)
+		constructor_ = s_data->entity_class_.getMethod(".ctor", 1);
 		onCreateMethod_ = script_class_->getMethod("onCreate", 0);
 		onUpdateMethod_ = script_class_->getMethod("onUpdate", 1);
+
+		{
+			UUID entity_uuid = entity.getUUID();
+			void* param = &entity_uuid;
+			script_class_->invokeMethod(instance_, constructor_, &param);
+		}
 	}
 
 	void ScriptInstance::invokeOnCreate()

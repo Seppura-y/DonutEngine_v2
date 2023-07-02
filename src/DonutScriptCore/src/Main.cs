@@ -10,11 +10,31 @@ namespace Donut
     {
         public float X, Y, Z;
 
+        public static Vector3 Zero => new Vector3(0.0f);
+
+        public Vector3(float scalar)
+        {
+            X = scalar;
+            Y = scalar;
+            Z = scalar;
+        }
+
         public Vector3(float x, float y, float z)
         {
             X = x;
             Y = y;
             Z = z;
+        }
+
+
+        public static Vector3 operator +(Vector3 vector1, Vector3 vector2)
+        {
+            return new Vector3(vector1.X + vector2.X, vector1.Y + vector2.Y, vector1.Z + vector2.Z);
+        }
+
+        public static Vector3 operator*(Vector3 vector, float scalar)
+        {
+            return new Vector3(vector.X * scalar, vector.Y * scalar, vector.Z * scalar);
         }
     }
 
@@ -29,66 +49,45 @@ namespace Donut
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static void nativeLog_Vector(ref Vector3 param, out Vector3 result);
 
+
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        internal extern static float nativeLog_VectorDot(ref Vector3 param);
+        internal extern static float entity_setTranslation(ulong entity_id, ref Vector3 translation);
+
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static float entity_getTranslation(ulong entity_id, out Vector3 translation);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static bool input_isKeydown(KeyCode keycode);
+
+        //[MethodImplAttribute(MethodImplOptions.InternalCall)]
+        //internal extern static float entity_setTranslation(ref Vector3 translation);
     }
 
     public class Entity
     {
-        
-        public Entity()
-        {
-            Console.WriteLine("Main constructor");
-            //InternalCalls.CppFunction();
-            Log("sdfasdf", 1234);
+        protected Entity() { ID = 0; }
 
-            Vector3 pos = new Vector3(1, 2, 3);
-            Vector3 result = Log(pos);
-            Console.WriteLine($"{result.X}, {result.Y}, {result.Z}");
-            Console.WriteLine("{0}", InternalCalls.nativeLog_VectorDot(ref pos));
+        internal Entity(ulong id)
+        {
+            ID = id;
         }
 
-        public void PrintMessage()
+        public readonly ulong ID;
+
+        public Vector3 Translation
         {
-            Console.WriteLine("Hello World from C#!");
+            get
+            {
+                InternalCalls.entity_getTranslation(ID, out Vector3 translation);
+                return translation;
+            }
+
+            set
+            {
+                InternalCalls.entity_setTranslation(ID, ref value);
+            }
         }
-
-        public void PrintInt(int value)
-        {
-            Console.WriteLine($"C# says: {value}");
-        }
-
-        public void PrintInts(int value1, int value2)
-        {
-            Console.WriteLine($"C# says: {value1} and {value2}");
-        }
-
-        public void PrintCustomMessage(string message)
-        {
-            Console.WriteLine($"C# says: {message}");
-        }
-
-        private void Log(string text, int parameter)
-        {
-            InternalCalls.nativeLog(text, parameter);
-        }
-
-        //private void Log(Vector3 parameter)
-        //{
-        //    nativeLog_Vector(ref parameter);
-        //}
-
-        private Vector3 Log(Vector3 parameter)
-        {
-            InternalCalls.nativeLog_Vector(ref parameter, out Vector3 result);
-            return result;
-
-            //Vector3 result;
-            //nativeLog_Vector_Ret(ref parameter, out result);
-            //return result;
-        }
-
-        
 
     }
 }
