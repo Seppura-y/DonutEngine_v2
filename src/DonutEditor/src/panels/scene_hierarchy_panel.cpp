@@ -321,15 +321,10 @@ namespace Donut
 
 		drawComponent<ScriptComponent>("Script", entity, [](auto& component)
 			{
-				bool script_class_exists = false;
-				const auto& entity_classes = ScriptEngine::getEntityClasses();
-				if (entity_classes.find(component.name_) != entity_classes.end())
-				{
-					script_class_exists = true;
-				}
+				bool script_class_exists = ScriptEngine::isClassExists(component.class_name_);
 
 				char buffer[64];
-				strcpy(buffer, component.name_.c_str());
+				strcpy(buffer, component.class_name_.c_str());
 
 				if (!script_class_exists)
 				{
@@ -338,7 +333,7 @@ namespace Donut
 
 				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
 				{
-					component.name_ = buffer;
+					component.class_name_ = buffer;
 				}
 
 				if (!script_class_exists)

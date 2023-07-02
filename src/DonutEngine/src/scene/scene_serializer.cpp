@@ -187,6 +187,16 @@ namespace Donut
 			out << YAML::EndMap; // CameraComponent
 		}
 
+		if (entity.hasComponent<ScriptComponent>())
+		{
+			auto& script_component = entity.getComponent<ScriptComponent>();
+
+			out << YAML::Key << "ScriptComponent";
+			out << YAML::BeginMap;
+			out << YAML::Key << "ClassName" << YAML::Value << script_component.class_name_;
+			out << YAML::EndMap;
+		}
+
 		if (entity.hasComponent<SpriteRendererComponent>())
 		{
 			out << YAML::Key << "SpriteRendererComponent";
@@ -367,6 +377,13 @@ namespace Donut
 
 					cc.is_primary_ = cameraComponent["Primary"].as<bool>();
 					cc.is_fixed_aspect_ratio_ = cameraComponent["FixedAspectRatio"].as<bool>();
+				}
+
+				auto scriptComponent = entity["ScriptComponent"];
+				if (scriptComponent)
+				{
+					auto& sc = deserialized_entity.addComponent<ScriptComponent>();
+					sc.class_name_ = scriptComponent["ClassName"].as<std::string>();
 				}
 
 				auto spriteRendererComponent = entity["SpriteRendererComponent"];

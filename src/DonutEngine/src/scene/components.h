@@ -192,7 +192,7 @@ namespace Donut
 
 	struct ScriptComponent
 	{
-		std::string name_;
+		std::string class_name_;
 
 		ScriptComponent() = default;
 		ScriptComponent(const ScriptComponent& other) = default;

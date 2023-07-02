@@ -9,6 +9,8 @@
 
 #include "scene/entity.h"
 
+#include "scripting/script_engine.h"
+
 #include <box2d/b2_world.h>
 #include <box2d/b2_body.h>
 #include <box2d/b2_fixture.h>
@@ -118,6 +120,15 @@ namespace Donut
 	{
 		// Update scripts
 		{
+
+			// C# Entity onUpdate
+			auto view = registry_.view<ScriptComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				ScriptEngine::onUpdateEntity(entity, ts);
+			}
+
 			registry_.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
 				{
 					if (!nsc.instance_)
@@ -307,6 +318,33 @@ namespace Donut
 	void Scene::onRuntimeStart()
 	{
 		onPhysics2DStart();
+
+		// instantiate all script entities
+		{
+			ScriptEngine::onRuntimeStart(this);
+
+			auto view = registry_.view<ScriptComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				ScriptEngine::onCreateEntity(entity);
+			}
+		}
+		//{
+		//	auto view = registry_.view<ScriptComponent>();
+		//	for (auto e : view)
+		//	{
+		//		Entity entity = { e, this };
+
+		//		const auto& sc = entity.getComponent<ScriptComponent>();
+		//		if (ScriptEngine::isClassExists(sc.class_name_))
+		//		{
+		//			ScriptEngine::onCreateEntity(entity);
+		//		}
+		//	}
+		//	ScriptEngine::onRuntimeStart(this);
+		//}
+
 	}
 
 	void Scene::onRuntimeStop()
@@ -314,6 +352,8 @@ namespace Donut
 		onPhysics2DStop();
 		//delete physics_world_;
 		//physics_world_ = nullptr;
+
+		ScriptEngine::onRuntimeStop();
 	}
 
 	Ref<Scene> Scene::copyScene(Ref<Scene> other)

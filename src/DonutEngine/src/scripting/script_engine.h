@@ -3,6 +3,8 @@
 
 #include <filesystem>
 
+#include "scene/scene.h"
+
 extern"C"
 {
 	typedef struct _MonoClass MonoClass;
@@ -53,6 +55,14 @@ namespace Donut
 		static void shutdown();
 
 		static void loadAssembly(const std::filesystem::path& filepath);
+
+		static void onRuntimeStart(Scene* scene);
+		static void onRuntimeStop();
+
+		static bool isClassExists(const std::string& full_classname);
+
+		static void onCreateEntity(Entity entity);
+		static void onUpdateEntity(Entity entity, float ts);
 
 		static std::unordered_map<std::string, Ref<ScriptClass>> getEntityClasses();
 	private:

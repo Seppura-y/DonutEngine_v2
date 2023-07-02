@@ -2,6 +2,8 @@
 #include "script_engine.h"
 #include "script_glue.h"
 
+#include "scene/entity.h"
+
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
 #include "mono/metadata/object.h"
@@ -18,7 +20,11 @@ namespace Donut {
 
 		ScriptClass entity_class_;
 
+
 		std::unordered_map<std::string, Ref<ScriptClass>> entity_classes_;
+		std::unordered_map<UUID, Ref<ScriptInstance>> entity_instances_;
+
+		Scene* scene_context_ = nullptr;
 	};
 
 	static ScriptEngineData* s_data = nullptr;
@@ -218,6 +224,43 @@ namespace Donut {
 		s_data->core_assemply_ = Utils::loadMonoAssembly(filepath);
 
 		s_data->core_assembly_image_ = mono_assembly_get_image(s_data->core_assemply_);
+	}
+
+	void ScriptEngine::onRuntimeStart(Scene* scene)
+	{
+		s_data->scene_context_ = scene;
+	}
+
+	void ScriptEngine::onRuntimeStop()
+	{
+		s_data->scene_context_ = nullptr;
+		s_data->entity_instances_.clear();
+	}
+
+	bool ScriptEngine::isClassExists(const std::string& full_classname)
+	{
+		return s_data->entity_classes_.find(full_classname) != s_data->entity_classes_.end();
+	}
+
+	void ScriptEngine::onCreateEntity(Entity entity)
+	{
+		const auto& sc = entity.getComponent<ScriptComponent>();
+		if (ScriptEngine::isClassExists(sc.class_name_))
+		{
+			Ref<ScriptInstance> instance = createRef<ScriptInstance>(s_data->entity_classes_[sc.class_name_]);
+			s_data->entity_instances_[entity.getUUID()] = instance;
+
+			instance->invokeOnCreate();
+		}
+	}
+
+	void ScriptEngine::onUpdateEntity(Entity entity, float ts)
+	{
+		UUID entity_uuid = entity.getUUID();
+		DN_CORE_ASSERT(s_data->entity_instances_.find(entity_uuid) != s_data->entity_instances_.end(), "");
+
+		Ref<ScriptInstance> instance = s_data->entity_instances_[entity_uuid];
+		instance->invokeOnUpdate(ts);
 	}
 
 	std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::getEntityClasses()
