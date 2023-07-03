@@ -378,12 +378,17 @@ namespace Donut {
 
 	void ScriptInstance::invokeOnCreate()
 	{
-		script_class_->invokeMethod(instance_, onCreateMethod_, nullptr);
+		if(onCreateMethod_)
+			script_class_->invokeMethod(instance_, onCreateMethod_, nullptr);
 	}
 
 	void ScriptInstance::invokeOnUpdate(float ts)
 	{
-		void* param = &ts;
-		script_class_->invokeMethod(instance_, onUpdateMethod_, &param);
+		if (onUpdateMethod_)
+		{
+			void* param = &ts;
+			script_class_->invokeMethod(instance_, onUpdateMethod_, &param);
+		}
+
 	}
 }

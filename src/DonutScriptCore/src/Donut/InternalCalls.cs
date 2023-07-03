@@ -15,6 +15,12 @@ namespace Donut
         internal extern static void TransformComponent_setTranslation(ulong entity_id, ref Vector3 translation);
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody2DComponent_applyLinearImpulse(ulong entity_id, ref Vector2 impulse, ref Vector2 world_pos, ref bool wake);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody2DComponent_applyLinearImpulseToCenter(ulong entity_id, ref Vector2 impulse, ref bool wake);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static bool Input_isKeydown(KeyCode keycode);
     }
 }

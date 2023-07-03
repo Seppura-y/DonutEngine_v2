@@ -13,10 +13,14 @@ set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../DonutEditor/Resources/Scripts/)
 
 add_library("DonutScriptCore" SHARED
     src/Player.cs
+    src/Camera.cs
+
     src/Donut/InternalCalls.cs
     src/Donut/KeyCode.cs
     src/Donut/Input.cs
+    src/Donut/Vector2.cs
     src/Donut/Vector3.cs
+    
     src/Donut/Scene/Entity.cs
     src/Donut/Scene/Components.cs
 )

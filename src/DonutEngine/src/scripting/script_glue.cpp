@@ -13,6 +13,8 @@
 #include <mono/metadata/object.h>
 #include <mono/metadata/reflection.h>
 
+#include <box2d/b2_body.h>
+
 namespace Donut
 {
 	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_entity_hasComponent_funcs;
@@ -56,18 +58,49 @@ namespace Donut
 	static void TransformComponent_getTranslation(UUID uuid, glm::vec3* out_translation)
 	{
 		Scene* scene = ScriptEngine::getSceneContext();
-
+		DN_CORE_ASSERT(scene, "");
 		
 		Entity entity = scene->getEntityByUUID(uuid);
+		DN_CORE_ASSERT(entity, "");
+
 		*out_translation = entity.getComponent<TransformComponent>().translation_;
 	}
 
 	static void TransformComponent_setTranslation(UUID uuid, glm::vec3* translation)
 	{
 		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
 
 		Entity entity = scene->getEntityByUUID(uuid);
+		DN_CORE_ASSERT(entity, "");
+
 		entity.getComponent<TransformComponent>().translation_ = *translation;
+	}
+
+	static void Rigidbody2DComponent_applyLinearImpulse(UUID uuid, glm::vec2* impulse, glm::vec2* world_pos, bool wake)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
+
+		Entity entity = scene->getEntityByUUID(uuid);
+		DN_CORE_ASSERT(entity, "");
+
+		auto& rb2d = entity.getComponent<Rigidbody2DComponent>();
+		b2Body* body = (b2Body*)rb2d.runtime_body_;
+		body->ApplyLinearImpulse(b2Vec2(impulse->x, impulse->y), b2Vec2(world_pos->x, world_pos->y), wake);
+	}
+
+	static void Rigidbody2DComponent_applyLinearImpulseToCenter(UUID uuid, glm::vec2* impulse, bool wake)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
+
+		Entity entity = scene->getEntityByUUID(uuid);
+		DN_CORE_ASSERT(entity, "");
+
+		auto& rb2d = entity.getComponent<Rigidbody2DComponent>();
+		b2Body* body = (b2Body*)rb2d.runtime_body_;
+		body->ApplyLinearImpulseToCenter(b2Vec2(impulse->x, impulse->y), wake);
 	}
 
 	static bool Input_isKeydown(KeyCode keycode)
@@ -85,6 +118,9 @@ namespace Donut
 
 		DN_ADD_INTERNAL_CALL(TransformComponent_getTranslation);
 		DN_ADD_INTERNAL_CALL(TransformComponent_setTranslation);
+
+		DN_ADD_INTERNAL_CALL(Rigidbody2DComponent_applyLinearImpulse);
+		DN_ADD_INTERNAL_CALL(Rigidbody2DComponent_applyLinearImpulseToCenter);
 
 		DN_ADD_INTERNAL_CALL(Input_isKeydown);
 	}

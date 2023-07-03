@@ -11,12 +11,14 @@ namespace Sandbox
     public class Player : Entity
     {
         private TransformComponent Transform;
+        private Rigidbody2DComponent Rigidbody;
 
         void onCreate()
         {
             Console.WriteLine($"Player.onCreate - {ID}");
 
             Transform = getComponent<TransformComponent>();
+            Rigidbody = getComponent<Rigidbody2DComponent>();
 
             bool has_transform_component = hasComponent<TransformComponent>();
             Console.WriteLine("has transform {0}", has_transform_component);
@@ -32,7 +34,6 @@ namespace Sandbox
             if(Input.IsKeydown(KeyCode.W))
             {
                 velocity.Y = 1.0f;
-                Console.WriteLine("key w pressed");
             }
             else if (Input.IsKeydown(KeyCode.S))
             {
@@ -48,11 +49,18 @@ namespace Sandbox
                 velocity.X = 1.0f;
             }
 
+            if (Input.IsKeydown(KeyCode.Space))
+            {
+                velocity.X = -1.0f;
+            }
+
             velocity *= speed;
 
-            Vector3 translation = Transform.Translation;
-            translation += velocity * ts;
-            Transform.Translation = translation;
+            Rigidbody.applyLinearImpulse(velocity.XY, true);
+
+            //Vector3 translation = Transform.Translation;
+            //translation += velocity * ts;
+            //Transform.Translation = translation;
         }
     }
 }
