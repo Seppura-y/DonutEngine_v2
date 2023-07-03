@@ -134,6 +134,7 @@ namespace Donut {
 		Utils::printAssemblyTypes(s_data->core_assemply_);
 
 		ScriptGlue::registerFunctions();
+		ScriptGlue::registerComponents();
 		
 		//MonoObject* instance = s_data->entity_class_.instantiate();
 		//MonoMethod* onCreateFunc = s_data->entity_class_.getMethod("onCreate", 0);
@@ -324,6 +325,11 @@ namespace Donut {
 				s_data->entity_classes_[full_name] = createRef<ScriptClass>(name_space, name);
 			}
 		}
+	}
+
+	MonoImage* ScriptEngine::getCoreAssemblyImage()
+	{
+		return s_data->core_assembly_image_;
 	}
 
 	ScriptClass::ScriptClass(const std::string& class_namespace, const std::string& class_name)

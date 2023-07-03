@@ -237,7 +237,7 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 		int pixel_data = framebuffer_->readPixel(1, mouse_x, mouse_y);
 
 		hovered_entity_ = pixel_data == -1 ? Entity() : Entity((entt::entity)pixel_data, active_scene_.get());
-		DN_CORE_WARN("Pixel data = {0}", pixel_data);
+		//DN_CORE_WARN("Pixel data = {0}", pixel_data);
 	}
 
 

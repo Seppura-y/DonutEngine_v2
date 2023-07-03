@@ -6,7 +6,7 @@ namespace Donut
     {
         public static bool IsKeydown(KeyCode keycode)
         {
-            return InternalCalls.input_isKeydown(keycode);
+            return InternalCalls.Input_isKeydown(keycode);
         }
     }
 }

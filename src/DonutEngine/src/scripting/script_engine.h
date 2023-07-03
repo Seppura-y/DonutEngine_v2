@@ -68,13 +68,17 @@ namespace Donut
 		static Scene* getSceneContext();
 
 		static std::unordered_map<std::string, Ref<ScriptClass>> getEntityClasses();
+
+		static MonoImage* getCoreAssemblyImage();
 	private:
 		static void initMono();
 		static void shutdownMono();
 		static MonoObject* instantiateClass(MonoClass* mono_class);
 		static void loadAssemblyClasses(MonoAssembly* assembly);
 
+
 		friend class ScriptClass;
+		friend class ScriptGlue;
 	};
 
 

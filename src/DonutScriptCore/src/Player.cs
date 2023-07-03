@@ -1,23 +1,30 @@
 using System;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 using Donut;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Sandbox
 {
     public class Player : Entity
     {
-        public float speed_ = 5.0f;
+        private TransformComponent Transform;
 
         void onCreate()
         {
             Console.WriteLine($"Player.onCreate - {ID}");
+
+            Transform = getComponent<TransformComponent>();
+
+            bool has_transform_component = hasComponent<TransformComponent>();
+            Console.WriteLine("has transform {0}", has_transform_component);
         }
 
         void onUpdate(float ts)
         {
-            Console.WriteLine($"Player.OnUpdate: {ts}");
+            //Console.WriteLine($"Player.OnUpdate: {ts}");
 
             float speed = 1.0f;
             Vector3 velocity = Vector3.Zero;
@@ -25,6 +32,7 @@ namespace Sandbox
             if(Input.IsKeydown(KeyCode.W))
             {
                 velocity.Y = 1.0f;
+                Console.WriteLine("key w pressed");
             }
             else if (Input.IsKeydown(KeyCode.S))
             {
@@ -42,9 +50,9 @@ namespace Sandbox
 
             velocity *= speed;
 
-            Vector3 translation = Translation;
+            Vector3 translation = Transform.Translation;
             translation += velocity * ts;
-            Translation = translation;
+            Transform.Translation = translation;
         }
     }
 }

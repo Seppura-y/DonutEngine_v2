@@ -11,9 +11,12 @@
 #include "core/input.h"
 
 #include <mono/metadata/object.h>
+#include <mono/metadata/reflection.h>
 
 namespace Donut
 {
+	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_entity_hasComponent_funcs;
+
 #define DN_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Donut.InternalCalls::" #Name, Name)
 
 	static void nativeLog(MonoString* string, int parameter)
@@ -36,7 +39,21 @@ namespace Donut
 		return glm::dot(*parameter, *parameter);
 	}
 
-	static void entity_getTranslation(UUID uuid, glm::vec3* out_translation)
+	static bool Entity_hasComponent(UUID entity_id, MonoReflectionType* component_type)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
+
+		Entity entity = scene->getEntityByUUID(entity_id);
+		DN_CORE_ASSERT(entity, "");
+
+		MonoType* mono_component_type = mono_reflection_type_get_type(component_type);
+		DN_CORE_ASSERT(s_entity_hasComponent_funcs.find(mono_component_type) != s_entity_hasComponent_funcs.end(), "");
+		
+		return s_entity_hasComponent_funcs.at(mono_component_type)(entity);
+	}
+
+	static void TransformComponent_getTranslation(UUID uuid, glm::vec3* out_translation)
 	{
 		Scene* scene = ScriptEngine::getSceneContext();
 
@@ -45,7 +62,7 @@ namespace Donut
 		*out_translation = entity.getComponent<TransformComponent>().translation_;
 	}
 
-	static void entity_setTranslation(UUID uuid, glm::vec3* translation)
+	static void TransformComponent_setTranslation(UUID uuid, glm::vec3* translation)
 	{
 		Scene* scene = ScriptEngine::getSceneContext();
 
@@ -53,7 +70,7 @@ namespace Donut
 		entity.getComponent<TransformComponent>().translation_ = *translation;
 	}
 
-	static bool input_isKeydown(KeyCode keycode)
+	static bool Input_isKeydown(KeyCode keycode)
 	{
 		return Input::isKeyPressed(keycode);
 	}
@@ -64,10 +81,48 @@ namespace Donut
 		//DN_ADD_INTERNAL_CALL(nativeLog_Vector);
 		//DN_ADD_INTERNAL_CALL(nativeLog_VectorDot);
 
-		DN_ADD_INTERNAL_CALL(entity_getTranslation);
-		DN_ADD_INTERNAL_CALL(entity_setTranslation);
+		DN_ADD_INTERNAL_CALL(Entity_hasComponent);
 
-		DN_ADD_INTERNAL_CALL(input_isKeydown);
+		DN_ADD_INTERNAL_CALL(TransformComponent_getTranslation);
+		DN_ADD_INTERNAL_CALL(TransformComponent_setTranslation);
 
+		DN_ADD_INTERNAL_CALL(Input_isKeydown);
+	}
+
+	template<typename... Component>
+	static void registerComponent()
+	{
+		([]()
+		{
+			std::string_view type_name = typeid(Component).name();
+
+			size_t pos = type_name.find_last_of(':');
+			std::string_view struct_name = type_name.substr(pos + 1);
+
+			std::string managed_type_name = fmt::format("Donut.{}", struct_name);
+
+			DN_CORE_WARN("'{}' = '{}'", type_name, struct_name);
+
+			MonoType* managed_type = mono_reflection_type_from_name(managed_type_name.data(), ScriptEngine::getCoreAssemblyImage());
+			if (!managed_type)
+			{
+				DN_CORE_ERROR("could not find component type {}", managed_type_name);
+				return;
+			}
+			s_entity_hasComponent_funcs[managed_type] = [](Entity entity) { return entity.hasComponent<Component>(); };
+
+		}(), ...);
+
+	}
+
+	template<typename... Component>
+	static void registerComponent(ComponentGroup<Component...>)
+	{
+		registerComponent<Component...>();
+	}
+
+	void ScriptGlue::registerComponents()
+	{
+		registerComponent(AllComponents{});
 	}
 }

@@ -12,10 +12,13 @@ set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../DonutEditor/Resources/Scripts/)
 # set(LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/../../lib)
 
 add_library("DonutScriptCore" SHARED
-    src/Main.cs
     src/Player.cs
-    src/KeyCode.cs
-    src/Input.cs
+    src/Donut/InternalCalls.cs
+    src/Donut/KeyCode.cs
+    src/Donut/Input.cs
+    src/Donut/Vector3.cs
+    src/Donut/Scene/Entity.cs
+    src/Donut/Scene/Components.cs
 )
 
 foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)

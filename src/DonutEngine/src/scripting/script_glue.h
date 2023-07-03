@@ -7,6 +7,7 @@ namespace Donut
 	{
 	public:
 		static void registerFunctions();
+		static void registerComponents();
 	};
 }
 
