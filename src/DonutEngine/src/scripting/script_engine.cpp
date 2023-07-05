@@ -7,6 +7,7 @@
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
 #include "mono/metadata/object.h"
+#include "mono/metadata/tabledefs.h"
 
 namespace Donut {
 
@@ -31,6 +32,27 @@ namespace Donut {
 	};
 
 	static ScriptEngineData* s_data = nullptr;
+
+	static std::unordered_map<std::string, ScriptFieldType> s_script_field_type_map =
+	{
+		{ "System.Single", ScriptFieldType::Float },
+		{ "System.Double", ScriptFieldType::Double },
+		{ "System.Boolean", ScriptFieldType::Bool },
+		{ "System.Char", ScriptFieldType::Char },
+		{ "System.Int16", ScriptFieldType::Short },
+		{ "System.Int32", ScriptFieldType::Int },
+		{ "System.Int64", ScriptFieldType::Long },
+		{ "System.Byte", ScriptFieldType::Byte },
+		{ "System.UInt16", ScriptFieldType::UShort },
+		{ "System.UInt32", ScriptFieldType::UInt },
+		{ "System.UInt64", ScriptFieldType::ULong },
+
+		{ "Hazel.Vector2", ScriptFieldType::Vector2 },
+		{ "Hazel.Vector3", ScriptFieldType::Vector3 },
+		{ "Hazel.Vector4", ScriptFieldType::Vector4 },
+
+		{ "Hazel.Entity", ScriptFieldType::Entity },
+	};
 
 	namespace Utils {
 
@@ -105,6 +127,44 @@ namespace Donut {
 
 				DN_CORE_TRACE("{}.{}", name_space, name);
 			}
+		}
+
+		static ScriptFieldType monoTypeToScriptFieldType(MonoType* mono_type)
+		{
+			std::string type_name = mono_type_get_name(mono_type);
+
+			auto it = s_script_field_type_map.find(type_name);
+			if (it == s_script_field_type_map.end())
+			{
+				DN_CORE_ERROR("Unknown type : {}", type_name);
+				return ScriptFieldType::None;
+			}
+
+			return it->second;
+		}
+
+		const char* scriptFieldTypeToString(ScriptFieldType type)
+		{
+			switch (type)
+			{
+			case ScriptFieldType::Float:   return "Float";
+			case ScriptFieldType::Double:  return "Double";
+			case ScriptFieldType::Bool:    return "Bool";
+			case ScriptFieldType::Char:    return "Char";
+			case ScriptFieldType::Byte:    return "Byte";
+			case ScriptFieldType::Short:   return "Short";
+			case ScriptFieldType::Int:     return "Int";
+			case ScriptFieldType::Long:    return "Long";
+			case ScriptFieldType::UByte:   return "UByte";
+			case ScriptFieldType::UShort:  return "UShort";
+			case ScriptFieldType::UInt:    return "UInt";
+			case ScriptFieldType::ULong:   return "ULong";
+			case ScriptFieldType::Vector2: return "Vector2";
+			case ScriptFieldType::Vector3: return "Vector3";
+			case ScriptFieldType::Vector4: return "Vector4";
+			case ScriptFieldType::Entity:  return "Entity";
+			}
+			return "<Invalid>";
 		}
 	}
 
@@ -311,19 +371,19 @@ namespace Donut {
 			mono_metadata_decode_row(type_definitions_table, i, cols, MONO_TYPEDEF_SIZE);
 
 			const char* name_space = mono_metadata_string_heap(s_data->app_assembly_image_, cols[MONO_TYPEDEF_NAMESPACE]);
-			const char* name = mono_metadata_string_heap(s_data->app_assembly_image_, cols[MONO_TYPEDEF_NAME]);
+			const char* class_name = mono_metadata_string_heap(s_data->app_assembly_image_, cols[MONO_TYPEDEF_NAME]);
 
 			std::string full_name;
 			if (strlen(name_space) != 0)
 			{
-				full_name = fmt::format("{}.{}", name_space, name);
+				full_name = fmt::format("{}.{}", name_space, class_name);
 			}
 			else
 			{
-				full_name = name;
+				full_name = class_name;
 			}
 
-			MonoClass* mono_class = mono_class_from_name(s_data->app_assembly_image_, name_space, name);
+			MonoClass* mono_class = mono_class_from_name(s_data->app_assembly_image_, name_space, class_name);
 
 			if (mono_class == entity_class)
 			{
@@ -331,11 +391,36 @@ namespace Donut {
 			}
 
 			bool is_entity = mono_class_is_subclass_of(mono_class, entity_class, false);
-			if (is_entity)
+			if (!is_entity)
 			{
-				s_data->entity_classes_[full_name] = createRef<ScriptClass>(name_space, name);
+				continue;
+			}
+
+			Ref<ScriptClass> script_class = createRef<ScriptClass>(name_space, class_name);
+			s_data->entity_classes_[full_name] = script_class;
+
+			// This routine is an iterator routine for retrieving the fields in a class.
+			// You must pass a gpointer that points to zero and is treated as an opaque handle
+			// to iterate over all of the elements. When no more values are available, the return value is NULL.
+		
+			int field_count = mono_class_num_fields(mono_class);
+			DN_CORE_WARN("{} has {} fields : ", class_name, field_count);
+
+			void* iterator = nullptr;
+			while (MonoClassField* field = mono_class_get_fields(mono_class, &iterator))
+			{
+				const char* field_name = mono_field_get_name(field);
+				uint32_t flags = mono_field_get_flags(field);
+				if (flags & FIELD_ATTRIBUTE_PUBLIC)
+				{
+					MonoType* type = mono_field_get_type(field);
+					ScriptFieldType field_type = Utils::monoTypeToScriptFieldType(type);
+					DN_CORE_WARN("  {}  ({})", field_name, Utils::scriptFieldTypeToString(field_type));
+				}
 			}
 		}
+
+		auto& entity_classes = s_data->entity_classes_;
 	}
 
 	MonoImage* ScriptEngine::getCoreAssemblyImage()

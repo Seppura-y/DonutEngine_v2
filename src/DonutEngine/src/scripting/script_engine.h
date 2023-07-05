@@ -12,10 +12,23 @@ extern"C"
 	typedef struct _MonoMethod MonoMethod;
 	typedef struct _MonoAssembly MonoAssembly;
 	typedef struct _MonoImage MonoImage;
+	typedef struct _MonoClassField MonoClassField;
 }
 
 namespace Donut
 {
+	enum class ScriptFieldType
+	{
+		None = 0,
+		Float, Double,
+		Bool, Char, Byte, Short, Int, Long,
+		UByte, UShort, UInt, ULong,
+		Vector2, Vector3, Vector4,
+		Entity
+	};
+
+
+
 	class ScriptClass
 	{
 	public:
@@ -26,10 +39,13 @@ namespace Donut
 		MonoMethod* getMethod(const std::string& name, int parameter_count);
 		MonoObject* invokeMethod(MonoObject* instance, MonoMethod* method, void** params = nullptr);
 
+		//std::map<std::string, ScriptField>& getFields() const { return fields_; }
 	private:
 		std::string class_name_;
 		std::string class_namespace_;
 		MonoClass* mono_class_ = nullptr;
+
+		//std::map<std::string, ScriptField> fields_;
 	};
 
 	class ScriptInstance
