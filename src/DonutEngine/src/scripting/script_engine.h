@@ -20,7 +20,7 @@ namespace Donut
 	{
 	public:
 		ScriptClass() = default;
-		ScriptClass(const std::string& class_namespace, const std::string& class_name);
+		ScriptClass(const std::string& class_namespace, const std::string& class_name, bool is_core = false);
 
 		MonoObject* instantiate();
 		MonoMethod* getMethod(const std::string& name, int parameter_count);
@@ -56,6 +56,7 @@ namespace Donut
 		static void shutdown();
 
 		static void loadAssembly(const std::filesystem::path& filepath);
+		static void loadAppAssembly(const std::filesystem::path& filepath);
 
 		static void onRuntimeStart(Scene* scene);
 		static void onRuntimeStop();
@@ -74,7 +75,8 @@ namespace Donut
 		static void initMono();
 		static void shutdownMono();
 		static MonoObject* instantiateClass(MonoClass* mono_class);
-		static void loadAssemblyClasses(MonoAssembly* assembly);
+
+		static void loadAssemblyClasses();
 
 
 		friend class ScriptClass;

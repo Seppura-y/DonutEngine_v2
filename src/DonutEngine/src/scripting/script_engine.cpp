@@ -18,6 +18,9 @@ namespace Donut {
 		MonoAssembly* core_assemply_ = nullptr;
 		MonoImage* core_assembly_image_ = nullptr;
 
+		MonoAssembly* app_assembly_ = nullptr;
+		MonoImage* app_assembly_image_ = nullptr;
+
 		ScriptClass entity_class_;
 
 
@@ -129,7 +132,8 @@ namespace Donut {
 
 		initMono();
 		loadAssembly("../src/DonutEditor/Resources/Scripts/DonutScriptCore.dll");
-		loadAssemblyClasses(s_data->core_assemply_);
+		loadAppAssembly("../src/DonutEditor/Resources/Scripts/SandboxScript.dll");
+		loadAssemblyClasses();
 		// for debug
 		Utils::printAssemblyTypes(s_data->core_assemply_);
 
@@ -141,7 +145,7 @@ namespace Donut {
 		//s_data->entity_class_.invokeMethod(instance, onCreateFunc);
 		
 		// 1. retrieve and instantiate class (with constructor)
-		s_data->entity_class_ = ScriptClass("Donut", "Entity");
+		s_data->entity_class_ = ScriptClass("Donut", "Entity", true);
 #if 0	// example for how to use the API
 
 		// 1. retrieve and instantiate class (with constructor)
@@ -229,6 +233,13 @@ namespace Donut {
 		s_data->core_assembly_image_ = mono_assembly_get_image(s_data->core_assemply_);
 	}
 
+	void ScriptEngine::loadAppAssembly(const std::filesystem::path& filepath)
+	{
+		s_data->app_assembly_ = Utils::loadMonoAssembly(filepath);
+
+		s_data->app_assembly_image_ = mono_assembly_get_image(s_data->app_assembly_);
+	}
+
 	void ScriptEngine::onRuntimeStart(Scene* scene)
 	{
 		s_data->scene_context_ = scene;
@@ -284,12 +295,12 @@ namespace Donut {
 		return instance;
 	}
 
-	void ScriptEngine::loadAssemblyClasses(MonoAssembly* assembly)
+	void ScriptEngine::loadAssemblyClasses()
 	{
 		s_data->entity_classes_.clear();
 
-		MonoImage* image = mono_assembly_get_image(assembly);
-		const MonoTableInfo* type_definitions_table = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
+		const MonoTableInfo* type_definitions_table = mono_image_get_table_info(s_data->app_assembly_image_, MONO_TABLE_TYPEDEF);
+
 		int32_t num_types = mono_table_info_get_rows(type_definitions_table);
 
 		MonoClass* entity_class = mono_class_from_name(s_data->core_assembly_image_, "Donut", "Entity");
@@ -299,8 +310,8 @@ namespace Donut {
 			uint32_t cols[MONO_TYPEDEF_SIZE];
 			mono_metadata_decode_row(type_definitions_table, i, cols, MONO_TYPEDEF_SIZE);
 
-			const char* name_space = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
-			const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
+			const char* name_space = mono_metadata_string_heap(s_data->app_assembly_image_, cols[MONO_TYPEDEF_NAMESPACE]);
+			const char* name = mono_metadata_string_heap(s_data->app_assembly_image_, cols[MONO_TYPEDEF_NAME]);
 
 			std::string full_name;
 			if (strlen(name_space) != 0)
@@ -312,7 +323,7 @@ namespace Donut {
 				full_name = name;
 			}
 
-			MonoClass* mono_class = mono_class_from_name(s_data->core_assembly_image_, name_space, name);
+			MonoClass* mono_class = mono_class_from_name(s_data->app_assembly_image_, name_space, name);
 
 			if (mono_class == entity_class)
 			{
@@ -332,10 +343,10 @@ namespace Donut {
 		return s_data->core_assembly_image_;
 	}
 
-	ScriptClass::ScriptClass(const std::string& class_namespace, const std::string& class_name)
+	ScriptClass::ScriptClass(const std::string& class_namespace, const std::string& class_name, bool is_core)
 		:class_namespace_(class_namespace), class_name_(class_name)
 	{
-		mono_class_ = mono_class_from_name(s_data->core_assembly_image_, class_namespace_.c_str(), class_name_.c_str());
+		mono_class_ = mono_class_from_name(is_core ? s_data->core_assembly_image_ : s_data->app_assembly_image_, class_namespace_.c_str(), class_name_.c_str());
 	}
 
 	MonoObject* ScriptClass::instantiate()

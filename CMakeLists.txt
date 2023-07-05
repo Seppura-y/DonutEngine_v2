@@ -12,7 +12,7 @@ set(PROJECT_DONUT_EDITOR            TRUE CACHE BOOL "add project DonutEditor ?")
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutEngine)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutEditor)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutScriptCore)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutScripts/DonutScriptCore)
 
 add_dependencies(DonutEditor DonutEngine)
 add_dependencies(DonutEngine DonutScriptCore)

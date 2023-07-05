@@ -8,12 +8,12 @@ list(APPEND CONFIG_TYPES "MinSizeRel")
 
 set(CMAKE_CONFIGURATION_TYPES ${CONFIG_TYPES})
 
-set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../DonutEditor/Resources/Scripts/)
+set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../../DonutEditor/Resources/Scripts/)
 # set(LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/../../lib)
 
-add_library("DonutScriptCore" SHARED
-    src/Player.cs
-    src/Camera.cs
+add_library(${PROJECT_NAME} SHARED
+    # src/Player.cs
+    # src/Camera.cs
 
     src/Donut/InternalCalls.cs
     src/Donut/KeyCode.cs
@@ -41,10 +41,10 @@ foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)
     )
 endforeach()
 
-set_property(TARGET "DonutScriptCore" PROPERTY DOTNET_TARGET_FRAMEWORK_VERSION "v4.7.2")
-set_property(TARGET "DonutScriptCore" PROPERTY WIN32_EXECUTABLE FALSE)
-set_property(TARGET "DonutScriptCore" PROPERTY VS_CONFIGURATION_TYPE ClassLibrary)
-set_property(TARGET "DonutScriptCore" PROPERTY VS_DOTNET_REFERENCES
+set_property(TARGET ${PROJECT_NAME} PROPERTY DOTNET_TARGET_FRAMEWORK_VERSION "v4.7.2")
+set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE FALSE)
+set_property(TARGET ${PROJECT_NAME} PROPERTY VS_CONFIGURATION_TYPE ClassLibrary)
+set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DOTNET_REFERENCES
         "Microsoft.CSharp"
         "PresentationCore"
         "PresentationFramework"
