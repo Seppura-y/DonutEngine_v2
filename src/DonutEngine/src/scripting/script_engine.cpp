@@ -342,6 +342,16 @@ namespace Donut {
 		return s_data->scene_context_;
 	}
 
+	Ref<ScriptInstance> ScriptEngine::getEntityScriptInstance(UUID entity_id)
+	{
+		auto it = s_data->entity_instances_.find(entity_id);
+		if (it == s_data->entity_instances_.end())
+		{
+			return nullptr;
+		}
+		return it->second;
+	}
+
 	std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::getEntityClasses()
 	{
 		return s_data->entity_classes_;
@@ -416,6 +426,8 @@ namespace Donut {
 					MonoType* type = mono_field_get_type(field);
 					ScriptFieldType field_type = Utils::monoTypeToScriptFieldType(type);
 					DN_CORE_WARN("  {}  ({})", field_name, Utils::scriptFieldTypeToString(field_type));
+
+					script_class->fields_[field_name] = { field_type, field_name, field };
 				}
 			}
 		}
@@ -486,5 +498,33 @@ namespace Donut {
 			script_class_->invokeMethod(instance_, onUpdateMethod_, &param);
 		}
 
+	}
+
+	bool ScriptInstance::getFieldValueInternal(const std::string& name, void* buffer)
+	{
+		const auto& fields = script_class_->getFields();
+		auto it = fields.find(name);
+		if (it == fields.end())
+		{
+			return false;
+		}
+
+		const ScriptField& field = it->second;
+		mono_field_get_value(instance_, field.mono_class_field_, buffer);
+		return true;
+	}
+
+	bool ScriptInstance::setFieldValueInternal(const std::string& name, const void* buffer)
+	{
+		const auto& fields = script_class_->getFields();
+		auto it = fields.find(name);
+		if (it == fields.end())
+		{
+			return false;
+		}
+
+		const ScriptField& field = it->second;
+		mono_field_set_value(instance_, field.mono_class_field_, (void*)buffer);
+		return true;
 	}
 }

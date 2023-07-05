@@ -319,7 +319,7 @@ namespace Donut
 			}
 		});
 
-		drawComponent<ScriptComponent>("Script", entity, [](auto& component)
+		drawComponent<ScriptComponent>("Script", entity, [entity](auto& component) mutable
 			{
 				bool script_class_exists = ScriptEngine::isClassExists(component.class_name_);
 
@@ -334,6 +334,24 @@ namespace Donut
 				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
 				{
 					component.class_name_ = buffer;
+				}
+
+				Ref<ScriptInstance> script_instance = ScriptEngine::getEntityScriptInstance(entity.getUUID());
+				if (script_instance)
+				{
+					const auto& fields = script_instance->getScriptClass()->getFields();
+
+					for (const auto& [name, field] : fields)
+					{
+						if (field.type_ == ScriptFieldType::Float)
+						{
+							float data = script_instance->getFieldValue<float>(name);
+							if (ImGui::DragFloat(name.c_str(), &data))
+							{
+								script_instance->setFieldValue(name, data);
+							}
+						}
+					}
 				}
 
 				if (!script_class_exists)

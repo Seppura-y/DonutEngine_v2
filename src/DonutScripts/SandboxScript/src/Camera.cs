@@ -5,6 +5,7 @@ namespace Sandbox
 {
     public class Camera : Entity
     {
+        public Entity other_entity_;
         void onUpdate(float ts)
         {
             float speed = 10.0f;

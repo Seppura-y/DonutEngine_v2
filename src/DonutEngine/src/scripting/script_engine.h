@@ -27,7 +27,13 @@ namespace Donut
 		Entity
 	};
 
+	struct ScriptField
+	{
+		ScriptFieldType type_;
+		std::string name_;
 
+		MonoClassField* mono_class_field_;
+	};
 
 	class ScriptClass
 	{
@@ -39,13 +45,15 @@ namespace Donut
 		MonoMethod* getMethod(const std::string& name, int parameter_count);
 		MonoObject* invokeMethod(MonoObject* instance, MonoMethod* method, void** params = nullptr);
 
-		//std::map<std::string, ScriptField>& getFields() const { return fields_; }
+		const std::map<std::string, ScriptField>& getFields() const { return fields_; }
 	private:
 		std::string class_name_;
 		std::string class_namespace_;
 		MonoClass* mono_class_ = nullptr;
 
-		//std::map<std::string, ScriptField> fields_;
+		std::map<std::string, ScriptField> fields_;
+
+		friend class ScriptEngine;
 	};
 
 	class ScriptInstance
@@ -53,9 +61,32 @@ namespace Donut
 	public:
 		ScriptInstance(Ref<ScriptClass> sricpt_class, Entity entity);
 
+		Ref<ScriptClass> getScriptClass() { return script_class_; }
+
 		void invokeOnCreate();
 		void invokeOnUpdate(float ts);
 
+		template<typename T>
+		T getFieldValue(const std::string& name)
+		{
+			bool success = getFieldValueInternal(name, field_value_buffer_);
+			if (!success)
+			{
+				return T();
+			}
+			return *(T*)field_value_buffer_;
+		}
+
+
+		template<typename T>
+		void setFieldValue(const std::string& name, const T& value)
+		{
+			setFieldValueInternal(name, &value);
+		}
+
+	private:
+		bool getFieldValueInternal(const std::string& name, void* buffer);
+		bool setFieldValueInternal(const std::string& name, const void* buffer);
 	private:
 		Ref<ScriptClass> script_class_;
 
@@ -63,6 +94,8 @@ namespace Donut
 		MonoMethod* constructor_ = nullptr;
 		MonoMethod* onCreateMethod_ = nullptr;
 		MonoMethod* onUpdateMethod_ = nullptr;
+
+		inline static char field_value_buffer_[8];
 	};
 
 	class ScriptEngine
@@ -83,6 +116,7 @@ namespace Donut
 		static void onUpdateEntity(Entity entity, float ts);
 
 		static Scene* getSceneContext();
+		static Ref<ScriptInstance> getEntityScriptInstance(UUID entity_id);
 
 		static std::unordered_map<std::string, Ref<ScriptClass>> getEntityClasses();
 
