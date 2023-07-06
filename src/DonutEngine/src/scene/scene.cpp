@@ -329,6 +329,8 @@ namespace Donut
 
 	void Scene::onRuntimeStart()
 	{
+		is_running_ = true;
+
 		onPhysics2DStart();
 
 		// instantiate all script entities
@@ -361,6 +363,8 @@ namespace Donut
 
 	void Scene::onRuntimeStop()
 	{
+		is_running_ = false;
+
 		onPhysics2DStop();
 		//delete physics_world_;
 		//physics_world_ = nullptr;

@@ -27,6 +27,7 @@ namespace Donut {
 
 		std::unordered_map<std::string, Ref<ScriptClass>> entity_classes_;
 		std::unordered_map<UUID, Ref<ScriptInstance>> entity_instances_;
+		std::unordered_map<UUID, ScriptFieldMap> entity_script_fields_;
 
 		Scene* scene_context_ = nullptr;
 	};
@@ -321,8 +322,19 @@ namespace Donut {
 		const auto& sc = entity.getComponent<ScriptComponent>();
 		if (ScriptEngine::isClassExists(sc.class_name_))
 		{
+			UUID entity_id = entity.getUUID();
+
 			Ref<ScriptInstance> instance = createRef<ScriptInstance>(s_data->entity_classes_[sc.class_name_], entity);
-			s_data->entity_instances_[entity.getUUID()] = instance;
+			s_data->entity_instances_[entity_id] = instance;
+
+			if (s_data->entity_script_fields_.find(entity_id) != s_data->entity_script_fields_.end())
+			{
+				const ScriptFieldMap& field_map = s_data->entity_script_fields_.at(entity_id);
+				for (const auto& [name, field_instance] : field_map)
+				{
+					instance->setFieldValueInternal(name, field_instance.buffer_);
+				}
+			}
 
 			instance->invokeOnCreate();
 		}
@@ -355,6 +367,22 @@ namespace Donut {
 	std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::getEntityClasses()
 	{
 		return s_data->entity_classes_;
+	}
+
+	Ref<ScriptClass> ScriptEngine::getEntityClass(const std::string& name)
+	{
+		if (s_data->entity_classes_.find(name) == s_data->entity_classes_.end())
+		{
+			return nullptr;
+		}
+		return s_data->entity_classes_.at(name);
+	}
+
+	ScriptFieldMap& ScriptEngine::getScriptFieldMap(Entity entity)
+	{
+		DN_CORE_ASSERT(entity," getScriptFieldMap : entity not exsist");
+		UUID entity_id = entity.getUUID();
+		return s_data->entity_script_fields_[entity_id];
 	}
 
 	MonoObject* ScriptEngine::instantiateClass(MonoClass* mono_class)

@@ -57,7 +57,7 @@ namespace Sandbox
                 velocity.X = -1.0f;
             }
 
-            velocity *= speed;
+            velocity *= speed * ts;
 
             Rigidbody.applyLinearImpulse(velocity.XY, true);
 

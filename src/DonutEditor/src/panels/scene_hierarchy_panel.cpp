@@ -204,7 +204,7 @@ namespace Donut
 			auto& tag = entity.getComponent<TagComponent>().tag_;
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
-			strcpy_s(buffer, sizeof(buffer), tag.c_str());
+			strncpy_s(buffer, sizeof(buffer), tag.c_str(), sizeof(buffer));
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
@@ -319,12 +319,12 @@ namespace Donut
 			}
 		});
 
-		drawComponent<ScriptComponent>("Script", entity, [entity](auto& component) mutable
+		drawComponent<ScriptComponent>("Script", entity, [entity, scene = context_](auto& component) mutable
 			{
 				bool script_class_exists = ScriptEngine::isClassExists(component.class_name_);
 
 				char buffer[64];
-				strcpy(buffer, component.class_name_.c_str());
+				strcpy_s(buffer, sizeof(buffer), component.class_name_.c_str());
 
 				if (!script_class_exists)
 				{
@@ -336,19 +336,63 @@ namespace Donut
 					component.class_name_ = buffer;
 				}
 
-				Ref<ScriptInstance> script_instance = ScriptEngine::getEntityScriptInstance(entity.getUUID());
-				if (script_instance)
+				bool is_scene_running = scene->isRunning();
+				if (is_scene_running)
 				{
-					const auto& fields = script_instance->getScriptClass()->getFields();
-
-					for (const auto& [name, field] : fields)
+					Ref<ScriptInstance> script_instance = ScriptEngine::getEntityScriptInstance(entity.getUUID());
+					if (script_instance)
 					{
-						if (field.type_ == ScriptFieldType::Float)
+						const auto& fields = script_instance->getScriptClass()->getFields();
+
+						for (const auto& [name, field] : fields)
 						{
-							float data = script_instance->getFieldValue<float>(name);
-							if (ImGui::DragFloat(name.c_str(), &data))
+							if (field.type_ == ScriptFieldType::Float)
 							{
-								script_instance->setFieldValue(name, data);
+								float data = script_instance->getFieldValue<float>(name);
+								if (ImGui::DragFloat(name.c_str(), &data))
+								{
+									script_instance->setFieldValue(name, data);
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					if (script_class_exists)
+					{
+						Ref<ScriptClass> entity_class = ScriptEngine::getEntityClass(component.class_name_);
+						const auto& fields = entity_class->getFields();
+
+						auto& entity_fields = ScriptEngine::getScriptFieldMap(entity);
+						for (const auto& [name, field] : fields)
+						{
+							// field has been set in editor
+							if (entity_fields.find(name) != entity_fields.end())
+							{
+								ScriptFieldInstance& script_field = entity_fields.at(name);
+
+								if (field.type_ == ScriptFieldType::Float)
+								{
+									float data = script_field.getValue<float>();
+									if (ImGui::DragFloat(name.c_str(), &data))
+									{
+										script_field.setValue(data);
+									}
+								}
+							}
+							else
+							{
+								if (field.type_ == ScriptFieldType::Float)
+								{
+									float data = 0.0f;
+									if (ImGui::DragFloat(name.c_str(), &data))
+									{
+										ScriptFieldInstance& field_instance = entity_fields[name];
+										field_instance.field_ = field;
+										field_instance.setValue(data);
+									}
+								}
 							}
 						}
 					}

@@ -35,6 +35,37 @@ namespace Donut
 		MonoClassField* mono_class_field_;
 	};
 
+	struct ScriptFieldInstance
+	{
+		ScriptField field_;
+
+		ScriptFieldInstance()
+		{
+			memset(buffer_, 0, sizeof(buffer_));
+		}
+
+		template<typename T>
+		T getValue()
+		{
+			static_assert(sizeof(T) <= 16, "Type too large!");
+			return *(T*)buffer_;
+		}
+
+		template<typename T>
+		void setValue(T value)
+		{
+			static_assert(sizeof(T) <= 16, "Type too large!");
+			memcpy(buffer_, &value, sizeof(T));
+		}
+	private:
+		uint8_t buffer_[16];
+
+		friend class ScriptEngine;
+		friend class ScriptInstance;
+	};
+
+	using ScriptFieldMap = std::unordered_map<std::string, ScriptFieldInstance>;
+
 	class ScriptClass
 	{
 	public:
@@ -69,6 +100,8 @@ namespace Donut
 		template<typename T>
 		T getFieldValue(const std::string& name)
 		{
+			static_assert(sizeof(T) <= 16, "Type too large!");
+
 			bool success = getFieldValueInternal(name, field_value_buffer_);
 			if (!success)
 			{
@@ -79,8 +112,10 @@ namespace Donut
 
 
 		template<typename T>
-		void setFieldValue(const std::string& name, const T& value)
+		void setFieldValue(const std::string& name, T value)
 		{
+			static_assert(sizeof(T) <= 16, "Type too large!");
+
 			setFieldValueInternal(name, &value);
 		}
 
@@ -96,6 +131,9 @@ namespace Donut
 		MonoMethod* onUpdateMethod_ = nullptr;
 
 		inline static char field_value_buffer_[8];
+
+		friend class ScriptEngine;
+		friend class ScriptFieldInstance;
 	};
 
 	class ScriptEngine
@@ -119,6 +157,9 @@ namespace Donut
 		static Ref<ScriptInstance> getEntityScriptInstance(UUID entity_id);
 
 		static std::unordered_map<std::string, Ref<ScriptClass>> getEntityClasses();
+
+		static Ref<ScriptClass> getEntityClass(const std::string& name);
+		static ScriptFieldMap& getScriptFieldMap(Entity entity);
 
 		static MonoImage* getCoreAssemblyImage();
 	private:
