@@ -141,8 +141,9 @@ void Donut::EditorLayer::onAttach()
 	if (spec.commandline_args_.count_ > 1)
 	{
 		auto scene_filepath = spec.commandline_args_[1];
-		SceneSerializer serializer(active_scene_);
-		serializer.deserialize(scene_filepath);
+		//SceneSerializer serializer(active_scene_);
+		//serializer.deserialize(scene_filepath);
+		openScene(scene_filepath);
 	}
 
 	editor_camera_ = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
@@ -360,7 +361,7 @@ bool Donut::EditorLayer::onMouseButtonPressed(MouseButtonPressedEvent& ev)
 void Donut::EditorLayer::newScene()
 {
 	active_scene_ = createRef<Scene>();
-	active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+	//active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 	scene_hierarchy_panel_.setContext(active_scene_);
 	editor_scene_path_ = std::filesystem::path();
 }
@@ -393,7 +394,7 @@ void Donut::EditorLayer::openScene(const std::filesystem::path& path)
 	if (serializer.deserialize(path.string()))
 	{
 		editor_scene_ = new_scene;
-		editor_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+		//editor_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 		scene_hierarchy_panel_.setContext(editor_scene_);
 
 		active_scene_ = editor_scene_;
@@ -781,7 +782,8 @@ void Donut::EditorLayer::onImGuiRender()
 
 	is_viewport_focused_ = ImGui::IsWindowFocused();
 	is_viewport_hovered_ = ImGui::IsWindowHovered();
-	Application::getInstance().getImGuiLayer()->setBlockEvents(!(is_viewport_focused_ && is_viewport_hovered_));
+	Application::getInstance().getImGuiLayer()->setBlockEvents(!is_viewport_hovered_);
+	//Application::getInstance().getImGuiLayer()->setBlockEvents(!(is_viewport_focused_ && is_viewport_hovered_));
 
 	ImVec2 viewport_size = ImGui::GetContentRegionAvail();
 	if (viewport_size_ != *((glm::vec2*)&viewport_size))
