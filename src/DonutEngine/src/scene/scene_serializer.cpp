@@ -4,6 +4,9 @@
 #include "entity.h"
 #include "components.h"
 
+#include "scripting/script_engine.h"
+#include "uuid.h"
+
 #include <fstream>
 
 #include <yaml-cpp/yaml.h>
@@ -83,11 +86,41 @@ namespace YAML
 		}
 	};
 
+	template<>
+	struct convert<Donut::UUID>
+	{
+		static Node encode(const Donut::UUID& uuid)
+		{
+			Node node;
+			node.push_back((uint64_t)uuid);
+			return node;
+		}
+
+		static bool decode(const Node& node, Donut::UUID& uuid)
+		{
+			uuid = node.as<uint64_t>();
+			return true;
+		}
+	};
+
 }
 
 
 namespace Donut
 {
+#define WRITE_SCRIPT_FIELD(FieldType, Type)           \
+			case ScriptFieldType::FieldType:          \
+				out << script_field.getValue<Type>();  \
+				break
+
+#define READ_SCRIPT_FIELD(FieldType, Type)             \
+	case ScriptFieldType::FieldType:                   \
+	{                                                  \
+		Type data = script_field["Data"].as<Type>();    \
+		field_instance.setValue(data);                  \
+		break;                                         \
+	}
+
 	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v)
 	{
 		out << YAML::Flow;
@@ -185,6 +218,61 @@ namespace Donut
 			out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.is_fixed_aspect_ratio_;
 
 			out << YAML::EndMap; // CameraComponent
+		}
+
+		if (entity.hasComponent<ScriptComponent>())
+		{
+			auto& script_component = entity.getComponent<ScriptComponent>();
+
+			out << YAML::Key << "ScriptComponent";
+			out << YAML::BeginMap;
+			out << YAML::Key << "ClassName" << YAML::Value << script_component.class_name_;
+
+			// Fields
+			Ref<ScriptClass> entity_class = ScriptEngine::getEntityClass(script_component.class_name_);
+			const auto& fields = entity_class->getFields();
+			if (fields.size() > 0)
+			{
+				out << YAML::Key << "ScriptFields" << YAML::Value;
+				auto& entity_fields = ScriptEngine::getScriptFieldMap(entity);
+				out << YAML::BeginSeq;
+				for (const auto& [name, field] : fields)
+				{
+					if (entity_fields.find(name) == entity_fields.end())
+						continue;
+
+					out << YAML::BeginMap; // ScriptField
+					out << YAML::Key << "Name" << YAML::Value << name;
+					out << YAML::Key << "Type" << YAML::Value << Utils::scriptFieldTypeToString(field.type_);
+
+					out << YAML::Key << "Data" << YAML::Value;
+					ScriptFieldInstance& script_field = entity_fields.at(name);
+
+					switch (field.type_)
+					{
+						WRITE_SCRIPT_FIELD(Float, float);
+						WRITE_SCRIPT_FIELD(Double, double);
+						WRITE_SCRIPT_FIELD(Bool, bool);
+						WRITE_SCRIPT_FIELD(Char, char);
+						WRITE_SCRIPT_FIELD(Byte, int8_t);
+						WRITE_SCRIPT_FIELD(Short, int16_t);
+						WRITE_SCRIPT_FIELD(Int, int32_t);
+						WRITE_SCRIPT_FIELD(Long, int64_t);
+						WRITE_SCRIPT_FIELD(UByte, uint8_t);
+						WRITE_SCRIPT_FIELD(UShort, uint16_t);
+						WRITE_SCRIPT_FIELD(UInt, uint32_t);
+						WRITE_SCRIPT_FIELD(ULong, uint64_t);
+						WRITE_SCRIPT_FIELD(Vector2, glm::vec2);
+						WRITE_SCRIPT_FIELD(Vector3, glm::vec3);
+						WRITE_SCRIPT_FIELD(Vector4, glm::vec4);
+						WRITE_SCRIPT_FIELD(Entity, UUID);
+					}
+					out << YAML::EndMap; // ScriptFields
+				}
+				out << YAML::EndSeq;
+			}
+
+			out << YAML::EndMap;
 		}
 
 		if (entity.hasComponent<SpriteRendererComponent>())
@@ -349,12 +437,12 @@ namespace Donut
 					tc.scale_ = transform_component["Scale"].as<glm::vec3>();
 				}
 
-				auto cameraComponent = entity["CameraComponent"];
-				if (cameraComponent)
+				auto camera_component = entity["CameraComponent"];
+				if (camera_component)
 				{
 					auto& cc = deserialized_entity.addComponent<CameraComponent>();
 
-					auto& cameraProps = cameraComponent["Camera"];
+					auto& cameraProps = camera_component["Camera"];
 					cc.camera_.setProjectionType((SceneCamera::ProjectionType)cameraProps["ProjectionType"].as<int>());
 
 					cc.camera_.setPerspectiveVerticalFov(cameraProps["PerspectiveFOV"].as<float>());
@@ -365,8 +453,61 @@ namespace Donut
 					cc.camera_.setOrthographicNearClip(cameraProps["OrthographicNear"].as<float>());
 					cc.camera_.setOrthographicFarClip(cameraProps["OrthographicFar"].as<float>());
 
-					cc.is_primary_ = cameraComponent["Primary"].as<bool>();
-					cc.is_fixed_aspect_ratio_ = cameraComponent["FixedAspectRatio"].as<bool>();
+					cc.is_primary_ = camera_component["Primary"].as<bool>();
+					cc.is_fixed_aspect_ratio_ = camera_component["FixedAspectRatio"].as<bool>();
+				}
+
+				auto script_component = entity["ScriptComponent"];
+				if (script_component)
+				{
+					auto& sc = deserialized_entity.addComponent<ScriptComponent>();
+					sc.class_name_ = script_component["ClassName"].as<std::string>();
+
+					auto scriptFields = script_component["ScriptFields"];
+					if (scriptFields)
+					{
+						Ref<ScriptClass> entityClass = ScriptEngine::getEntityClass(sc.class_name_);
+						DN_CORE_ASSERT(entityClass, " ");
+						const auto& fields = entityClass->getFields();
+						auto& entityFields = ScriptEngine::getScriptFieldMap(deserialized_entity);
+
+						for (auto script_field : scriptFields)
+						{
+							std::string name = script_field["Name"].as<std::string>();
+							std::string typeString = script_field["Type"].as<std::string>();
+							ScriptFieldType type = Utils::scriptFieldTypeFromString(typeString);
+
+							ScriptFieldInstance& field_instance = entityFields[name];
+
+							// TODO(Yan): turn this assert into Hazelnut log warning
+							DN_CORE_ASSERT(fields.find(name) != fields.end(), " ");
+
+							if (fields.find(name) == fields.end())
+								continue;
+
+							field_instance.field_ = fields.at(name);
+
+							switch (type)
+							{
+								READ_SCRIPT_FIELD(Float, float);
+								READ_SCRIPT_FIELD(Double, double);
+								READ_SCRIPT_FIELD(Bool, bool);
+								READ_SCRIPT_FIELD(Char, char);
+								READ_SCRIPT_FIELD(Byte, int8_t);
+								READ_SCRIPT_FIELD(Short, int16_t);
+								READ_SCRIPT_FIELD(Int, int32_t);
+								READ_SCRIPT_FIELD(Long, int64_t);
+								READ_SCRIPT_FIELD(UByte, uint8_t);
+								READ_SCRIPT_FIELD(UShort, uint16_t);
+								READ_SCRIPT_FIELD(UInt, uint32_t);
+								READ_SCRIPT_FIELD(ULong, uint64_t);
+								READ_SCRIPT_FIELD(Vector2, glm::vec2);
+								READ_SCRIPT_FIELD(Vector3, glm::vec3);
+								READ_SCRIPT_FIELD(Vector4, glm::vec4);
+								READ_SCRIPT_FIELD(Entity, UUID);
+							}
+						}
+					}
 				}
 
 				auto spriteRendererComponent = entity["SpriteRendererComponent"];

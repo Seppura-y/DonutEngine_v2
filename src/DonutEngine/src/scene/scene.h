@@ -31,6 +31,7 @@ namespace Donut
 		void destroyEntity(Entity entity);
 
 		Entity getPrimaryCameraEntity();
+		Entity getEntityByUUID(UUID id);
 
 		void onRuntimeStart();
 		void onRuntimeStop();
@@ -44,6 +45,8 @@ namespace Donut
 
 		static Ref<Scene> copyScene(Ref<Scene> other);
 		void duplicateEntity(Entity entity);
+
+		bool isRunning() const { return is_running_; }
 
 		template<typename... Components>
 		auto getAllEntitiesWith()
@@ -65,6 +68,10 @@ namespace Donut
 		uint32_t viewport_height_ = 0;
 
 		b2World* physics_world_ = nullptr;
+
+		std::unordered_map<UUID, entt::entity> entt_map_;
+
+		bool is_running_ = false;
 
 		friend class Entity;
 		friend class SceneSerializer;

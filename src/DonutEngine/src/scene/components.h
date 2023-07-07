@@ -190,6 +190,14 @@ namespace Donut
 		CircleCollider2DComponent(const CircleCollider2DComponent&) = default;
 	};
 
+	struct ScriptComponent
+	{
+		std::string class_name_;
+
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent& other) = default;
+	};
+
 	 template<typename... Component>
 	 struct ComponentGroup
 	 {
@@ -197,7 +205,7 @@ namespace Donut
 	 };
 
 	 using AllComponents =
-			ComponentGroup<TransformComponent, SpriteRendererComponent, CircleRendererComponent, CameraComponent,
+			ComponentGroup<TransformComponent, SpriteRendererComponent, CircleRendererComponent, CameraComponent,ScriptComponent,
 							CircleCollider2DComponent, BoxCollider2DComponent, NativeScriptComponent, Rigidbody2DComponent>;
 }
 #endif

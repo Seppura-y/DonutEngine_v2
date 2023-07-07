@@ -8,6 +8,7 @@
 #include <filesystem>
 
 #include "../DonutEngine/src/scene/components.h"
+#include "../DonutEngine/src/scripting/script_engine.h"
 
 namespace Donut
 {
@@ -203,7 +204,7 @@ namespace Donut
 			auto& tag = entity.getComponent<TagComponent>().tag_;
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
-			strcpy_s(buffer, sizeof(buffer), tag.c_str());
+			strncpy_s(buffer, sizeof(buffer), tag.c_str(), sizeof(buffer));
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
@@ -221,6 +222,7 @@ namespace Donut
 		if (ImGui::BeginPopup("AddComponent"))
 		{
 			displayAddComponentEntry<CameraComponent>("Camera");
+			displayAddComponentEntry<ScriptComponent>("Script");
 			displayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 			displayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
 			displayAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
@@ -316,8 +318,92 @@ namespace Donut
 				}
 			}
 		});
-	
 
+		drawComponent<ScriptComponent>("Script", entity, [entity, scene = context_](auto& component) mutable
+			{
+				bool script_class_exists = ScriptEngine::isClassExists(component.class_name_);
+
+				char buffer[64];
+				strcpy_s(buffer, sizeof(buffer), component.class_name_.c_str());
+
+				if (!script_class_exists)
+				{
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0, 0, 1.0f));
+				}
+
+				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				{
+					component.class_name_ = buffer;
+				}
+
+				bool is_scene_running = scene->isRunning();
+				if (is_scene_running)
+				{
+					Ref<ScriptInstance> script_instance = ScriptEngine::getEntityScriptInstance(entity.getUUID());
+					if (script_instance)
+					{
+						const auto& fields = script_instance->getScriptClass()->getFields();
+
+						for (const auto& [name, field] : fields)
+						{
+							if (field.type_ == ScriptFieldType::Float)
+							{
+								float data = script_instance->getFieldValue<float>(name);
+								if (ImGui::DragFloat(name.c_str(), &data))
+								{
+									script_instance->setFieldValue(name, data);
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					if (script_class_exists)
+					{
+						Ref<ScriptClass> entity_class = ScriptEngine::getEntityClass(component.class_name_);
+						const auto& fields = entity_class->getFields();
+
+						auto& entity_fields = ScriptEngine::getScriptFieldMap(entity);
+						for (const auto& [name, field] : fields)
+						{
+							// field has been set in editor
+							if (entity_fields.find(name) != entity_fields.end())
+							{
+								ScriptFieldInstance& script_field = entity_fields.at(name);
+
+								if (field.type_ == ScriptFieldType::Float)
+								{
+									float data = script_field.getValue<float>();
+									if (ImGui::DragFloat(name.c_str(), &data))
+									{
+										script_field.setValue(data);
+									}
+								}
+							}
+							else
+							{
+								if (field.type_ == ScriptFieldType::Float)
+								{
+									float data = 0.0f;
+									if (ImGui::DragFloat(name.c_str(), &data))
+									{
+										ScriptFieldInstance& field_instance = entity_fields[name];
+										field_instance.field_ = field;
+										field_instance.setValue(data);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (!script_class_exists)
+				{
+					ImGui::PopStyleColor();
+				}
+			});
+	
 		drawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 		{
 			auto& color = component.color_;
