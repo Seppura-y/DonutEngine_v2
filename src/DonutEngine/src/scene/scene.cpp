@@ -118,48 +118,51 @@ namespace Donut
 
 	void Scene::onUpdateRuntime(Timestep ts)
 	{
-		// Update scripts
+		if (!is_paused_ || step_frames_-- > 0)
 		{
-
-			// C# Entity onUpdate
-			auto view = registry_.view<ScriptComponent>();
-			for (auto e : view)
+			// Update scripts
 			{
-				Entity entity = { e, this };
-				ScriptEngine::onUpdateEntity(entity, ts);
+
+				// C# Entity onUpdate
+				auto view = registry_.view<ScriptComponent>();
+				for (auto e : view)
+				{
+					Entity entity = { e, this };
+					ScriptEngine::onUpdateEntity(entity, ts);
+				}
+
+				registry_.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+					{
+						if (!nsc.instance_)
+						{
+							nsc.instance_ = nsc.instantiateScript();
+							nsc.instance_->entity_ = Entity{ entity, this };
+							nsc.instance_->onCreate();
+						}
+
+				nsc.instance_->onUpdate(ts);
+					});
 			}
 
-			registry_.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
-				{
-					if (!nsc.instance_)
-					{
-						nsc.instance_ = nsc.instantiateScript();
-						nsc.instance_->entity_ = Entity{ entity, this };
-						nsc.instance_->onCreate();
-					}
-
-					nsc.instance_->onUpdate(ts);
-				});
-		}
-
-		// Update physics
-		{
-			const int32_t velocity_iterations = 6;
-			const int32_t position_iterations = 2;
-			physics_world_->Step(ts, velocity_iterations, position_iterations);
-
-			auto view = registry_.view<Rigidbody2DComponent>();
-			for (auto it : view)
+			// Update physics
 			{
-				Entity entity = { it, this };
-				auto& transform = entity.getComponent<TransformComponent>();
-				auto& rigidbody_2d = entity.getComponent<Rigidbody2DComponent>();
+				const int32_t velocity_iterations = 6;
+				const int32_t position_iterations = 2;
+				physics_world_->Step(ts, velocity_iterations, position_iterations);
 
-				b2Body* body = (b2Body*)rigidbody_2d.runtime_body_;
-				const auto& position = body->GetPosition();
-				transform.translation_.x = position.x;
-				transform.translation_.y = position.y;
-				transform.rotation_.z = body->GetAngle();
+				auto view = registry_.view<Rigidbody2DComponent>();
+				for (auto it : view)
+				{
+					Entity entity = { it, this };
+					auto& transform = entity.getComponent<TransformComponent>();
+					auto& rigidbody_2d = entity.getComponent<Rigidbody2DComponent>();
+
+					b2Body* body = (b2Body*)rigidbody_2d.runtime_body_;
+					const auto& position = body->GetPosition();
+					transform.translation_.x = position.x;
+					transform.translation_.y = position.y;
+					transform.rotation_.z = body->GetAngle();
+				}
 			}
 		}
 
@@ -227,27 +230,29 @@ namespace Donut
 
 	void Scene::onUpdateSimulation(Timestep ts, EditorCamera& camera)
 	{
-		// Update physics
+		if (!is_paused_ || step_frames_-- > 0)
 		{
-			const int32_t velocity_iterations = 6;
-			const int32_t position_iterations = 2;
-			physics_world_->Step(ts, velocity_iterations, position_iterations);
-
-			auto view = registry_.view<Rigidbody2DComponent>();
-			for (auto it : view)
+			// Update physics
 			{
-				Entity entity = { it, this };
-				auto& transform = entity.getComponent<TransformComponent>();
-				auto& rigidbody_2d = entity.getComponent<Rigidbody2DComponent>();
+				const int32_t velocity_iterations = 6;
+				const int32_t position_iterations = 2;
+				physics_world_->Step(ts, velocity_iterations, position_iterations);
 
-				b2Body* body = (b2Body*)rigidbody_2d.runtime_body_;
-				const auto& position = body->GetPosition();
-				transform.translation_.x = position.x;
-				transform.translation_.y = position.y;
-				transform.rotation_.z = body->GetAngle();
+				auto view = registry_.view<Rigidbody2DComponent>();
+				for (auto it : view)
+				{
+					Entity entity = { it, this };
+					auto& transform = entity.getComponent<TransformComponent>();
+					auto& rigidbody_2d = entity.getComponent<Rigidbody2DComponent>();
+
+					b2Body* body = (b2Body*)rigidbody_2d.runtime_body_;
+					const auto& position = body->GetPosition();
+					transform.translation_.x = position.x;
+					transform.translation_.y = position.y;
+					transform.rotation_.z = body->GetAngle();
+				}
 			}
 		}
-
 		// Render
 		renderScene(camera);
 	}
@@ -423,6 +428,11 @@ namespace Donut
 		Entity new_entity = createEntity(name);
 
 		copyComponentIfExists(AllComponents{}, new_entity, entity);
+	}
+
+	void Scene::step(int frames)
+	{
+		step_frames_ = frames;
 	}
 
 	void Scene::onPhysics2DStart()

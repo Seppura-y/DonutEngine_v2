@@ -37,6 +37,7 @@ namespace Donut
 		void onSceneStop();
 		void onScenePlay();
 		void onSceneSimulate();
+		void onScenePause();
 
 		void onDuplicateEntity();
 
@@ -110,6 +111,8 @@ namespace Donut
 		Donut::Ref<Texture2D> play_icon_;
 		Donut::Ref<Texture2D> stop_icon_;
 		Donut::Ref<Texture2D> simulate_icon_;
+		Donut::Ref<Texture2D> pause_icon_;
+		Donut::Ref<Texture2D> step_icon_;
 	};
 }
 #endif

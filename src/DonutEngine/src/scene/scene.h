@@ -48,6 +48,9 @@ namespace Donut
 		void duplicateEntity(Entity entity);
 
 		bool isRunning() const { return is_running_; }
+		bool isPaused() const { return is_paused_; }
+		void setPaused(bool paused) { is_paused_ = paused; }
+		void step(int frames = 1);
 
 		template<typename... Components>
 		auto getAllEntitiesWith()
@@ -73,6 +76,8 @@ namespace Donut
 		std::unordered_map<UUID, entt::entity> entt_map_;
 
 		bool is_running_ = false;
+		bool is_paused_ = false;
+		int step_frames_ = 0;
 
 		friend class Entity;
 		friend class SceneSerializer;

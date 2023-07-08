@@ -58,6 +58,8 @@ void Donut::EditorLayer::onAttach()
 	play_icon_ = Texture2D::createTexture("assets/icons/PlayButton.png");
 	stop_icon_ = Texture2D::createTexture("assets/icons/StopButton.png");
 	simulate_icon_ = Texture2D::createTexture("assets/icons/SimulateButton.png");
+	pause_icon_ = Texture2D::createTexture("assets/icons/PauseButton.png");
+	step_icon_ = Texture2D::createTexture("assets/icons/StepButton.png");
 	Donut::FramebufferSpecification framebuffer_spec;
 	framebuffer_spec.attachments_specifications_ = 
 	{
@@ -496,6 +498,15 @@ void Donut::EditorLayer::onSceneSimulate()
 	scene_hierarchy_panel_.setContext(active_scene_);
 }
 
+void Donut::EditorLayer::onScenePause()
+{
+	if (scene_state_ == SceneState::Edit)
+	{
+		return;
+	}
+	active_scene_->setPaused(true);
+}
+
 void Donut::EditorLayer::onDuplicateEntity()
 {
 	if (scene_state_ != SceneState::Edit)
@@ -532,9 +543,14 @@ void Donut::EditorLayer::uiToolbar()
 	}
 
 	float size = ImGui::GetWindowHeight() - 4.0f;
+	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+	bool has_play_button = scene_state_ == SceneState::Edit || scene_state_ == SceneState::Play;
+	bool has_simulate_button = scene_state_ == SceneState::Edit || scene_state_ == SceneState::Simulate;
+	bool has_pause_button = scene_state_ != SceneState::Edit;
+	if(has_play_button)
 	{
 		Ref<Texture2D> icon = (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Simulate) ? play_icon_ : stop_icon_;
-		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 		if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
 		{
 			if (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Simulate)
@@ -544,9 +560,14 @@ void Donut::EditorLayer::uiToolbar()
 		}
 	}
 
-	ImGui::SameLine();
-
+	//ImGui::SameLine();
+	if(has_simulate_button)
 	{
+		if (has_play_button)
+		{
+			ImGui::SameLine();
+		}
+
 		Ref<Texture2D> icon = (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Play) ? simulate_icon_ : stop_icon_;
 		//ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 		if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
@@ -557,6 +578,34 @@ void Donut::EditorLayer::uiToolbar()
 				onSceneStop();
 		}
 	}
+
+	if (has_pause_button)
+	{
+		bool is_paused = active_scene_->isPaused();
+		ImGui::SameLine();
+		{
+			Ref<Texture2D> icon = pause_icon_;
+			if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
+			{
+				active_scene_->setPaused(!is_paused);
+			}
+		}
+
+		// step button
+		if (is_paused)
+		{
+			ImGui::SameLine();
+			{
+				Ref<Texture2D> icon = step_icon_;
+				bool is_paused = active_scene_->isPaused();
+				if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
+				{
+					active_scene_->step();
+				}
+			}
+		}
+	}
+
 
 	ImGui::PopStyleVar(2);
 	ImGui::PopStyleColor(3);
