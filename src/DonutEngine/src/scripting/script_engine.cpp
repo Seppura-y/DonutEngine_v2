@@ -4,10 +4,15 @@
 
 #include "scene/entity.h"
 
-#include "mono/jit/jit.h"
-#include "mono/metadata/assembly.h"
-#include "mono/metadata/object.h"
-#include "mono/metadata/tabledefs.h"
+#include "core/application.h"
+#include "core/timer.h"
+
+#include <mono/jit/jit.h>
+#include <mono/metadata/assembly.h>
+#include <mono/metadata/object.h>
+#include <mono/metadata/tabledefs.h>
+
+#include <filewatch.h>
 
 namespace Donut {
 
@@ -32,10 +37,27 @@ namespace Donut {
 		std::unordered_map<UUID, Ref<ScriptInstance>> entity_instances_;
 		std::unordered_map<UUID, ScriptFieldMap> entity_script_fields_;
 
+		Scope<filewatch::FileWatch<std::string>> app_assembly_filewatcher_;
+		bool assembly_reload_pending = false;
+
 		Scene* scene_context_ = nullptr;
 	};
 
 	static ScriptEngineData* s_data = nullptr;
+
+	static void onAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type)
+	{
+		if (!s_data->assembly_reload_pending && change_type == filewatch::Event::modified)
+		{
+			s_data->assembly_reload_pending = true;
+
+			Application::getInstance().submitToMainThread([]()
+			{
+				s_data->app_assembly_filewatcher_.reset();
+				ScriptEngine::reloadAssembly();
+			});
+		}
+	}
 
 	static std::unordered_map<std::string, ScriptFieldType> s_script_field_type_map =
 	{
@@ -281,6 +303,9 @@ namespace Donut {
 		s_data->app_assembly_ = Utils::loadMonoAssembly(filepath);
 
 		s_data->app_assembly_image_ = mono_assembly_get_image(s_data->app_assembly_);
+
+		s_data->app_assembly_filewatcher_ = createScope<filewatch::FileWatch<std::string>>(filepath.string(), onAppAssemblyFileSystemEvent);
+		s_data->assembly_reload_pending = false;
 	}
 
 	void ScriptEngine::reloadAssembly()

@@ -93,6 +93,8 @@ namespace Donut
 			Timestep timestep = time - last_frame_time_;
 			last_frame_time_ = time;
 
+			executeMainThreadQueue();
+
 			// when the window is minimized, then we don't need to render anything in the viewport.
 			if (!is_minimized_)
 			{
@@ -156,6 +158,13 @@ namespace Donut
 		layer->onAttach();
 	}
 
+	void Application::submitToMainThread(const std::function<void()>& function)
+	{
+		std::scoped_lock<std::mutex> lock(main_thread_queue_mtx_);
+
+		main_thread_queue_.emplace_back(function);
+	}
+
 	bool Application::onWindowClose(WindowCloseEvent& ev)
 	{
 		is_running_ = false;
@@ -178,6 +187,17 @@ namespace Donut
 		}
 
 		return false;
+	}
+	void Application::executeMainThreadQueue()
+	{
+		std::scoped_lock<std::mutex> lock(main_thread_queue_mtx_);
+
+		for (auto& func : main_thread_queue_)
+		{
+			func();
+		}
+
+		main_thread_queue_.clear();
 	}
 }
 

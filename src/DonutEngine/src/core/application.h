@@ -56,9 +56,13 @@ namespace Donut
 
 		//ApplicationCommandLineArgs getCommandLineArgs() const { return commandline_args_; }
 		const ApplicationSpecification& getSpecification() const { return specification_; }
+
+		void submitToMainThread(const std::function<void()>& function);
 	private:
 		bool onWindowClose(WindowCloseEvent& ev);
 		bool onWindowResize(WindowResizeEvent& ev);
+
+		void executeMainThreadQueue();
 	private:
 		static Application* s_instance_;
 		bool is_running_ = false;
@@ -69,6 +73,9 @@ namespace Donut
 		float last_frame_time_ = 0.0f;
 
 		bool is_minimized_ = false;
+
+		std::vector<std::function<void()>> main_thread_queue_;
+		std::mutex main_thread_queue_mtx_;
 
 		//ApplicationCommandLineArgs commandline_args_;
 		ApplicationSpecification specification_;

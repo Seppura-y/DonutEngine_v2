@@ -100,6 +100,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies/entt/include
 
     ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies/ImGuizmo
+    ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/dependencies/filewatch
 
     ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/assets/textures
     ${CMAKE_CURRENT_LIST_DIR}/../DonutEngine/assets/shaders

@@ -375,6 +375,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/ImGuizmo
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/Box2d/include
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/mono/include
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/filewatch
     $ENV{VULKAN_SDK}/Include
 
 )
