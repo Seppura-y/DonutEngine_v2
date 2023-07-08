@@ -183,6 +183,7 @@ namespace Donut
 
 	void ScriptGlue::registerComponents()
 	{
+		s_entity_hasComponent_funcs.clear();
 		registerComponent(AllComponents{});
 	}
 }

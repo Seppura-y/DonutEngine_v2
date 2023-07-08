@@ -22,6 +22,9 @@ namespace Donut {
 		MonoAssembly* app_assembly_ = nullptr;
 		MonoImage* app_assembly_image_ = nullptr;
 
+		std::filesystem::path core_assembly_filepath_;
+		std::filesystem::path app_assembly_filepath_;
+
 		ScriptClass entity_class_;
 
 
@@ -168,13 +171,14 @@ namespace Donut {
 		s_data = new ScriptEngineData();
 
 		initMono();
+		ScriptGlue::registerFunctions();
+
 		loadAssembly("../src/DonutEditor/Resources/Scripts/DonutScriptCore.dll");
 		loadAppAssembly("../src/DonutEditor/Resources/Scripts/SandboxScript.dll");
 		loadAssemblyClasses();
 		// for debug
 		Utils::printAssemblyTypes(s_data->core_assemply_);
 
-		ScriptGlue::registerFunctions();
 		ScriptGlue::registerComponents();
 		
 		//MonoObject* instance = s_data->entity_class_.instantiate();
@@ -249,12 +253,12 @@ namespace Donut {
 
 	void ScriptEngine::shutdownMono()
 	{
-		// NOTE(Yan): mono is a little confusing to shutdown, so maybe come back to this
+		mono_domain_set(mono_get_root_domain(), false);
 
-		// mono_domain_unload(s_data->app_domain_);
+		mono_domain_unload(s_data->app_domain_);
 		s_data->app_domain_ = nullptr;
 
-		// mono_jit_cleanup(s_data->root_domain_);
+		mono_jit_cleanup(s_data->root_domain_);
 		s_data->root_domain_ = nullptr;
 	}
 
@@ -265,6 +269,7 @@ namespace Donut {
 		s_data->app_domain_ = mono_domain_create_appdomain("DonutScriptRuntime", nullptr);
 		mono_domain_set(s_data->app_domain_, true);
 
+		s_data->core_assembly_filepath_ = filepath;
 		s_data->core_assemply_ = Utils::loadMonoAssembly(filepath);
 
 		s_data->core_assembly_image_ = mono_assembly_get_image(s_data->core_assemply_);
@@ -272,9 +277,25 @@ namespace Donut {
 
 	void ScriptEngine::loadAppAssembly(const std::filesystem::path& filepath)
 	{
+		s_data->app_assembly_filepath_ = filepath;
 		s_data->app_assembly_ = Utils::loadMonoAssembly(filepath);
 
 		s_data->app_assembly_image_ = mono_assembly_get_image(s_data->app_assembly_);
+	}
+
+	void ScriptEngine::reloadAssembly()
+	{
+		mono_domain_set(mono_get_root_domain(), false);
+
+		mono_domain_unload(s_data->app_domain_);
+
+		loadAssembly(s_data->core_assembly_filepath_);
+		loadAppAssembly(s_data->app_assembly_filepath_);
+		loadAssemblyClasses();
+
+		ScriptGlue::registerComponents();
+
+		s_data->entity_class_ = ScriptClass("Donut", "Entity", true);
 	}
 
 	void ScriptEngine::onRuntimeStart(Scene* scene)

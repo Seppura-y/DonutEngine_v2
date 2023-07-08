@@ -12,6 +12,8 @@
 
 #include "utils/platform_utils.h"
 
+#include "scripting/script_engine.h"
+
 #include "ImGuizmo.h"
 #include "math/math.h"
 
@@ -342,6 +344,20 @@ bool Donut::EditorLayer::onKeyPressed(KeyPressedEvent& ev)
 		}
 		break;
 
+	case DN_KEY_R:
+		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
+		{
+			ScriptEngine::reloadAssembly();
+		}
+		else
+		{
+			if (!ImGuizmo::IsUsing())
+			{
+				gizmo_type_ = ImGuizmo::OPERATION::SCALE;
+			}
+		}
+		break;
+
 	}
 	return false;
 }
@@ -666,6 +682,7 @@ void Donut::EditorLayer::onImGuiRender()
 
 	if (ImGui::BeginMenuBar())
 	{
+
 		if (ImGui::BeginMenu("File"))
 		{
 			// Disabling fullscreen would allow the window to be moved to the front of other windows, 
@@ -704,7 +721,20 @@ void Donut::EditorLayer::onImGuiRender()
 				}
 			}
 
-			if (ImGui::MenuItem("Exit")) Donut::Application::getInstance().close();
+			if (ImGui::MenuItem("Exit"))
+			{
+				Donut::Application::getInstance().close();
+			}
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Scripts"))
+		{
+			if (ImGui::MenuItem("Reload assembly", "Ctrl+R"))
+			{
+				ScriptEngine::reloadAssembly();
+			}
+
 			ImGui::EndMenu();
 		}
 

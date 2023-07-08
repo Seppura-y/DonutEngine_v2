@@ -21,6 +21,7 @@ namespace Sandbox
 
             if(player_ != null)
             {
+                DistanceFromPlayer -= ts;
                 Translation = new Vector3(player_.Translation.XY, DistanceFromPlayer);
             }
 
