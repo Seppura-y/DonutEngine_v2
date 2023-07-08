@@ -444,6 +444,12 @@ namespace Donut {
 		return s_data->core_assembly_image_;
 	}
 
+	MonoObject* ScriptEngine::getManagedInstance(UUID uuid)
+	{
+		DN_CORE_ASSERT(s_data->entity_instances_.find(uuid) != s_data->entity_instances_.end(), "");
+		return s_data->entity_instances_.at(uuid)->getManagedObject();
+	}
+
 	ScriptClass::ScriptClass(const std::string& class_namespace, const std::string& class_name, bool is_core)
 		:class_namespace_(class_namespace), class_name_(class_name)
 	{

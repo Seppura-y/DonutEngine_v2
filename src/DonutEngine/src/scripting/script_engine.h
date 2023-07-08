@@ -119,6 +119,7 @@ namespace Donut
 			setFieldValueInternal(name, &value);
 		}
 
+		MonoObject* getManagedObject() { return instance_; }
 	private:
 		bool getFieldValueInternal(const std::string& name, void* buffer);
 		bool setFieldValueInternal(const std::string& name, const void* buffer);
@@ -162,6 +163,8 @@ namespace Donut
 		static ScriptFieldMap& getScriptFieldMap(Entity entity);
 
 		static MonoImage* getCoreAssemblyImage();
+
+		static MonoObject* getManagedInstance(UUID uuid);
 	private:
 		static void initMono();
 		static void shutdownMono();

@@ -161,6 +161,8 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 	//Timer timer("Donut::EditorLayer::onUpdate", [&](auto profile_result) { profile_results_.push_back(profile_result)});
 	DN_PROFILE_FUNCTION();
 
+	active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+
 	// Resize
 	if (FramebufferSpecification spec = framebuffer_->getSpecification();
 		viewport_size_.x > 0.0f && viewport_size_.y > 0.0f && // zero sized framebuffer is invalid
@@ -169,7 +171,7 @@ void Donut::EditorLayer::onUpdate(Donut::Timestep ts)
 		framebuffer_->resize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
 		camera_controller_.onResize(viewport_size_.x, viewport_size_.y);
 
-		active_scene_->onViewportResize(viewport_size_.x, viewport_size_.y);
+		//active_scene_->onViewportResize(viewport_size_.x, viewport_size_.y);
 
 		editor_camera_.setViewportSize(viewport_size_.x, viewport_size_.y);
 	}

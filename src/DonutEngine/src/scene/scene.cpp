@@ -259,6 +259,10 @@ namespace Donut
 
 	void Scene::onViewportResize(uint32_t width, uint32_t height)
 	{
+		if (viewport_width_ == width && viewport_height_ == height)
+		{
+			return;
+		}
 		viewport_width_ = width;
 		viewport_height_ = height;
 
@@ -323,6 +327,20 @@ namespace Donut
 		if (entt_map_.find(id) != entt_map_.end())
 		{
 			return { entt_map_.at(id), this };
+		}
+		return {};
+	}
+
+	Entity Scene::findEntityByName(std::string_view name)
+	{
+		auto view = registry_.view<TagComponent>();
+		for (auto entity : view)
+		{
+			const TagComponent& tc = view.get<TagComponent>(entity);
+			if (tc.tag_ == name)
+			{
+				return Entity{ entity, this };
+			}
 		}
 		return {};
 	}

@@ -32,6 +32,7 @@ namespace Donut
 
 		Entity getPrimaryCameraEntity();
 		Entity getEntityByUUID(UUID id);
+		Entity findEntityByName(std::string_view name);
 
 		void onRuntimeStart();
 		void onRuntimeStop();
