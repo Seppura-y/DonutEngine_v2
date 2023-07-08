@@ -41,6 +41,11 @@ namespace Donut
 		return glm::dot(*parameter, *parameter);
 	}
 
+	static MonoObject* getScriptInstance(UUID entity_id)
+	{
+		return ScriptEngine::getManagedInstance(entity_id);
+	}
+
 	static bool Entity_hasComponent(UUID entity_id, MonoReflectionType* component_type)
 	{
 		Scene* scene = ScriptEngine::getSceneContext();
@@ -53,6 +58,22 @@ namespace Donut
 		DN_CORE_ASSERT(s_entity_hasComponent_funcs.find(mono_component_type) != s_entity_hasComponent_funcs.end(), "");
 		
 		return s_entity_hasComponent_funcs.at(mono_component_type)(entity);
+	}
+
+	static uint64_t Entity_findEntityByName(MonoString* name)
+	{
+		char* name_c_str = mono_string_to_utf8(name);
+
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
+		Entity entity = scene->findEntityByName(name_c_str);
+
+		mono_free(name_c_str);
+
+		if (!entity)
+			return 0;
+
+		return entity.getUUID();
 	}
 
 	static void TransformComponent_getTranslation(UUID uuid, glm::vec3* out_translation)
@@ -115,6 +136,9 @@ namespace Donut
 		//DN_ADD_INTERNAL_CALL(nativeLog_VectorDot);
 
 		DN_ADD_INTERNAL_CALL(Entity_hasComponent);
+		DN_ADD_INTERNAL_CALL(Entity_findEntityByName);
+
+		DN_ADD_INTERNAL_CALL(getScriptInstance);
 
 		DN_ADD_INTERNAL_CALL(TransformComponent_getTranslation);
 		DN_ADD_INTERNAL_CALL(TransformComponent_setTranslation);

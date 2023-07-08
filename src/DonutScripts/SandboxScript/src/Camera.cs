@@ -6,8 +6,24 @@ namespace Sandbox
     public class Camera : Entity
     {
         public Entity other_entity_;
+
+        public float DistanceFromPlayer = 5.0f;
+
+        private Entity player_;
+
+        void onCreate()
+        {
+            player_ = findEntityByName("Player");
+        }
+
         void onUpdate(float ts)
         {
+
+            if(player_ != null)
+            {
+                Translation = new Vector3(player_.Translation.XY, DistanceFromPlayer);
+            }
+
             float speed = 10.0f;
             Vector3 velocity = Vector3.Zero;
 

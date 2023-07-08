@@ -9,6 +9,12 @@ namespace Donut
         internal extern static bool Entity_hasComponent(ulong entity_id, Type component_type);
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static ulong Entity_findEntityByName(string name);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static object getScriptInstance(ulong enttity_id);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static void TransformComponent_getTranslation(ulong entity_id, out Vector3 translation);
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]

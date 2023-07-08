@@ -57,6 +57,21 @@ namespace Sandbox
                 velocity.X = -1.0f;
             }
 
+            Entity camera_entity = findEntityByName("Camera");
+            if(camera_entity != null) 
+            {
+                Camera camera = camera_entity.As<Camera>();
+
+                if(Input.IsKeydown(KeyCode.Q)) 
+                {
+                    camera.DistanceFromPlayer += speed * 2.0f * ts;
+                }
+                else if(Input.IsKeydown(KeyCode.E)) 
+                {
+                    camera.DistanceFromPlayer -= speed * 2.0f * ts;
+                }
+            }
+
             velocity *= speed * ts;
 
             Rigidbody.applyLinearImpulse(velocity.XY, true);
