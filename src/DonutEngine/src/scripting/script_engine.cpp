@@ -11,6 +11,8 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/object.h>
 #include <mono/metadata/tabledefs.h>
+#include <mono/metadata/mono-debug.h>
+#include <mono/metadata/threads.h>
 
 #include <filewatch.h>
 
@@ -39,6 +41,8 @@ namespace Donut {
 
 		Scope<filewatch::FileWatch<std::string>> app_assembly_filewatcher_;
 		bool assembly_reload_pending = false;
+
+		bool enable_debugging = true;
 
 		Scene* scene_context_ = nullptr;
 	};
@@ -111,7 +115,7 @@ namespace Donut {
 			return buffer;
 		}
 
-		static MonoAssembly* loadMonoAssembly(const std::filesystem::path& assembly_path)
+		static MonoAssembly* loadMonoAssembly(const std::filesystem::path& assembly_path, bool load_pdb = false)
 		{
 			uint32_t file_size = 0;
 			char* file_data = readBytes(assembly_path.string(), &file_size);
@@ -125,6 +129,21 @@ namespace Donut {
 				const char* error_message = mono_image_strerror(status);
 				// Log some error message using the errorMessage data
 				return nullptr;
+			}
+
+			if (load_pdb)
+			{
+				std::filesystem::path pdb_path = assembly_path;
+				pdb_path.replace_extension(".pdb");
+
+				if (std::filesystem::exists(pdb_path))
+				{
+					uint32_t pdb_filesize = 0;
+					char* pdb_filedata = readBytes(pdb_path, &pdb_filesize);
+					mono_debug_open_image_from_memory(image, (const mono_byte*)pdb_filedata, pdb_filesize);
+					DN_CORE_INFO("Loaded PDB {}", pdb_path);
+					delete pdb_filedata;
+				}
 			}
 
 			std::string path_string = assembly_path.string();
@@ -266,11 +285,29 @@ namespace Donut {
 	{
 		mono_set_assemblies_path("mono/lib");
 
+		if (s_data->enable_debugging)
+		{
+			const char* argv[2] = {
+				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.log",
+				"--soft-breakpoints"
+			};
+
+			mono_jit_parse_options(2, (char**)argv);
+			mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+		}
+
 		MonoDomain* root_domain = mono_jit_init("DountJITRuntime");
 		DN_CORE_ASSERT(root_domain, " ");
 
 		// Store the root domain pointer
 		s_data->root_domain_ = root_domain;
+
+		if (s_data->enable_debugging)
+		{
+			mono_debug_domain_create(s_data->root_domain_);
+		}
+
+		mono_thread_set_main(mono_thread_current());
 	}
 
 	void ScriptEngine::shutdownMono()
@@ -292,7 +329,7 @@ namespace Donut {
 		mono_domain_set(s_data->app_domain_, true);
 
 		s_data->core_assembly_filepath_ = filepath;
-		s_data->core_assemply_ = Utils::loadMonoAssembly(filepath);
+		s_data->core_assemply_ = Utils::loadMonoAssembly(filepath,s_data->enable_debugging);
 
 		s_data->core_assembly_image_ = mono_assembly_get_image(s_data->core_assemply_);
 	}
@@ -300,7 +337,7 @@ namespace Donut {
 	void ScriptEngine::loadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_data->app_assembly_filepath_ = filepath;
-		s_data->app_assembly_ = Utils::loadMonoAssembly(filepath);
+		s_data->app_assembly_ = Utils::loadMonoAssembly(filepath, s_data->enable_debugging);
 
 		s_data->app_assembly_image_ = mono_assembly_get_image(s_data->app_assembly_);
 
@@ -514,7 +551,8 @@ namespace Donut {
 
 	MonoObject* ScriptClass::invokeMethod(MonoObject* instance, MonoMethod* method, void** params)
 	{
-		return mono_runtime_invoke(method, instance, params, nullptr);
+		MonoObject* exception = nullptr;
+		return mono_runtime_invoke(method, instance, params, &exception);
 	}
 
 
