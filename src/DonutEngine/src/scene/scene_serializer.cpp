@@ -463,48 +463,50 @@ namespace Donut
 					auto& sc = deserialized_entity.addComponent<ScriptComponent>();
 					sc.class_name_ = script_component["ClassName"].as<std::string>();
 
-					auto scriptFields = script_component["ScriptFields"];
-					if (scriptFields)
+					auto script_fields = script_component["ScriptFields"];
+					if (script_fields)
 					{
-						Ref<ScriptClass> entityClass = ScriptEngine::getEntityClass(sc.class_name_);
-						DN_CORE_ASSERT(entityClass, " ");
-						const auto& fields = entityClass->getFields();
-						auto& entityFields = ScriptEngine::getScriptFieldMap(deserialized_entity);
+						Ref<ScriptClass> entity_class = ScriptEngine::getEntityClass(sc.class_name_);
 
-						for (auto script_field : scriptFields)
+						if(entity_class)
 						{
-							std::string name = script_field["Name"].as<std::string>();
-							std::string typeString = script_field["Type"].as<std::string>();
-							ScriptFieldType type = Utils::scriptFieldTypeFromString(typeString);
-
-							ScriptFieldInstance& field_instance = entityFields[name];
-
-							// TODO(Yan): turn this assert into Hazelnut log warning
-							DN_CORE_ASSERT(fields.find(name) != fields.end(), " ");
-
-							if (fields.find(name) == fields.end())
-								continue;
-
-							field_instance.field_ = fields.at(name);
-
-							switch (type)
+							const auto& fields = entity_class->getFields();
+							auto& entityFields = ScriptEngine::getScriptFieldMap(deserialized_entity);
+							for (auto script_field : script_fields)
 							{
-								READ_SCRIPT_FIELD(Float, float);
-								READ_SCRIPT_FIELD(Double, double);
-								READ_SCRIPT_FIELD(Bool, bool);
-								READ_SCRIPT_FIELD(Char, char);
-								READ_SCRIPT_FIELD(Byte, int8_t);
-								READ_SCRIPT_FIELD(Short, int16_t);
-								READ_SCRIPT_FIELD(Int, int32_t);
-								READ_SCRIPT_FIELD(Long, int64_t);
-								READ_SCRIPT_FIELD(UByte, uint8_t);
-								READ_SCRIPT_FIELD(UShort, uint16_t);
-								READ_SCRIPT_FIELD(UInt, uint32_t);
-								READ_SCRIPT_FIELD(ULong, uint64_t);
-								READ_SCRIPT_FIELD(Vector2, glm::vec2);
-								READ_SCRIPT_FIELD(Vector3, glm::vec3);
-								READ_SCRIPT_FIELD(Vector4, glm::vec4);
-								READ_SCRIPT_FIELD(Entity, UUID);
+								std::string name = script_field["Name"].as<std::string>();
+								std::string typeString = script_field["Type"].as<std::string>();
+								ScriptFieldType type = Utils::scriptFieldTypeFromString(typeString);
+
+								ScriptFieldInstance& field_instance = entityFields[name];
+
+								// TODO(Yan): turn this assert into Hazelnut log warning
+								DN_CORE_ASSERT(fields.find(name) != fields.end(), " ");
+
+								if (fields.find(name) == fields.end())
+									continue;
+
+								field_instance.field_ = fields.at(name);
+
+								switch (type)
+								{
+									READ_SCRIPT_FIELD(Float, float);
+									READ_SCRIPT_FIELD(Double, double);
+									READ_SCRIPT_FIELD(Bool, bool);
+									READ_SCRIPT_FIELD(Char, char);
+									READ_SCRIPT_FIELD(Byte, int8_t);
+									READ_SCRIPT_FIELD(Short, int16_t);
+									READ_SCRIPT_FIELD(Int, int32_t);
+									READ_SCRIPT_FIELD(Long, int64_t);
+									READ_SCRIPT_FIELD(UByte, uint8_t);
+									READ_SCRIPT_FIELD(UShort, uint16_t);
+									READ_SCRIPT_FIELD(UInt, uint32_t);
+									READ_SCRIPT_FIELD(ULong, uint64_t);
+									READ_SCRIPT_FIELD(Vector2, glm::vec2);
+									READ_SCRIPT_FIELD(Vector3, glm::vec3);
+									READ_SCRIPT_FIELD(Vector4, glm::vec4);
+									READ_SCRIPT_FIELD(Entity, UUID);
+								}
 							}
 						}
 					}

@@ -182,8 +182,19 @@ namespace Donut {
 		initMono();
 		ScriptGlue::registerFunctions();
 
-		loadAssembly("../src/DonutEditor/Resources/Scripts/DonutScriptCore.dll");
-		loadAppAssembly("../src/DonutEditor/Resources/Scripts/SandboxScript.dll");
+		bool status = loadAssembly("../src/DonutEditor/Resources/Scripts/DonutScriptCore.dll");
+		if (!status)
+		{
+			DN_CORE_ERROR("[ScriptEngine] Could not load DonutScriptCore assembly");
+			return;
+		}
+
+		status = loadAppAssembly("../src/DonutEditor/Resources/Scripts/SandboxScript.dll");
+		if (!status)
+		{
+			DN_CORE_ERROR("[ScriptEngine] Could not load app assembly");
+			return;
+		}
 		loadAssemblyClasses();
 		// for debug
 		Utils::printAssemblyTypes(s_data->core_assemply_);
@@ -290,7 +301,7 @@ namespace Donut {
 	}
 
 
-	void ScriptEngine::loadAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::loadAssembly(const std::filesystem::path& filepath)
 	{
 		// Create an App Domain
 		s_data->app_domain_ = mono_domain_create_appdomain("DonutScriptRuntime", nullptr);
@@ -299,18 +310,31 @@ namespace Donut {
 		s_data->core_assembly_filepath_ = filepath;
 		s_data->core_assemply_ = Utils::loadMonoAssembly(filepath,s_data->enable_debugging_);
 
+		if (s_data->core_assemply_ == nullptr)
+		{
+			return false;
+		}
+
 		s_data->core_assembly_image_ = mono_assembly_get_image(s_data->core_assemply_);
+
+		return true;
 	}
 
-	void ScriptEngine::loadAppAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::loadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_data->app_assembly_filepath_ = filepath;
 		s_data->app_assembly_ = Utils::loadMonoAssembly(filepath, s_data->enable_debugging_);
+		if (s_data->app_assembly_ == nullptr)
+		{
+			return false;
+		}
 
 		s_data->app_assembly_image_ = mono_assembly_get_image(s_data->app_assembly_);
 
 		s_data->app_assembly_filewatcher_ = createScope<filewatch::FileWatch<std::string>>(filepath.string(), onAppAssemblyFileSystemEvent);
 		s_data->assembly_reload_pending = false;
+
+		return true;
 	}
 
 	void ScriptEngine::reloadAssembly()
@@ -370,10 +394,15 @@ namespace Donut {
 	void ScriptEngine::onUpdateEntity(Entity entity, float ts)
 	{
 		UUID entity_uuid = entity.getUUID();
-		DN_CORE_ASSERT(s_data->entity_instances_.find(entity_uuid) != s_data->entity_instances_.end(), "");
-
-		Ref<ScriptInstance> instance = s_data->entity_instances_[entity_uuid];
-		instance->invokeOnUpdate(ts);
+		if (s_data->entity_instances_.find(entity_uuid) != s_data->entity_instances_.end())
+		{
+			Ref<ScriptInstance> instance = s_data->entity_instances_[entity_uuid];
+			instance->invokeOnUpdate(ts);
+		}
+		else
+		{
+			DN_CORE_ERROR("Could not find ScriptInstance for entity {}",entity_uuid);
+		}
 	}
 
 	Scene* ScriptEngine::getSceneContext()

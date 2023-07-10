@@ -143,8 +143,8 @@ namespace Donut
 		static void init();
 		static void shutdown();
 
-		static void loadAssembly(const std::filesystem::path& filepath);
-		static void loadAppAssembly(const std::filesystem::path& filepath);
+		static bool loadAssembly(const std::filesystem::path& filepath);
+		static bool loadAppAssembly(const std::filesystem::path& filepath);
 
 		static void reloadAssembly();
 
