@@ -551,7 +551,7 @@ void Donut::EditorLayer::uiToolbar()
 	if(has_play_button)
 	{
 		Ref<Texture2D> icon = (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Simulate) ? play_icon_ : stop_icon_;
-		if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
+		if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
 		{
 			if (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Simulate)
 				onScenePlay();
@@ -570,7 +570,7 @@ void Donut::EditorLayer::uiToolbar()
 
 		Ref<Texture2D> icon = (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Play) ? simulate_icon_ : stop_icon_;
 		//ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-		if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
+		if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
 		{
 			if (scene_state_ == SceneState::Edit || scene_state_ == SceneState::Play)
 				onSceneSimulate();
@@ -585,7 +585,7 @@ void Donut::EditorLayer::uiToolbar()
 		ImGui::SameLine();
 		{
 			Ref<Texture2D> icon = pause_icon_;
-			if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
+			if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
 			{
 				active_scene_->setPaused(!is_paused);
 			}
@@ -598,7 +598,7 @@ void Donut::EditorLayer::uiToolbar()
 			{
 				Ref<Texture2D> icon = step_icon_;
 				bool is_paused = active_scene_->isPaused();
-				if (ImGui::ImageButton((ImTextureID)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
+				if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->getObjectId(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tint_color) && toolbar_enabled)
 				{
 					active_scene_->step();
 				}

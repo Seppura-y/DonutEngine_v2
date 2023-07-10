@@ -7,6 +7,9 @@
 #include "core/application.h"
 #include "core/timer.h"
 
+#include "core/buffer.h"
+#include "core/file_system.h"
+
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/object.h>
@@ -42,7 +45,7 @@ namespace Donut {
 		Scope<filewatch::FileWatch<std::string>> app_assembly_filewatcher_;
 		bool assembly_reload_pending = false;
 
-		bool enable_debugging = true;
+		bool enable_debugging_ = true;
 
 		Scene* scene_context_ = nullptr;
 	};
@@ -86,43 +89,13 @@ namespace Donut {
 
 	namespace Utils {
 
-		// todo : move to filesystem class
-		static char* readBytes(const std::filesystem::path& filepath, uint32_t* outSize)
-		{
-			std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
-
-			if (!stream)
-			{
-				// Failed to open the file
-				return nullptr;
-			}
-
-			std::streampos end = stream.tellg();
-			stream.seekg(0, std::ios::beg);
-			uint32_t size = end - stream.tellg();
-
-			if (size == 0)
-			{
-				// File is empty
-				return nullptr;
-			}
-
-			char* buffer = new char[size];
-			stream.read((char*)buffer, size);
-			stream.close();
-
-			*outSize = size;
-			return buffer;
-		}
-
 		static MonoAssembly* loadMonoAssembly(const std::filesystem::path& assembly_path, bool load_pdb = false)
 		{
-			uint32_t file_size = 0;
-			char* file_data = readBytes(assembly_path.string(), &file_size);
+			ScopedBuffer file_data = FileSystem::readFileBinary(assembly_path);
 
 			// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
 			MonoImageOpenStatus status;
-			MonoImage* image = mono_image_open_from_data_full(file_data, file_size, 1, &status, 0);
+			MonoImage* image = mono_image_open_from_data_full(file_data.as<char>(), file_data.getSize(), 1, &status, 0);
 
 			if (status != MONO_IMAGE_OK)
 			{
@@ -138,20 +111,15 @@ namespace Donut {
 
 				if (std::filesystem::exists(pdb_path))
 				{
-					uint32_t pdb_filesize = 0;
-					char* pdb_filedata = readBytes(pdb_path, &pdb_filesize);
-					mono_debug_open_image_from_memory(image, (const mono_byte*)pdb_filedata, pdb_filesize);
+					ScopedBuffer pdb_filedata = FileSystem::readFileBinary(pdb_path);
+					mono_debug_open_image_from_memory(image, pdb_filedata.as<const mono_byte>(), pdb_filedata.getSize());
 					DN_CORE_INFO("Loaded PDB {}", pdb_path);
-					delete pdb_filedata;
 				}
 			}
 
 			std::string path_string = assembly_path.string();
 			MonoAssembly* assembly = mono_assembly_load_from_full(image, path_string.c_str(), &status, 0);
 			mono_image_close(image);
-
-			// Don't forget to free the file data
-			delete[] file_data;
 
 			return assembly;
 		}
@@ -285,7 +253,7 @@ namespace Donut {
 	{
 		mono_set_assemblies_path("mono/lib");
 
-		if (s_data->enable_debugging)
+		if (s_data->enable_debugging_)
 		{
 			const char* argv[2] = {
 				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.log",
@@ -302,7 +270,7 @@ namespace Donut {
 		// Store the root domain pointer
 		s_data->root_domain_ = root_domain;
 
-		if (s_data->enable_debugging)
+		if (s_data->enable_debugging_)
 		{
 			mono_debug_domain_create(s_data->root_domain_);
 		}
@@ -329,7 +297,7 @@ namespace Donut {
 		mono_domain_set(s_data->app_domain_, true);
 
 		s_data->core_assembly_filepath_ = filepath;
-		s_data->core_assemply_ = Utils::loadMonoAssembly(filepath,s_data->enable_debugging);
+		s_data->core_assemply_ = Utils::loadMonoAssembly(filepath,s_data->enable_debugging_);
 
 		s_data->core_assembly_image_ = mono_assembly_get_image(s_data->core_assemply_);
 	}
@@ -337,7 +305,7 @@ namespace Donut {
 	void ScriptEngine::loadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_data->app_assembly_filepath_ = filepath;
-		s_data->app_assembly_ = Utils::loadMonoAssembly(filepath, s_data->enable_debugging);
+		s_data->app_assembly_ = Utils::loadMonoAssembly(filepath, s_data->enable_debugging_);
 
 		s_data->app_assembly_image_ = mono_assembly_get_image(s_data->app_assembly_);
 
