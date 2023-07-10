@@ -84,6 +84,16 @@ FILE(GLOB ${PROJECT_NAME}_EVENTS_HEADER
 )
 
 #####################################################################################################
+# Project
+FILE(GLOB ${PROJECT_NAME}_PROJECT_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/src/project/*.h
+)
+
+FILE(GLOB ${PROJECT_NAME}_PROJECT_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/src/project/*.cpp
+)
+
+#####################################################################################################
 # Renderer
 FILE(GLOB ${PROJECT_NAME}_RENDERER_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/src/renderer/*.h
@@ -215,6 +225,7 @@ FILE(GLOB ${PROJECT_NAME}_SCRIPT_ENGINE_SRC
 source_group("src\\DonutEngine\\Global" FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
 source_group("src\\DonutEngine\\Core" FILES ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC})
 source_group("src\\DonutEngine\\Events" FILES ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC})
+source_group("src\\DonutEngine\\Project" FILES ${${PROJECT_NAME}_PROJECT_HEADER} ${${PROJECT_NAME}_PROJECT_SRC})
 source_group("src\\DonutEngine\\Renderer" FILES ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC})
 source_group("src\\DonutEngine\\ImGui" FILES ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC})
 source_group("src\\DonutEngine\\Scene" FILES ${${PROJECT_NAME}_SCENE_HEADER} ${${PROJECT_NAME}_SCENE_SRC})
@@ -263,6 +274,7 @@ if (WIN32)
         ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC}
         ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC}
         ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC}
+        ${${PROJECT_NAME}_PROJECT_HEADER} ${${PROJECT_NAME}_PROJECT_SRC}
         ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC}
         ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC}
         ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC}

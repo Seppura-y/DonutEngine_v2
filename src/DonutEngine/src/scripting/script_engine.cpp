@@ -182,14 +182,16 @@ namespace Donut {
 		initMono();
 		ScriptGlue::registerFunctions();
 
-		bool status = loadAssembly("../src/DonutEditor/Resources/Scripts/DonutScriptCore.dll");
+		//bool status = loadAssembly("../src/DonutEditor/Resources/Scripts/DonutScriptCore.dll");
+		bool status = loadAssembly("assets/scripts/DonutScriptCore.dll");
 		if (!status)
 		{
 			DN_CORE_ERROR("[ScriptEngine] Could not load DonutScriptCore assembly");
 			return;
 		}
 
-		status = loadAppAssembly("../src/DonutEditor/Resources/Scripts/SandboxScript.dll");
+		//status = loadAppAssembly("../src/DonutEditor/Resources/Scripts/SandboxScript.dll");
+		status = loadAppAssembly("assets/scripts/SandboxScript.dll");
 		if (!status)
 		{
 			DN_CORE_ERROR("[ScriptEngine] Could not load app assembly");

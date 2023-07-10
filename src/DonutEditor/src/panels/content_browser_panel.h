@@ -16,6 +16,7 @@ namespace Donut
 
     private:
         std::filesystem::path current_dir_;
+        std::filesystem::path base_directory_;
 
         Ref<Texture2D> dir_icon_;
         Ref<Texture2D> file_icon_;

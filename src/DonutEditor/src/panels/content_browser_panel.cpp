@@ -1,16 +1,18 @@
 #include "pch.h"
 #include "content_browser_panel.h"
 
+#include "project/project.h"
+
 #include <imgui/imgui.h>
 
 #include <filesystem>
 
 namespace Donut
 {
-	extern const std::filesystem::path g_asset_dir = "assets";
+	//extern const std::filesystem::path g_asset_dir = "assets";
 
 	ContentBrowserPanel::ContentBrowserPanel()
-		: current_dir_(g_asset_dir)
+		: base_directory_(Project::getAssetDirectory()), current_dir_(Project::getAssetDirectory())
 	{
 		dir_icon_ = Texture2D::createTexture("assets/icons/content_browser/DirectoryIcon.png");
 		file_icon_ = Texture2D::createTexture("assets/icons/content_browser/FileIcon.png");
@@ -20,7 +22,7 @@ namespace Donut
 	{
 		ImGui::Begin("Content Browser");
 
-		if (current_dir_ != std::filesystem::path(g_asset_dir))
+		if (current_dir_ != std::filesystem::path(base_directory_))
 		{
 			if (ImGui::Button("<-"))
 			{
@@ -62,7 +64,7 @@ namespace Donut
 			
 			if (ImGui::BeginDragDropSource())
 			{
-				auto relative_path = std::filesystem::relative(path, g_asset_dir);
+				std::filesystem::path relative_path(path);
 				const wchar_t* item_path = relative_path.c_str();
 
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM",

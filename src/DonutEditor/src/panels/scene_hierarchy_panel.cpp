@@ -12,7 +12,7 @@
 
 namespace Donut
 {
-	extern const std::filesystem::path g_asset_path = "assets";
+	//extern const std::filesystem::path g_asset_path = "assets";
 
 	template<typename T, typename UIFunction>
 	static void drawComponent(const std::string& name, Entity entity, UIFunction function)
@@ -415,7 +415,7 @@ namespace Donut
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 				{
 					const wchar_t* path = (const wchar_t*)payload->Data;
-					std::filesystem::path texture_path = std::filesystem::path(g_asset_path) / path;
+					std::filesystem::path texture_path(path);
 					Ref<Texture2D> texture = Texture2D::createTexture(texture_path.string());
 					if (texture->isLoaded())
 					{

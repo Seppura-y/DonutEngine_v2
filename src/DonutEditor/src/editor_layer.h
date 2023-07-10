@@ -44,6 +44,10 @@ namespace Donut
 		void uiToolbar();
 
 		void onOverlayRender();
+
+		void newProject();
+		void openProject(const std::filesystem::path& path);
+		void saveProject();
 	private:
 		struct ProfileResult
 		{
@@ -89,7 +93,7 @@ namespace Donut
 		bool is_first_cam_ = true;
 
 		SceneHierarchyPanel scene_hierarchy_panel_;
-		ContentBrowserPanel content_browser_panel_;
+		Scope<ContentBrowserPanel> content_browser_panel_;
 
 		int gizmo_type_ = -1;
 		

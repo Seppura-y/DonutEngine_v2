@@ -7,6 +7,8 @@
 #include "scripting/script_engine.h"
 #include "uuid.h"
 
+#include "project/project.h"
+
 #include <fstream>
 
 #include <yaml-cpp/yaml.h>
@@ -512,30 +514,32 @@ namespace Donut
 					}
 				}
 
-				auto spriteRendererComponent = entity["SpriteRendererComponent"];
-				if (spriteRendererComponent)
+				auto sprite_renderer_component = entity["SpriteRendererComponent"];
+				if (sprite_renderer_component)
 				{
 					auto& src = deserialized_entity.addComponent<SpriteRendererComponent>();
-					src.color_ = spriteRendererComponent["Color"].as<glm::vec4>();
+					src.color_ = sprite_renderer_component["Color"].as<glm::vec4>();
 
-					if (spriteRendererComponent["TexturePath"])
+					if (sprite_renderer_component["TexturePath"])
 					{
-						src.texture_ = Texture2D::createTexture(spriteRendererComponent["TexturePath"].as<std::string>());
+						std::string texture_path = sprite_renderer_component["TexturePath"].as<std::string>();
+						auto path = Project::getAssetFileSystemPath(texture_path);
+						src.texture_ = Texture2D::createTexture(path.string());
 					}
 
-					if (spriteRendererComponent["TillingFactor"])
+					if (sprite_renderer_component["TillingFactor"])
 					{
-						src.tiling_factor_ = spriteRendererComponent["TillingFactor"].as<float>();
+						src.tiling_factor_ = sprite_renderer_component["TillingFactor"].as<float>();
 					}
 				}
 
-				auto circleRendererComponent = entity["CircleRendererComponent"];
-				if (circleRendererComponent)
+				auto circle_renderer_component = entity["CircleRendererComponent"];
+				if (circle_renderer_component)
 				{
 					auto& crc = deserialized_entity.addComponent<CircleRendererComponent>();
-					crc.color_ = circleRendererComponent["Color"].as<glm::vec4>();
-					crc.thickness_ = circleRendererComponent["Thickness"].as<float>();
-					crc.fade_ = circleRendererComponent["Fade"].as<float>();
+					crc.color_ = circle_renderer_component["Color"].as<glm::vec4>();
+					crc.thickness_ = circle_renderer_component["Thickness"].as<float>();
+					crc.fade_ = circle_renderer_component["Fade"].as<float>();
 				}
 
 				auto rigidbody_2d_component = entity["Rigidbody2DComponent"];

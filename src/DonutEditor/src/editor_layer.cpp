@@ -23,7 +23,7 @@
 
 #include <chrono>
 
-extern const std::filesystem::path g_asset_path = "assets";
+//extern const std::filesystem::path g_asset_path = "assets";
 
 static const uint32_t tile_width = 24;
 static const char* map_tiles =
@@ -144,10 +144,11 @@ void Donut::EditorLayer::onAttach()
 	auto spec = Application::getInstance().getSpecification();
 	if (spec.commandline_args_.count_ > 1)
 	{
-		auto scene_filepath = spec.commandline_args_[1];
-		//SceneSerializer serializer(active_scene_);
-		//serializer.deserialize(scene_filepath);
-		openScene(scene_filepath);
+		//auto scene_filepath = spec.commandline_args_[1];
+		//openScene(scene_filepath);
+
+		auto project_path = spec.commandline_args_[1];
+		openProject(project_path);
 	}
 
 	editor_camera_ = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
@@ -677,6 +678,26 @@ void Donut::EditorLayer::onOverlayRender()
 	Renderer2D::endScene();
 }
 
+void Donut::EditorLayer::newProject()
+{
+	Project::newProject();
+}
+
+void Donut::EditorLayer::openProject(const std::filesystem::path& path)
+{
+	if (Project::loadProject(path))
+	{
+		auto start_scene_path = Project::getAssetFileSystemPath(Project::getActive()->getConfig().start_scene_);
+		openScene(start_scene_path);
+		content_browser_panel_ = createScope<ContentBrowserPanel>();
+	}
+}
+
+void Donut::EditorLayer::saveProject()
+{
+	// Project::saveActive();
+}
+
 void Donut::EditorLayer::onImGuiRender()
 {
 	DN_PROFILE_FUNCTION();
@@ -791,7 +812,7 @@ void Donut::EditorLayer::onImGuiRender()
 	}
 
 	scene_hierarchy_panel_.onImGuiRender();
-	content_browser_panel_.onImGuiRender();
+	content_browser_panel_->onImGuiRender();
 
 	ImGui::Begin("Stats");
 
@@ -887,7 +908,8 @@ void Donut::EditorLayer::onImGuiRender()
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 		{
 			const wchar_t* path = (const wchar_t*)payload->Data;
-			openScene(std::filesystem::path(g_asset_path) / path);
+			//openScene(std::filesystem::path(g_asset_path) / path);
+			openScene(path);
 		}
 		ImGui::EndDragDropTarget();
 	}

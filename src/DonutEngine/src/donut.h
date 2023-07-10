@@ -14,6 +14,8 @@
 
 #include "core/timestep.h"
 
+#include "project/project.h"
+
 #include "renderer/renderer.h"
 #include "renderer/render_command.h"
 #include "renderer/renderer_2d.h"

@@ -8,7 +8,9 @@ list(APPEND CONFIG_TYPES "MinSizeRel")
 
 set(CMAKE_CONFIGURATION_TYPES ${CONFIG_TYPES})
 
-set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../../DonutEditor/Resources/Scripts/)
+# set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../../DonutEditor/Resources/Scripts/)
+set(RUNTIME_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../bin/assets/scripts/)
+
 # set(LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/../../lib)
 
 add_library(${PROJECT_NAME} SHARED
