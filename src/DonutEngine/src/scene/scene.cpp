@@ -422,12 +422,13 @@ namespace Donut
 		return new_scene;
 	}
 
-	void Scene::duplicateEntity(Entity entity)
+	Entity Scene::duplicateEntity(Entity entity)
 	{
 		std::string name = entity.getName();
 		Entity new_entity = createEntity(name);
 
 		copyComponentIfExists(AllComponents{}, new_entity, entity);
+		return new_entity;
 	}
 
 	void Scene::step(int frames)

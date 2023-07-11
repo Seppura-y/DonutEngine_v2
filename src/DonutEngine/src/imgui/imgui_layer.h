@@ -28,6 +28,8 @@ namespace Donut
 		void setBlockEvents(bool status) { is_block_events_ = status; }
 
 		void setDarkThemeColors();
+
+		uint32_t getActiveWidgetID() const;
 	private:
 		float time_ = 0.0f;
 		bool is_block_events_ = false;

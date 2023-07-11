@@ -226,6 +226,12 @@ FILE(GLOB ${PROJECT_NAME}_UI_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/src/ui/*.h
 )
 
+#####################################################################################################
+# Physics
+FILE(GLOB ${PROJECT_NAME}_PHYSICS_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/src/physics/*.h
+)
+
 
 #####################################################################################################
 source_group("src\\DonutEngine\\Global" FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
@@ -239,6 +245,7 @@ source_group("src\\DonutEngine\\Utils" FILES ${${PROJECT_NAME}_UTILS_HEADER} ${$
 source_group("src\\DonutEngine\\Math" FILES ${${PROJECT_NAME}_MATH_HEADER} ${${PROJECT_NAME}_MATH_SRC})
 source_group("src\\DonutEngine\\Scripting" FILES ${${PROJECT_NAME}_SCRIPT_ENGINE_HEADER} ${${PROJECT_NAME}_SCRIPT_ENGINE_SRC})
 source_group("src\\DonutEngine\\UI" FILES ${${PROJECT_NAME}_UI_HEADER})
+source_group("src\\DonutEngine\\Physics" FILES ${${PROJECT_NAME}_PHYSICS_HEADER})
 
 source_group("src\\DonutEngine\\Platform\\OpenGL" FILES ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC})
 source_group("src\\DonutEngine\\Platform\\Windows" FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
@@ -291,6 +298,7 @@ if (WIN32)
         ${${PROJECT_NAME}_MATH_HEADER} ${${PROJECT_NAME}_MATH_SRC}
         ${${PROJECT_NAME}_SCRIPT_ENGINE_HEADER} ${${PROJECT_NAME}_SCRIPT_ENGINE_SRC}
         ${${PROJECT_NAME}_UI_HEADER}
+        ${${PROJECT_NAME}_PHYSICS_HEADER}
 
         ${${PROJECT_NAME}_GLM_HEADER}
 

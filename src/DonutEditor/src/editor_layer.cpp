@@ -368,6 +368,17 @@ bool Donut::EditorLayer::onKeyPressed(KeyPressedEvent& ev)
 			}
 		}
 		break;
+	case DN_KEY_DELETE:
+		if (Application::getInstance().getImGuiLayer()->getActiveWidgetID() == 0)
+		{
+			Entity selected_entity = scene_hierarchy_panel_.getSelectedEntity();
+			if (selected_entity)
+			{
+				scene_hierarchy_panel_.setSelectedEntity({});
+				active_scene_->destroyEntity(selected_entity);
+			}
+		}
+		break;
 
 	}
 	return false;
@@ -526,7 +537,9 @@ void Donut::EditorLayer::onDuplicateEntity()
 	Entity selected_entity = scene_hierarchy_panel_.getSelectedEntity();
 	if (selected_entity)
 	{
-		editor_scene_->duplicateEntity(selected_entity);
+		Entity newEntity = editor_scene_->duplicateEntity(selected_entity);
+		scene_hierarchy_panel_.setSelectedEntity(newEntity);
+		//editor_scene_->duplicateEntity(selected_entity);
 	}
 }
 

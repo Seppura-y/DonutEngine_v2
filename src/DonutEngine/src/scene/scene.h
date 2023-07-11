@@ -45,7 +45,7 @@ namespace Donut
 		void onUpdateEditor(Timestep ts, EditorCamera& camera);
 
 		static Ref<Scene> copyScene(Ref<Scene> other);
-		void duplicateEntity(Entity entity);
+		Entity duplicateEntity(Entity entity);
 
 		bool isRunning() const { return is_running_; }
 		bool isPaused() const { return is_paused_; }
