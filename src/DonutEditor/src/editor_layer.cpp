@@ -14,6 +14,8 @@
 
 #include "scripting/script_engine.h"
 
+#include "renderer/font.h"
+
 #include "ImGuizmo.h"
 #include "math/math.h"
 
@@ -47,7 +49,7 @@ Donut::EditorLayer::EditorLayer()
 	camera_controller_(1600.0f / 900.0f, true),
 	rectangle_color_({ 0.2f, 0.3f, 0.8f, 1.0f })
 {
-
+	Font font("assets/fonts/opensans/OpenSans-Regular.ttf");
 }
 
 

@@ -113,34 +113,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     $ENV{VULKAN_SDK}/Lib
 )
 
-# target_link_libraries(${PROJECT_NAME} PRIVATE
-#     user32.lib
-#     dwmapi.lib
-#     DonutEngine.lib
-#     glfw3.lib   #为什么这些库不能从DonutEngine流转过来，实际上在DonutEngine中通过PUBLIC链接的库会流转到引用它的目标中
-#     glad.lib
-#     imgui.lib
-#     yaml-cpp.lib
-# )
-
-# target_link_libraries(${PROJECT_NAME} PRIVATE
-#     user32.lib
-#     dwmapi.lib
-#     DonutEngine.lib
-#     glfw3.lib
-#     glad.lib
-#     imgui.lib
-#     yaml-cpp.lib
-
-#     # vulkan-1.lib
-#     # VkLayer_utils.lib
-
-
-#     shaderc_shared.lib
-#     spirv-cross-core.lib
-#     spirv-cross-glsl.lib
-# )
-
 target_link_libraries(${PROJECT_NAME} PRIVATE
     user32.lib
     dwmapi.lib
@@ -164,6 +136,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Winmm.lib
     Version.lib
     BCrypt.lib
+
+    freetype.lib
+    msdfgen.lib
+    msdf-atlas-gen.lib
 )
 
 set_property(TARGET ${PROJECT_NAME}

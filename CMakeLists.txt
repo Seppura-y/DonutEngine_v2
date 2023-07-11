@@ -16,7 +16,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutEditor)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/DonutScripts)
 
 add_dependencies(DonutEditor DonutEngine)
-add_dependencies(DonutEngine glad glfw imgui yaml-cpp Box2D DonutScriptCore SandboxScript)
+add_dependencies(DonutEngine glad glfw imgui yaml-cpp Box2D msdf-atlas-gen msdfgen freetype DonutScriptCore SandboxScript)
 
 if(STARTUP_PROJ)
     set_property(DIRECTORY ${CMAKE_CURRENT_LIST_DIR} PROPERTY VS_STARTUP_PROJECT ${STARTUP_PROJ})

@@ -7,9 +7,10 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/yaml-cpp)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/Box2d)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/msdf-atlas-gen)
 # add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/spdlog)
 # add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/dependencies/glm)
-set_property(TARGET glad glfw imgui yaml-cpp Box2D PROPERTY FOLDER "Dependencies")
+set_property(TARGET glad glfw imgui yaml-cpp Box2D msdf-atlas-gen msdfgen freetype PROPERTY FOLDER "Dependencies")
 
 set(DN_SHARED OFF CACHE BOOL "Build shared library?")
 
@@ -404,63 +405,22 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/Box2d/include
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/mono/include
     ${CMAKE_CURRENT_LIST_DIR}/dependencies/filewatch
+
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/msdf-atlas-gen
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/msdf-atlas-gen/msdf-atlas-gen
+    ${CMAKE_CURRENT_LIST_DIR}/dependencies/msdf-atlas-gen/msdfgen
     $ENV{VULKAN_SDK}/Include
 
 )
 
 #========================================= LINKING LIBRARIES =========================================#
-target_link_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/../../lib
-    $<IF:$<CONFIG:Debug>,${CMAKE_CURRENT_LIST_DIR}/../../lib/mono/Debug,${CMAKE_CURRENT_LIST_DIR}/../../lib/mono/Release>
-    # ${CMAKE_CURRENT_LIST_DIR}/../../lib/mono/Debug
-    # ${CMAKE_CURRENT_LIST_DIR}/../../lib/mono/Release
-    $ENV{VULKAN_SDK}/Lib
-)
-
-# target_link_libraries(${PROJECT_NAME} PUBLIC
-#     user32.lib
-#     opengl32.lib
-#     dwmapi.lib
-#     glfw3.lib
-#     glad.lib
-#     imgui.lib
-#     yaml-cpp.lib
-
-#     # vulkan-1.lib
-#     # VkLayer_utils.lib
-
-
-#     shaderc_shared.lib
-#     spirv-cross-core.lib
-#     spirv-cross-glsl.lib
+# target_link_directories(${PROJECT_NAME} PUBLIC
+#     ${CMAKE_CURRENT_LIST_DIR}/../../lib
+#     $<IF:$<CONFIG:Debug>,${CMAKE_CURRENT_LIST_DIR}/../../lib/mono/Debug,${CMAKE_CURRENT_LIST_DIR}/../../lib/mono/Release>
+#     # ${CMAKE_CURRENT_LIST_DIR}/../../lib/mono/Debug
+#     # ${CMAKE_CURRENT_LIST_DIR}/../../lib/mono/Release
+#     $ENV{VULKAN_SDK}/Lib
 # )
-
-target_link_libraries(${PROJECT_NAME} PUBLIC
-    user32.lib
-    opengl32.lib
-    dwmapi.lib
-    glfw3.lib
-    glad.lib
-    imgui.lib
-    yaml-cpp.lib
-
-    Box2D.lib
-
-    # vulkan-1.lib
-    # VkLayer_utils.lib
-
-    shaderc_sharedd.lib
-    spirv-cross-cored.lib
-    spirv-cross-glsld.lib
-
-    libmono-static-sgen.lib
-
-    Ws2_32.lib
-    Winmm.lib
-    Version.lib
-    BCrypt.lib
-    # $<IF:$<CONFIG:Debug>,mono-2.0-sgen.lib,Release>
-)
 
 set_property(TARGET ${PROJECT_NAME}
 	PROPERTY
