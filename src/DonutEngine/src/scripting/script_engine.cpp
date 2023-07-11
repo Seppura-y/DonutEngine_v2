@@ -45,8 +45,11 @@ namespace Donut {
 		Scope<filewatch::FileWatch<std::string>> app_assembly_filewatcher_;
 		bool assembly_reload_pending = false;
 
+#ifdef DN_DEBUG
 		bool enable_debugging_ = true;
-
+#else
+		bool enable_debugging_ = false;
+#endif
 		Scene* scene_context_ = nullptr;
 	};
 

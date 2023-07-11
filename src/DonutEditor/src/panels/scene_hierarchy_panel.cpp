@@ -1,14 +1,16 @@
 #include "scene_hierarchy_panel.h"
 
+#include "../DonutEngine/src/scene/components.h"
+#include "../DonutEngine/src/scripting/script_engine.h"
+
+#include "../DonutEngine/src/ui/ui.h"
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
 #include <filesystem>
-
-#include "../DonutEngine/src/scene/components.h"
-#include "../DonutEngine/src/scripting/script_engine.h"
 
 namespace Donut
 {
@@ -326,14 +328,16 @@ namespace Donut
 				char buffer[64];
 				strcpy_s(buffer, sizeof(buffer), component.class_name_.c_str());
 
-				if (!script_class_exists)
-				{
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0, 0, 1.0f));
-				}
+				//if (!script_class_exists)
+				//{
+					//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0, 0, 1.0f));
+				//}
+				UI::ScopedStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0, 0, 1.0f), !script_class_exists);
 
 				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
 				{
 					component.class_name_ = buffer;
+					return;
 				}
 
 				bool is_scene_running = scene->isRunning();
@@ -398,10 +402,10 @@ namespace Donut
 					}
 				}
 
-				if (!script_class_exists)
-				{
-					ImGui::PopStyleColor();
-				}
+				//if (!script_class_exists)
+				//{
+				//	ImGui::PopStyleColor();
+				//}
 			});
 	
 		drawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)

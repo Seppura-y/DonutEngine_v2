@@ -150,6 +150,13 @@ void Donut::EditorLayer::onAttach()
 		auto project_path = spec.commandline_args_[1];
 		openProject(project_path);
 	}
+	else
+	{
+		if (!openProject())
+		{
+			Application::getInstance().close();
+		}
+	}
 
 	editor_camera_ = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
@@ -315,7 +322,8 @@ bool Donut::EditorLayer::onKeyPressed(KeyPressedEvent& ev)
 	case DN_KEY_O:
 		if (Input::isKeyPressed(DN_KEY_LEFT_CONTROL) || Input::isKeyPressed(DN_KEY_RIGHT_CONTROL))
 		{
-			openScene();
+			//openScene();
+			openProject();
 		}
 		break;
 
@@ -683,6 +691,18 @@ void Donut::EditorLayer::newProject()
 	Project::newProject();
 }
 
+bool Donut::EditorLayer::openProject()
+{
+	std::string filepath = FileDialogs::openFile("Donut Project (*.dproj)\0*.dproj\0");
+	if (filepath.empty())
+	{
+		return false;
+	}
+
+	openProject(filepath);
+	return true;
+}
+
 void Donut::EditorLayer::openProject(const std::filesystem::path& path)
 {
 	if (Project::loadProject(path))
@@ -761,34 +781,39 @@ void Donut::EditorLayer::onImGuiRender()
 
 			if (ImGui::MenuItem("New","Ctrl+N"))
 			{
-				active_scene_ = createRef<Scene>();
-				active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
-				scene_hierarchy_panel_.setContext(active_scene_);
+				//active_scene_ = createRef<Scene>();
+				//active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+				//scene_hierarchy_panel_.setContext(active_scene_);
+				newScene();
 			}
 
-			if (ImGui::MenuItem("Open...", "Ctrl+O"))
+			if (ImGui::MenuItem("Open Project", "Ctrl+O"))
 			{
-				std::string filepath = FileDialogs::openFile("Donut Scene (*.yaml)\0*.yaml\0");
+				//std::string filepath = FileDialogs::openFile("Donut Scene (*.yaml)\0*.yaml\0");
 
-				if (!filepath.empty())
-				{
-					active_scene_ = createRef<Scene>();
-					active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
-					scene_hierarchy_panel_.setContext(active_scene_);
+				//if (!filepath.empty())
+				//{
+				//	active_scene_ = createRef<Scene>();
+				//	active_scene_->onViewportResize((uint32_t)viewport_size_.x, (uint32_t)viewport_size_.y);
+				//	scene_hierarchy_panel_.setContext(active_scene_);
 
-					SceneSerializer serializer(active_scene_);
-					serializer.deserialize(filepath);
-				}
+				//	SceneSerializer serializer(active_scene_);
+				//	serializer.deserialize(filepath);
+				//}
+				openProject();
 			}
 
-			if (ImGui::MenuItem("Save As...", "Ctrl+S"))
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Save Scene As...", "Ctrl+S"))
 			{
-				std::string filepath = FileDialogs::openFile("Donut Scene (*.yaml)\0*.yaml\0");
-				if (!filepath.empty())
-				{
-					SceneSerializer serializer(active_scene_);
-					serializer.serialize(filepath);
-				}
+				//std::string filepath = FileDialogs::openFile("Donut Scene (*.yaml)\0*.yaml\0");
+				//if (!filepath.empty())
+				//{
+				//	SceneSerializer serializer(active_scene_);
+				//	serializer.serialize(filepath);
+				//}
+				saveSceneAs();
 			}
 
 			if (ImGui::MenuItem("Exit"))

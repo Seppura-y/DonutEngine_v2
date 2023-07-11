@@ -46,6 +46,7 @@ namespace Donut
 		void onOverlayRender();
 
 		void newProject();
+		bool openProject();
 		void openProject(const std::filesystem::path& path);
 		void saveProject();
 	private:

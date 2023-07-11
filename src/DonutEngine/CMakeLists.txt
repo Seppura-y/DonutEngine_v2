@@ -220,6 +220,12 @@ FILE(GLOB ${PROJECT_NAME}_SCRIPT_ENGINE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/src/scripting/*.cpp
 )
 
+#####################################################################################################
+# ui
+FILE(GLOB ${PROJECT_NAME}_UI_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/src/ui/*.h
+)
+
 
 #####################################################################################################
 source_group("src\\DonutEngine\\Global" FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
@@ -232,6 +238,7 @@ source_group("src\\DonutEngine\\Scene" FILES ${${PROJECT_NAME}_SCENE_HEADER} ${$
 source_group("src\\DonutEngine\\Utils" FILES ${${PROJECT_NAME}_UTILS_HEADER} ${${PROJECT_NAME}_UTILS_SRC})
 source_group("src\\DonutEngine\\Math" FILES ${${PROJECT_NAME}_MATH_HEADER} ${${PROJECT_NAME}_MATH_SRC})
 source_group("src\\DonutEngine\\Scripting" FILES ${${PROJECT_NAME}_SCRIPT_ENGINE_HEADER} ${${PROJECT_NAME}_SCRIPT_ENGINE_SRC})
+source_group("src\\DonutEngine\\UI" FILES ${${PROJECT_NAME}_UI_HEADER})
 
 source_group("src\\DonutEngine\\Platform\\OpenGL" FILES ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC})
 source_group("src\\DonutEngine\\Platform\\Windows" FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
@@ -283,6 +290,7 @@ if (WIN32)
         ${${PROJECT_NAME}_IMGUIZMO_HEADER} ${${PROJECT_NAME}_IMGUIZMO_SRC}
         ${${PROJECT_NAME}_MATH_HEADER} ${${PROJECT_NAME}_MATH_SRC}
         ${${PROJECT_NAME}_SCRIPT_ENGINE_HEADER} ${${PROJECT_NAME}_SCRIPT_ENGINE_SRC}
+        ${${PROJECT_NAME}_UI_HEADER}
 
         ${${PROJECT_NAME}_GLM_HEADER}
 
@@ -452,6 +460,7 @@ set_property(TARGET ${PROJECT_NAME}
 )
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+
 foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)
     if(type)
         string(TOUPPER ${type} config)
