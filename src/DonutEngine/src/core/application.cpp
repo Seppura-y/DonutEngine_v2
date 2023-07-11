@@ -58,7 +58,7 @@ namespace Donut
 
 		Renderer::init();
 		Renderer2D::init();
-		ScriptEngine::init();
+		//ScriptEngine::init();
 
 		imgui_layer_ = new ImGuiLayer();
 		pushOverlay(imgui_layer_);

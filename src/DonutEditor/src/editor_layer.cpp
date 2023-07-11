@@ -720,6 +720,7 @@ void Donut::EditorLayer::openProject(const std::filesystem::path& path)
 {
 	if (Project::loadProject(path))
 	{
+		ScriptEngine::init();
 		auto start_scene_path = Project::getAssetFileSystemPath(Project::getActive()->getConfig().start_scene_);
 		openScene(start_scene_path);
 		content_browser_panel_ = createScope<ContentBrowserPanel>();

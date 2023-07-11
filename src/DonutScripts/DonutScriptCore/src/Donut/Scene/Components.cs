@@ -26,6 +26,22 @@ namespace Donut
 
     public class Rigidbody2DComponent : Component
     {
+        public enum BodyType { Static = 0, Dynamic, Kinematic }
+        public Vector2 LinearVelocity
+        {
+            get
+            {
+                InternalCalls.Rigidbody2DComponent_getLinearVelocity(Entity.ID, out Vector2 velocity);
+                return velocity;
+            }
+        }
+
+        public BodyType type
+        {
+            get => InternalCalls.Rigidbody2DComponent_getType(Entity.ID);
+            set => InternalCalls.Rigidbody2DComponent_setType(Entity.ID, value);
+        }
+
         public void applyLinearImpulse(Vector2 impulse, Vector2 world_pos, bool wake)
         {
             InternalCalls.Rigidbody2DComponent_applyLinearImpulse(Entity.ID, ref impulse, ref world_pos, ref wake);
@@ -35,5 +51,7 @@ namespace Donut
         {
             InternalCalls.Rigidbody2DComponent_applyLinearImpulseToCenter(Entity.ID, ref impulse, ref wake);
         }
+
+
     }
 }

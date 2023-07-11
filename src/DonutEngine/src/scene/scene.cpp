@@ -11,6 +11,8 @@
 
 #include "scripting/script_engine.h"
 
+#include "physics/physics_2d.h"
+
 #include <box2d/b2_world.h>
 #include <box2d/b2_body.h>
 #include <box2d/b2_fixture.h>
@@ -21,18 +23,18 @@
 
 namespace Donut
 {
-	static b2BodyType rigidbody2DTypeToBox2DBody(Rigidbody2DComponent::BodyType body_type)
-	{
-		switch (body_type)
-		{
-			case Rigidbody2DComponent::BodyType::Static: return b2_staticBody;
-			case Rigidbody2DComponent::BodyType::Dynamic: return b2_dynamicBody;
-			case Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
-		}
+	//static b2BodyType rigidbody2DTypeToBox2DBody(Rigidbody2DComponent::BodyType body_type)
+	//{
+	//	switch (body_type)
+	//	{
+	//		case Rigidbody2DComponent::BodyType::Static: return b2_staticBody;
+	//		case Rigidbody2DComponent::BodyType::Dynamic: return b2_dynamicBody;
+	//		case Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
+	//	}
 
-		DN_CORE_ASSERT(false, "Unknown body type");
-		return b2_staticBody;
-	}
+	//	DN_CORE_ASSERT(false, "Unknown body type");
+	//	return b2_staticBody;
+	//}
 
 	template<typename... Component>
 	static void copyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& entt_map)
@@ -448,7 +450,7 @@ namespace Donut
 			auto& rigidbody_2d = entity.getComponent<Rigidbody2DComponent>();
 
 			b2BodyDef body_def;
-			body_def.type = rigidbody2DTypeToBox2DBody(rigidbody_2d.type_);
+			body_def.type = Utils::rigidbody2DTypeToBox2DBody(rigidbody_2d.type_);
 			body_def.position.Set(transform.translation_.x, transform.translation_.y);
 			body_def.angle = transform.rotation_.z;
 

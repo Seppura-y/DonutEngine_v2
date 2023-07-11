@@ -26,6 +26,16 @@ namespace Donut
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static void Rigidbody2DComponent_applyLinearImpulseToCenter(ulong entity_id, ref Vector2 impulse, ref bool wake);
 
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody2DComponent_getLinearVelocity(ulong entity_id, out Vector2 linear_velocity);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static Rigidbody2DComponent.BodyType Rigidbody2DComponent_getType(ulong entity_id);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody2DComponent_setType(ulong entity_id, Rigidbody2DComponent.BodyType type);
+
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static bool Input_isKeydown(KeyCode keycode);
     }

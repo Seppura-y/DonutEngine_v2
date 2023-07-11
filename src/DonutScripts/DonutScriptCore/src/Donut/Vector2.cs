@@ -1,3 +1,4 @@
+using System;
 
 namespace Donut
 {
@@ -31,6 +32,16 @@ namespace Donut
         public static Vector2 operator *(Vector2 vector, float scalar)
         {
             return new Vector2(vector.X * scalar, vector.Y * scalar);
+        }
+
+        public float lengthSquared()
+        {
+            return X * X + Y * Y;
+        }
+
+        public float length()
+        {
+            return (float)Math.Sqrt(lengthSquared());
         }
     }
 }

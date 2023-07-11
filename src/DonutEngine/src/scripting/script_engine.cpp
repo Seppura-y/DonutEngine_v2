@@ -10,6 +10,8 @@
 #include "core/buffer.h"
 #include "core/file_system.h"
 
+#include "project/project.h"
+
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/object.h>
@@ -194,7 +196,9 @@ namespace Donut {
 		}
 
 		//status = loadAppAssembly("../src/DonutEditor/Resources/Scripts/SandboxScript.dll");
-		status = loadAppAssembly("assets/scripts/SandboxScript.dll");
+		//status = loadAppAssembly("assets/scripts/SandboxScript.dll");
+		auto script_module_path = Project::getActive()->getConfig().script_module_path_;
+		status = loadAppAssembly(script_module_path);
 		if (!status)
 		{
 			DN_CORE_ERROR("[ScriptEngine] Could not load app assembly");
