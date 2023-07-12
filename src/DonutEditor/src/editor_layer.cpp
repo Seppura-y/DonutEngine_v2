@@ -44,12 +44,15 @@ static const char* map_tiles =
 "WWWWWWWWWWWWWWWWWWWWWWWW"
 "WWWWWWWWWWWWWWWWWWWWWWWW";
 
+static Donut::Font* s_font;
+
 Donut::EditorLayer::EditorLayer()
 	: Donut::Layer("sandbox 2d"),
 	camera_controller_(1600.0f / 900.0f, true),
 	rectangle_color_({ 0.2f, 0.3f, 0.8f, 1.0f })
 {
-	Font font("assets/fonts/opensans/OpenSans-Regular.ttf");
+	//Font font("assets/fonts/opensans/OpenSans-Regular.ttf");
+	s_font = new Donut::Font("assets/fonts/opensans/OpenSans-Regular.ttf");
 }
 
 
@@ -908,6 +911,9 @@ void Donut::EditorLayer::onImGuiRender()
 
 	ImGui::Begin("settings");
 	ImGui::Checkbox("Show physics colliders", &show_physics_collider_);
+
+	ImGui::Image((ImTextureID)s_font->getAtlasTexture()->getObjectId(), { 512, 512 }, { 0,1 }, { 1,0 });
+
 	ImGui::End();
 
 

@@ -173,7 +173,7 @@ namespace Donut
 		s_data.line_vertex_buffer_base_ = new LineVertex[s_data.max_vertices_];
 
 
-		s_data.white_texture_ = Texture2D::createTexture(1, 1);
+		s_data.white_texture_ = Texture2D::createTexture(TextureSpecification());
 		uint32_t white_texture_data = 0xffffffff;
 		s_data.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
 

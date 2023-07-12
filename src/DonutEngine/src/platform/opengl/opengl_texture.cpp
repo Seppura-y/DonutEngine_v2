@@ -7,12 +7,41 @@
 
 namespace Donut
 {
-	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
-		: width_(width), height_(height)
+	namespace Utils 
+	{
+		static GLenum donutImageFormatToGLDataFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+				case ImageFormat::RGB8: return GL_RGB;
+				case ImageFormat::RGBA8: return GL_RGBA;
+			}
+
+			DN_CORE_ASSERT(false, "donutImageFormatToGLDataFormat : unknown format");
+			return 0;
+		}
+
+		static GLenum donutImageFormatToGLInternalFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+			case ImageFormat::RGB8: return GL_RGB8;
+			case ImageFormat::RGBA8: return GL_RGBA8;
+			}
+
+			DN_CORE_ASSERT(false, "donutImageFormatToGLDataFormat : unknown format");
+			return 0;
+		}
+
+	}
+
+	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec)
+		: texture_spec_(spec), width_(spec.width_), height_(spec.height_)
 	{
 		DN_PROFILE_FUNCTION();
 
-		internal_format_ = GL_RGBA8, data_format_ = GL_RGBA;
+		internal_format_ = Utils::donutImageFormatToGLInternalFormat(texture_spec_.format_);
+		data_format_ = Utils::donutImageFormatToGLDataFormat(texture_spec_.format_);
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &object_id_);
 		glTextureStorage2D(object_id_, 1, internal_format_, width_, height_);

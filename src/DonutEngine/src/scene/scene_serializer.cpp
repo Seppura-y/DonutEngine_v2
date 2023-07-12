@@ -232,49 +232,53 @@ namespace Donut
 
 			// Fields
 			Ref<ScriptClass> entity_class = ScriptEngine::getEntityClass(script_component.class_name_);
-			const auto& fields = entity_class->getFields();
-			if (fields.size() > 0)
+			if (entity_class)
 			{
-				out << YAML::Key << "ScriptFields" << YAML::Value;
-				auto& entity_fields = ScriptEngine::getScriptFieldMap(entity);
-				out << YAML::BeginSeq;
-				for (const auto& [name, field] : fields)
+				const auto& fields = entity_class->getFields();
+				if (fields.size() > 0)
 				{
-					if (entity_fields.find(name) == entity_fields.end())
-						continue;
-
-					out << YAML::BeginMap; // ScriptField
-					out << YAML::Key << "Name" << YAML::Value << name;
-					out << YAML::Key << "Type" << YAML::Value << Utils::scriptFieldTypeToString(field.type_);
-
-					out << YAML::Key << "Data" << YAML::Value;
-					ScriptFieldInstance& script_field = entity_fields.at(name);
-
-					switch (field.type_)
+					out << YAML::Key << "ScriptFields" << YAML::Value;
+					auto& entity_fields = ScriptEngine::getScriptFieldMap(entity);
+					out << YAML::BeginSeq;
+					for (const auto& [name, field] : fields)
 					{
-						WRITE_SCRIPT_FIELD(Float, float);
-						WRITE_SCRIPT_FIELD(Double, double);
-						WRITE_SCRIPT_FIELD(Bool, bool);
-						WRITE_SCRIPT_FIELD(Char, char);
-						WRITE_SCRIPT_FIELD(Byte, int8_t);
-						WRITE_SCRIPT_FIELD(Short, int16_t);
-						WRITE_SCRIPT_FIELD(Int, int32_t);
-						WRITE_SCRIPT_FIELD(Long, int64_t);
-						WRITE_SCRIPT_FIELD(UByte, uint8_t);
-						WRITE_SCRIPT_FIELD(UShort, uint16_t);
-						WRITE_SCRIPT_FIELD(UInt, uint32_t);
-						WRITE_SCRIPT_FIELD(ULong, uint64_t);
-						WRITE_SCRIPT_FIELD(Vector2, glm::vec2);
-						WRITE_SCRIPT_FIELD(Vector3, glm::vec3);
-						WRITE_SCRIPT_FIELD(Vector4, glm::vec4);
-						WRITE_SCRIPT_FIELD(Entity, UUID);
-					}
-					out << YAML::EndMap; // ScriptFields
-				}
-				out << YAML::EndSeq;
-			}
+						if (entity_fields.find(name) == entity_fields.end())
+							continue;
 
+						out << YAML::BeginMap; // ScriptField
+						out << YAML::Key << "Name" << YAML::Value << name;
+						out << YAML::Key << "Type" << YAML::Value << Utils::scriptFieldTypeToString(field.type_);
+
+						out << YAML::Key << "Data" << YAML::Value;
+						ScriptFieldInstance& script_field = entity_fields.at(name);
+
+						switch (field.type_)
+						{
+							WRITE_SCRIPT_FIELD(Float, float);
+							WRITE_SCRIPT_FIELD(Double, double);
+							WRITE_SCRIPT_FIELD(Bool, bool);
+							WRITE_SCRIPT_FIELD(Char, char);
+							WRITE_SCRIPT_FIELD(Byte, int8_t);
+							WRITE_SCRIPT_FIELD(Short, int16_t);
+							WRITE_SCRIPT_FIELD(Int, int32_t);
+							WRITE_SCRIPT_FIELD(Long, int64_t);
+							WRITE_SCRIPT_FIELD(UByte, uint8_t);
+							WRITE_SCRIPT_FIELD(UShort, uint16_t);
+							WRITE_SCRIPT_FIELD(UInt, uint32_t);
+							WRITE_SCRIPT_FIELD(ULong, uint64_t);
+							WRITE_SCRIPT_FIELD(Vector2, glm::vec2);
+							WRITE_SCRIPT_FIELD(Vector3, glm::vec3);
+							WRITE_SCRIPT_FIELD(Vector4, glm::vec4);
+							WRITE_SCRIPT_FIELD(Entity, UUID);
+						}
+						out << YAML::EndMap; // ScriptFields
+					}
+					out << YAML::EndSeq;
+				}
+
+			}
 			out << YAML::EndMap;
+			
 		}
 
 		if (entity.hasComponent<SpriteRendererComponent>())
