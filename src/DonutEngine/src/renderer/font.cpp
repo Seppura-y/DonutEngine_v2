@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "font.h"
 
+#include "renderer/msdf_data.h"
+
 #undef INFINITE
 #include <msdf-atlas-gen.h>
 
@@ -13,11 +15,11 @@ using namespace msdfgen;
 
 namespace Donut
 {
-	struct MSDFData
-	{
-		std::vector<msdf_atlas::GlyphGeometry> glyphs_;
-		msdf_atlas::FontGeometry font_geometry_;
-	};
+	//struct MSDFData
+	//{
+	//	std::vector<msdf_atlas::GlyphGeometry> glyphs_;
+	//	msdf_atlas::FontGeometry font_geometry_;
+	//};
 
 	template<typename T, typename S, int N, msdf_atlas::GeneratorFunction<S, N> GenFunc>
 	static Ref<Texture2D> createAndCacheAtlas(const std::string& font_name, float font_size,
@@ -101,6 +103,32 @@ namespace Donut
 		int width, height;
 		atlas_packer.getDimensions(width, height);
 		em_size = atlas_packer.getScale();
+
+#define DEFAULT_ANGLE_THRESHOLD 3.0
+#define LCG_MULTIPLIER 6364136223846793005ull
+#define LCG_INCREMENT 1442695040888963407ull
+#define THREAD_COUNT 8
+		// if MSDF || MTSDF
+
+		uint64_t coloring_seed = 0;
+		bool id_expensive_coloring = false;
+		if (id_expensive_coloring)
+		{
+			msdf_atlas::Workload([&glyphs = msdf_data_->glyphs_, &coloring_seed](int i, int threadNo) -> bool {
+				unsigned long long glyph_seed = (LCG_MULTIPLIER * (coloring_seed ^ i) + LCG_INCREMENT) * !!coloring_seed;
+			glyphs[i].edgeColoring(msdfgen::edgeColoringInkTrap, DEFAULT_ANGLE_THRESHOLD, glyph_seed);
+			return true;
+				}, msdf_data_->glyphs_.size()).finish(THREAD_COUNT);
+		}
+		else {
+			unsigned long long glyph_seed = coloring_seed;
+			for (msdf_atlas::GlyphGeometry& glyph : msdf_data_->glyphs_)
+			{
+				glyph_seed *= LCG_MULTIPLIER;
+				glyph.edgeColoring(msdfgen::edgeColoringInkTrap, DEFAULT_ANGLE_THRESHOLD, glyph_seed);
+			}
+		}
+
 		atlas_texture_ = createAndCacheAtlas<uint8_t, float, 3, msdf_atlas::msdfGenerator>(
 			"test",
 			(float)em_size,

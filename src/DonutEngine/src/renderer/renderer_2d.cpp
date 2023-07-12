@@ -7,6 +7,8 @@
 
 #include "renderer/uniform_buffer.h"
 
+#include "renderer/msdf_data.h"
+
 #include "platform/opengl/opengl_shader.h"
 #include "platform/opengl/opengl_vertex_array.h"
 #include "platform/opengl/opengl_texture.h"
@@ -907,6 +909,58 @@ namespace Donut
 		drawLine(line_vertices[1], line_vertices[2], color, entity_id);
 		drawLine(line_vertices[2], line_vertices[3], color, entity_id);
 		drawLine(line_vertices[3], line_vertices[0], color, entity_id);
+	}
+
+	void Renderer2D::drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const glm::vec4& color)
+	{
+		const auto& font_geometry = font->getMSDFData()->font_geometry_;
+		const auto& metrics = font_geometry.getMetrics();
+
+		Ref<Texture2D> font_atlas_texture = font->getAtlasTexture();
+
+		double x = 0.0;
+		double fs_scale = 1.0 / (metrics.ascenderY - metrics.descenderY);
+		double y = 0;
+
+		char character = 'C';
+		auto glyph = font_geometry.getGlyph(character);
+		if (!glyph)
+		{
+			glyph = font_geometry.getGlyph('?');
+		}
+		if (!glyph)
+		{
+			return;
+		}
+
+		double al, ab, ar, at;
+		glyph->getQuadAtlasBounds(al, ab, ar, at);
+		glm::vec2 texcoord_min((float)al, (float)ab);
+		glm::vec2 texcoord_max((float)ar, (float)at);
+
+		double pl, pb, pr, pt;
+		glyph->getQuadPlaneBounds(pl, pb, pr, pt);
+		glm::vec2 rect_min((float)pl, (float)pb);
+		glm::vec2 rect_max((float)pr, (float)pt);
+
+		rect_min *= fs_scale, rect_max *= fs_scale;
+		rect_min += glm::vec2(x, y);
+		rect_max += glm::vec2(x, y);
+
+		float texel_width = 1.0f / font_atlas_texture->getWidth();
+		float texel_height = 1.0f / font_atlas_texture->getHeight();
+		texcoord_min *= glm::vec2(texel_width, texel_height);
+		texcoord_max *= glm::vec2(texel_width, texel_height);
+		//al *= texel_width, ab *= texel_height, ar *= texel_width, at *= texel_height;
+
+		// render here
+		double advance = glyph->getAdvance();
+		char next_character = 'C';
+		font_geometry.getAdvance(advance, character, next_character);
+
+		float kerning_offset = 0.0f;
+		x += fs_scale * advance + kerning_offset;
+
 	}
 
 	float Renderer2D::getLineWidth()

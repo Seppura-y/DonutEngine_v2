@@ -6,6 +6,8 @@
 #include "renderer/subtexture.h"
 #include "renderer/camera.h"
 #include "renderer/editor_camera.h"
+#include "renderer/font.h"
+
 #include "scene/components.h"
 
 namespace Donut
@@ -51,7 +53,9 @@ namespace Donut
 		static void drawLine(const glm::vec3& p0, glm::vec3& p1, const glm::vec4& color, int entity_id = -1);
 		static void drawRectangleWithLines(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entity_id = -1);
 		static void drawRectangleWithLines(const glm::mat4& transform, const glm::vec4& color, int entity_id = -1);
+		
 
+		static void drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const glm::vec4& color);
 		static float getLineWidth();
 		static void setLineWidth(float width);
 
