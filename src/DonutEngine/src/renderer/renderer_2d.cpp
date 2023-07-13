@@ -49,6 +49,11 @@ namespace Donut
 		int entity_id_;
 	};
 
+	struct TextVertex
+	{
+
+	};
+
 	struct Renderer2DData
 	{
 		static const uint32_t max_rects_ = 20000;

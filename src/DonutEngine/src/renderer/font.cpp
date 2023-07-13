@@ -15,12 +15,6 @@ using namespace msdfgen;
 
 namespace Donut
 {
-	//struct MSDFData
-	//{
-	//	std::vector<msdf_atlas::GlyphGeometry> glyphs_;
-	//	msdf_atlas::FontGeometry font_geometry_;
-	//};
-
 	template<typename T, typename S, int N, msdf_atlas::GeneratorFunction<S, N> GenFunc>
 	static Ref<Texture2D> createAndCacheAtlas(const std::string& font_name, float font_size,
 		const std::vector<msdf_atlas::GlyphGeometry>& glyphs,
