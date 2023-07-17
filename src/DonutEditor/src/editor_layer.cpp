@@ -44,7 +44,7 @@ static const char* map_tiles =
 "WWWWWWWWWWWWWWWWWWWWWWWW"
 "WWWWWWWWWWWWWWWWWWWWWWWW";
 
-static Donut::Font* s_font;
+static Donut::Ref<Donut::Font> s_font;
 
 Donut::EditorLayer::EditorLayer()
 	: Donut::Layer("sandbox 2d"),
@@ -52,7 +52,7 @@ Donut::EditorLayer::EditorLayer()
 	rectangle_color_({ 0.2f, 0.3f, 0.8f, 1.0f })
 {
 	//Font font("assets/fonts/opensans/OpenSans-Regular.ttf");
-	s_font = new Donut::Font("assets/fonts/opensans/OpenSans-Regular.ttf");
+	s_font = Donut::Font::getDefaultFont();
 }
 
 

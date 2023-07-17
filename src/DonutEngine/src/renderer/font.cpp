@@ -16,9 +16,12 @@ using namespace msdfgen;
 namespace Donut
 {
 	template<typename T, typename S, int N, msdf_atlas::GeneratorFunction<S, N> GenFunc>
-	static Ref<Texture2D> createAndCacheAtlas(const std::string& font_name, float font_size,
+	static Ref<Texture2D> createAndCacheAtlas(
+		const std::string& font_name,
+		float font_size,
 		const std::vector<msdf_atlas::GlyphGeometry>& glyphs,
-		const msdf_atlas::FontGeometry& font_geometry, uint32_t width, uint32_t height)
+		const msdf_atlas::FontGeometry& font_geometry,
+		uint32_t width, uint32_t height)
 	{
 		msdf_atlas::GeneratorAttributes attributes;
 		attributes.config.overlapSupport = true;
@@ -102,8 +105,8 @@ namespace Donut
 #define LCG_MULTIPLIER 6364136223846793005ull
 #define LCG_INCREMENT 1442695040888963407ull
 #define THREAD_COUNT 8
-		// if MSDF || MTSDF
 
+		// if MSDF || MTSDF
 		uint64_t coloring_seed = 0;
 		bool id_expensive_coloring = false;
 		if (id_expensive_coloring)
@@ -141,5 +144,16 @@ namespace Donut
 		{
 			delete msdf_data_;
 		}
+	}
+
+
+	Ref<Font> Font::getDefaultFont()
+	{
+		static Ref<Font> default_font;
+		if (!default_font)
+		{
+			default_font = createRef<Font>("assets/fonts/opensans/OpenSans-Regular.ttf");
+		}
+		return default_font;
 	}
 }

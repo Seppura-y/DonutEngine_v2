@@ -51,7 +51,11 @@ namespace Donut
 
 	struct TextVertex
 	{
+		glm::vec3 position_;
+		glm::vec4 color_;
+		glm::vec2 tex_coordinate_;
 
+		int entity_id_;
 	};
 
 	struct Renderer2DData
@@ -93,10 +97,22 @@ namespace Donut
 		LineVertex* line_vertex_buffer_base_ = nullptr;
 		LineVertex* line_vertex_buffer_ptr_ = nullptr;
 
+		////////////////////////////////////////////////////////////
+		// Text
+		Ref<VertexArray> text_va_;
+		Ref<VertexBuffer> text_vb_;
+		Ref<Shader> text_shader_;
+
+		uint32_t text_indices_count_ = 0;
+		TextVertex* text_vertex_buffer_base_ = nullptr;
+		TextVertex* text_vertex_buffer_ptr_ = nullptr;
+
 		float line_width_ = 2.0f;
 
 		std::array<Ref<Texture2D>, max_texture_slots_> texture_slots_;
 		uint32_t texture_index_ = 1;	//slot 0 for white texture
+
+		Ref<Texture2D> font_atlas_texture_;
 
 		glm::vec4 rect_vertex_positions_[4];
 		Renderer2D::Statistics statistics_;
@@ -180,6 +196,20 @@ namespace Donut
 		s_data.line_vertex_buffer_base_ = new LineVertex[s_data.max_vertices_];
 
 
+		s_data.text_va_ = VertexArray::create();
+
+		s_data.text_vb_.reset(VertexBuffer::create(s_data.max_indices_ * sizeof(TextVertex)));
+		s_data.text_vb_->setLayout({
+			{ ShaderDataType::Float3,	"a_Position" },
+			{ ShaderDataType::Float4,	"a_Color"},
+			{ ShaderDataType::Float2,	"a_TexCoord"},
+			{ ShaderDataType::Int,		"a_EntityID"}
+		});
+		s_data.text_va_->addVertexBuffer(s_data.text_vb_);
+		s_data.text_vertex_buffer_base_ = new TextVertex[s_data.max_vertices_];
+
+		s_data.text_va_->setIndexBuffer(rectangle_ib);
+
 		s_data.white_texture_ = Texture2D::createTexture(TextureSpecification());
 		uint32_t white_texture_data = 0xffffffff;
 		s_data.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
@@ -193,6 +223,7 @@ namespace Donut
 		s_data.circle_shader_ = Shader::createShader("assets/shaders/c8_circle_rendering.glsl");
 		s_data.rectangle_shader_ = Shader::createShader("assets/shaders/c7_spirv_shader.glsl");
 		s_data.line_shader_ = Shader::createShader("assets/shaders/c9_line_rendering.glsl");
+		s_data.text_shader_ = Shader::createShader("assets/shaders/c10_text_rendering.glsl");
 		//s_data.single_shader_ = Shader::createShader("assets/shaders/c6_batch_texture_rendering_v2.glsl");
 		//s_data.single_shader_->bind();
 		//s_data.single_shader_->setIntArray("u_textures", samplers, s_data.max_texture_slots_);
@@ -233,6 +264,9 @@ namespace Donut
 		s_data.line_vertex_count_ = 0;
 		s_data.line_vertex_buffer_ptr_ = s_data.line_vertex_buffer_base_;
 
+		s_data.text_indices_count_ = 0;
+		s_data.text_vertex_buffer_ptr_ = s_data.text_vertex_buffer_base_;
+
 		s_data.texture_index_ = 1;
 	}
 
@@ -249,6 +283,9 @@ namespace Donut
 
 		s_data.line_vertex_count_ = 0;
 		s_data.line_vertex_buffer_ptr_ = s_data.line_vertex_buffer_base_;
+
+		s_data.text_indices_count_ = 0;
+		s_data.text_vertex_buffer_ptr_ = s_data.text_vertex_buffer_base_;
 
 		s_data.texture_index_ = 1;
 	}
@@ -273,6 +310,9 @@ namespace Donut
 
 		s_data.line_vertex_count_ = 0;
 		s_data.line_vertex_buffer_ptr_ = s_data.line_vertex_buffer_base_;
+
+		s_data.text_indices_count_ = 0;
+		s_data.text_vertex_buffer_ptr_ = s_data.text_vertex_buffer_base_;
 
 		s_data.texture_index_ = 1;
 	}
@@ -328,6 +368,18 @@ namespace Donut
 			s_data.line_shader_->bind();
 			RenderCommand::setLineWidth(s_data.line_width_);
 			RenderCommand::drawLines(s_data.line_va_, s_data.line_vertex_count_);
+			s_data.statistics_.drawcalls_++;
+		}
+
+		if (s_data.text_indices_count_)
+		{
+			uint32_t data_size = (uint32_t)((uint8_t*)s_data.text_vertex_buffer_ptr_ - (uint8_t*)s_data.text_vertex_buffer_base_);
+			s_data.text_vb_->setData(s_data.text_vertex_buffer_base_, data_size);
+
+			s_data.font_atlas_texture_->bind(0);
+
+			s_data.text_shader_->bind();
+			RenderCommand::drawIndices(s_data.text_va_, s_data.text_indices_count_);
 			s_data.statistics_.drawcalls_++;
 		}
 	}
@@ -916,56 +968,110 @@ namespace Donut
 		drawLine(line_vertices[3], line_vertices[0], color, entity_id);
 	}
 
-	void Renderer2D::drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const glm::vec4& color, int entity_id)
 	{
 		const auto& font_geometry = font->getMSDFData()->font_geometry_;
 		const auto& metrics = font_geometry.getMetrics();
 
 		Ref<Texture2D> font_atlas_texture = font->getAtlasTexture();
+		s_data.font_atlas_texture_ = font_atlas_texture;
 
 		double x = 0.0;
+		double y = 0.0;
 		double fs_scale = 1.0 / (metrics.ascenderY - metrics.descenderY);
-		double y = 0;
 
-		char character = 'C';
-		auto glyph = font_geometry.getGlyph(character);
-		if (!glyph)
+		float lineheight_offset = 0.0f;
+
+		for (size_t i = 0; i < string.size(); i++)
 		{
-			glyph = font_geometry.getGlyph('?');
+			char character = string[i];
+
+			if (character == '\r')
+			{
+				continue;
+			}
+
+			if (character == '\n')
+			{
+				x = 0;
+				y -= fs_scale * metrics.lineHeight + lineheight_offset;
+				continue;
+			}
+
+			auto glyph = font_geometry.getGlyph(character);
+			if (!glyph)
+			{
+				glyph = font_geometry.getGlyph('?');
+			}
+			if (!glyph)
+			{
+				return;
+			}
+
+			if (character == '\t')
+			{
+				glyph = font_geometry.getGlyph(' ');
+			}
+
+			double al, ab, ar, at;
+			glyph->getQuadAtlasBounds(al, ab, ar, at);
+			glm::vec2 texcoord_min((float)al, (float)ab);
+			glm::vec2 texcoord_max((float)ar, (float)at);
+
+			double pl, pb, pr, pt;
+			glyph->getQuadPlaneBounds(pl, pb, pr, pt);
+			glm::vec2 rect_min((float)pl, (float)pb);
+			glm::vec2 rect_max((float)pr, (float)pt);
+
+			rect_min *= fs_scale, rect_max *= fs_scale;
+			rect_min += glm::vec2(x, y);
+			rect_max += glm::vec2(x, y);
+
+			float texel_width = 1.0f / font_atlas_texture->getWidth();
+			float texel_height = 1.0f / font_atlas_texture->getHeight();
+			texcoord_min *= glm::vec2(texel_width, texel_height);
+			texcoord_max *= glm::vec2(texel_width, texel_height);
+			//al *= texel_width, ab *= texel_height, ar *= texel_width, at *= texel_height;
+
+			// render here
+			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_min, 0.0f, 1.0f);
+			s_data.text_vertex_buffer_ptr_->color_ = color;
+			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = texcoord_min;
+			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
+			s_data.text_vertex_buffer_ptr_++;
+
+			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_min.x, rect_max.y, 0.0f, 1.0f);
+			s_data.text_vertex_buffer_ptr_->color_ = color;
+			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = { texcoord_min.x, texcoord_max.y };
+			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
+			s_data.text_vertex_buffer_ptr_++;
+
+			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_max, 0.0f, 1.0f);
+			s_data.text_vertex_buffer_ptr_->color_ = color;
+			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = texcoord_max;
+			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
+			s_data.text_vertex_buffer_ptr_++;
+
+			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_max.x, rect_min.y, 0.0f, 1.0f);
+			s_data.text_vertex_buffer_ptr_->color_ = color;
+			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = { texcoord_max.x, texcoord_min.y };
+			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
+			s_data.text_vertex_buffer_ptr_++;
+
+			s_data.text_indices_count_ += 6;
+			s_data.statistics_.rect_count_++;
+
+			if (i < string.size() - 1)
+			{
+				double advance = glyph->getAdvance();
+				char next_character = string[i + 1];
+				font_geometry.getAdvance(advance, character, next_character);
+
+				// ×Ö¾à
+				float kerning_offset = 0.0f;
+				x += fs_scale * advance + kerning_offset;
+			}
 		}
-		if (!glyph)
-		{
-			return;
-		}
-
-		double al, ab, ar, at;
-		glyph->getQuadAtlasBounds(al, ab, ar, at);
-		glm::vec2 texcoord_min((float)al, (float)ab);
-		glm::vec2 texcoord_max((float)ar, (float)at);
-
-		double pl, pb, pr, pt;
-		glyph->getQuadPlaneBounds(pl, pb, pr, pt);
-		glm::vec2 rect_min((float)pl, (float)pb);
-		glm::vec2 rect_max((float)pr, (float)pt);
-
-		rect_min *= fs_scale, rect_max *= fs_scale;
-		rect_min += glm::vec2(x, y);
-		rect_max += glm::vec2(x, y);
-
-		float texel_width = 1.0f / font_atlas_texture->getWidth();
-		float texel_height = 1.0f / font_atlas_texture->getHeight();
-		texcoord_min *= glm::vec2(texel_width, texel_height);
-		texcoord_max *= glm::vec2(texel_width, texel_height);
-		//al *= texel_width, ab *= texel_height, ar *= texel_width, at *= texel_height;
-
-		// render here
-		double advance = glyph->getAdvance();
-		char next_character = 'C';
-		font_geometry.getAdvance(advance, character, next_character);
-
-		float kerning_offset = 0.0f;
-		x += fs_scale * advance + kerning_offset;
-
 	}
 
 	float Renderer2D::getLineWidth()

@@ -18,6 +18,8 @@ namespace Donut
 		Ref<Texture2D> getAtlasTexture() const { return atlas_texture_; }
 
 		const MSDFData* getMSDFData() const { return msdf_data_; }
+
+		static Ref<Font> getDefaultFont();
 	private:
 		MSDFData* msdf_data_;
 		Ref<Texture2D> atlas_texture_;

@@ -532,6 +532,28 @@ namespace Donut
 
 		//Renderer2D::drawLine(glm::vec3(0.0f), glm::vec3(5.0f), glm::vec4(1, 0, 1, 1));
 
+		//Renderer2D::drawString("Donut", Font::getDefaultFont(), glm::mat4(1.0f), glm::vec4(1.0f));
+
+		std::string str = R"(
+			    public class TransformComponent : Component
+				{
+					public Vector3 Translation
+					{
+						get
+						{
+							InternalCalls.TransformComponent_getTranslation(Entity.ID, out Vector3 translation);
+							return translation;
+						}
+
+						set
+						{
+							InternalCalls.TransformComponent_setTranslation(Entity.ID, ref value);
+						}
+					}
+				}
+		)";
+		Renderer2D::drawString(str, Font::getDefaultFont(), glm::mat4(1.0f), glm::vec4(1.0f, 0.2f, 0.5f, 1.0f));
+
 		Renderer2D::endScene();
 	}
 
