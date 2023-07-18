@@ -216,6 +216,16 @@ namespace Donut
 				}
 			}
 
+			{
+				auto view = registry_.view<TransformComponent, TextComponent>();
+
+				for (auto entity : view)
+				{
+					auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
+					Renderer2D::drawString(text.text_string_, transform.getTransform(),text);
+				}
+			}
+
 			Renderer2D::endScene();
 		}
 	}
@@ -534,25 +544,15 @@ namespace Donut
 
 		//Renderer2D::drawString("Donut", Font::getDefaultFont(), glm::mat4(1.0f), glm::vec4(1.0f));
 
-		std::string str = R"(
-			    public class TransformComponent : Component
-				{
-					public Vector3 Translation
-					{
-						get
-						{
-							InternalCalls.TransformComponent_getTranslation(Entity.ID, out Vector3 translation);
-							return translation;
-						}
-
-						set
-						{
-							InternalCalls.TransformComponent_setTranslation(Entity.ID, ref value);
-						}
-					}
-				}
-		)";
-		Renderer2D::drawString(str, Font::getDefaultFont(), glm::mat4(1.0f), glm::vec4(1.0f, 0.2f, 0.5f, 1.0f));
+		{
+			auto view = registry_.view<TransformComponent, TextComponent>();
+			for (auto entity : view)
+			{
+				auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
+				Renderer2D::drawString(text.text_string_, transform.getTransform(), text);
+			}
+		}
+		//Renderer2D::drawString(str, Font::getDefaultFont(), glm::mat4(1.0f), glm::vec4(1.0f, 0.2f, 0.5f, 1.0f));
 
 		Renderer2D::endScene();
 	}
@@ -632,6 +632,12 @@ namespace Donut
 
 	template<>
 	void Scene::onComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::onComponentAdded<TextComponent>(Entity entity, TextComponent& component)
 	{
 
 	}

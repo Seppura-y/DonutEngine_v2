@@ -7,6 +7,7 @@
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -230,6 +231,7 @@ namespace Donut
 			displayAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
 			displayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
 			displayAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
+			displayAddComponentEntry<TextComponent>("Text Component");
 
 			ImGui::EndPopup();
 		}
@@ -489,6 +491,14 @@ namespace Donut
 			ImGui::DragFloat("Friction", &component.friction_, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Restitution", &component.restitution_, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Restitution Threshold", &component.restitution_threshold_, 0.01f, 0.0f);
+		});
+
+		drawComponent<TextComponent>("Text", entity, [](auto& component)
+		{
+			ImGui::InputTextMultiline("Text String", &component.text_string_);
+			ImGui::DragFloat("Kerning", &component.kerning_, 0.025f, 0.0f, 1.0f);
+			ImGui::DragFloat("Line Spacing", &component.line_spacing_, 0.025f, 0.0f, 1.0f);
+			ImGui::ColorEdit4("Text Color", glm::value_ptr(component.color_));
 		});
 	}
 

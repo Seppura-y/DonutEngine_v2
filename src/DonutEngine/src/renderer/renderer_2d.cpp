@@ -968,7 +968,7 @@ namespace Donut
 		drawLine(line_vertices[3], line_vertices[0], color, entity_id);
 	}
 
-	void Renderer2D::drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const glm::vec4& color, int entity_id)
+	void Renderer2D::drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& text_params)
 	{
 		const auto& font_geometry = font->getMSDFData()->font_geometry_;
 		const auto& metrics = font_geometry.getMetrics();
@@ -980,7 +980,7 @@ namespace Donut
 		double y = 0.0;
 		double fs_scale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 
-		float lineheight_offset = 0.0f;
+		const float space_glyph_advance = font_geometry.getGlyph(' ')->getAdvance();
 
 		for (size_t i = 0; i < string.size(); i++)
 		{
@@ -994,7 +994,27 @@ namespace Donut
 			if (character == '\n')
 			{
 				x = 0;
-				y -= fs_scale * metrics.lineHeight + lineheight_offset;
+				y -= fs_scale * metrics.lineHeight + text_params.line_spacing_;
+				continue;
+			}
+
+			if (character == ' ')
+			{
+				float advance = space_glyph_advance;
+				if (i < string.size() - 1)
+				{
+					char next_character = string[i + 1];
+					double next_advance;
+					font_geometry.getAdvance(next_advance, character, next_character);
+					advance = (float)next_advance;
+				}
+				x += fs_scale * advance + text_params.kerning_;
+				continue;
+			}
+
+			if (character == '\t')
+			{
+				x += 4 * (fs_scale * space_glyph_advance + text_params.kerning_);
 				continue;
 			}
 
@@ -1006,11 +1026,6 @@ namespace Donut
 			if (!glyph)
 			{
 				return;
-			}
-
-			if (character == '\t')
-			{
-				glyph = font_geometry.getGlyph(' ');
 			}
 
 			double al, ab, ar, at;
@@ -1035,25 +1050,25 @@ namespace Donut
 
 			// render here
 			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_min, 0.0f, 1.0f);
-			s_data.text_vertex_buffer_ptr_->color_ = color;
+			s_data.text_vertex_buffer_ptr_->color_ = text_params.color_;
 			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = texcoord_min;
 			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
 			s_data.text_vertex_buffer_ptr_++;
 
 			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_min.x, rect_max.y, 0.0f, 1.0f);
-			s_data.text_vertex_buffer_ptr_->color_ = color;
+			s_data.text_vertex_buffer_ptr_->color_ = text_params.color_;
 			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = { texcoord_min.x, texcoord_max.y };
 			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
 			s_data.text_vertex_buffer_ptr_++;
 
 			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_max, 0.0f, 1.0f);
-			s_data.text_vertex_buffer_ptr_->color_ = color;
+			s_data.text_vertex_buffer_ptr_->color_ = text_params.color_;
 			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = texcoord_max;
 			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
 			s_data.text_vertex_buffer_ptr_++;
 
 			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_max.x, rect_min.y, 0.0f, 1.0f);
-			s_data.text_vertex_buffer_ptr_->color_ = color;
+			s_data.text_vertex_buffer_ptr_->color_ = text_params.color_;
 			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = { texcoord_max.x, texcoord_min.y };
 			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
 			s_data.text_vertex_buffer_ptr_++;
@@ -1067,11 +1082,15 @@ namespace Donut
 				char next_character = string[i + 1];
 				font_geometry.getAdvance(advance, character, next_character);
 
-				// ×Ö¾à
-				float kerning_offset = 0.0f;
-				x += fs_scale * advance + kerning_offset;
+
+				x += fs_scale * advance + text_params.kerning_;
 			}
 		}
+	}
+
+	void Renderer2D::drawString(const std::string& string, const glm::mat4& transform, const TextComponent& component)
+	{
+		drawString(string, component.font_, transform, { component.color_, component.kerning_, component.line_spacing_ });
 	}
 
 	float Renderer2D::getLineWidth()

@@ -54,8 +54,14 @@ namespace Donut
 		static void drawRectangleWithLines(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entity_id = -1);
 		static void drawRectangleWithLines(const glm::mat4& transform, const glm::vec4& color, int entity_id = -1);
 		
-
-		static void drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const glm::vec4& color, int entity_id = -1);
+		struct TextParams
+		{
+			glm::vec4 color_{ 1.0f };
+			float kerning_{ 0.0f };
+			float line_spacing_{ 0.0f };
+		};
+		static void drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& text_params);
+		static void drawString(const std::string& string, const glm::mat4& transform, const TextComponent& component);
 		
 		static float getLineWidth();
 		static void setLineWidth(float width);

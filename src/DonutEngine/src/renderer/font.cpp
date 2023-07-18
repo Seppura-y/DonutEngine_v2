@@ -152,7 +152,8 @@ namespace Donut
 		static Ref<Font> default_font;
 		if (!default_font)
 		{
-			default_font = createRef<Font>("assets/fonts/opensans/OpenSans-Regular.ttf");
+			default_font = createRef<Font>("assets/fonts/opensans/CascadiaCode.ttf");
+			//default_font = createRef<Font>("assets/fonts/opensans/OpenSans-Regular.ttf");
 		}
 		return default_font;
 	}

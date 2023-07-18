@@ -356,6 +356,20 @@ namespace Donut
 			out << YAML::EndMap;
 		}
 
+		if (entity.hasComponent<TextComponent>())
+		{
+			out << YAML::Key << "TextComponent";
+			out << YAML::BeginMap;
+
+			auto& text_component = entity.getComponent<TextComponent>();
+			out << YAML::Key << "TextString" << YAML::Value << text_component.text_string_;
+			out << YAML::Key << "Color" << YAML::Value << text_component.color_;
+			out << YAML::Key << "Kerning" << YAML::Value << text_component.kerning_;
+			out << YAML::Key << "LineSpacing" << YAML::Value << text_component.line_spacing_;
+
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 	}
 
@@ -576,6 +590,17 @@ namespace Donut
 					cc2d.friction_ = circle_collider_2d_component["Friction"].as<float>();
 					cc2d.restitution_ = circle_collider_2d_component["Restitution"].as<float>();
 					cc2d.restitution_threshold_ = circle_collider_2d_component["RestitutionThreshold"].as<float>();
+				}
+
+				auto text_component = entity["TextComponent"];
+				if (text_component)
+				{
+					auto& tc = deserialized_entity.addComponent<TextComponent>();
+					tc.text_string_ = text_component["TextString"].as<std::string>();
+					tc.color_ = text_component["Color"].as<glm::vec4>();
+					tc.kerning_ = text_component["Kerning"].as<float>();
+					tc.line_spacing_ = text_component["LineSpacing"].as<float>();
+
 				}
 			}
 		}

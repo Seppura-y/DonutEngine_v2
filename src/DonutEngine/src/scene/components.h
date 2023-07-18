@@ -4,6 +4,8 @@
 #include "scene/scene_camera.h"
 #include "core/uuid.h"
 
+#include "renderer/font.h"
+
 #include "renderer/texture.h"
 #include "renderer/camera.h"
 
@@ -198,6 +200,15 @@ namespace Donut
 		ScriptComponent(const ScriptComponent& other) = default;
 	};
 
+	struct TextComponent
+	{
+		std::string text_string_;
+		float kerning_ = 0.0f;
+		float line_spacing_ = 0.0f;
+		Ref<Font> font_ = Font::getDefaultFont();
+		glm::vec4 color_ = glm::vec4(1.0f);
+	};
+
 	 template<typename... Component>
 	 struct ComponentGroup
 	 {
@@ -206,6 +217,6 @@ namespace Donut
 
 	 using AllComponents =
 			ComponentGroup<TransformComponent, SpriteRendererComponent, CircleRendererComponent, CameraComponent,ScriptComponent,
-							CircleCollider2DComponent, BoxCollider2DComponent, NativeScriptComponent, Rigidbody2DComponent>;
+							CircleCollider2DComponent, BoxCollider2DComponent, NativeScriptComponent, Rigidbody2DComponent, TextComponent>;
 }
 #endif
