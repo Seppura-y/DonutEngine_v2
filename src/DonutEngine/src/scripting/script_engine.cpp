@@ -85,11 +85,11 @@ namespace Donut {
 		{ "System.UInt32", ScriptFieldType::UInt },
 		{ "System.UInt64", ScriptFieldType::ULong },
 
-		{ "Hazel.Vector2", ScriptFieldType::Vector2 },
-		{ "Hazel.Vector3", ScriptFieldType::Vector3 },
-		{ "Hazel.Vector4", ScriptFieldType::Vector4 },
+		{ "Donut.Vector2", ScriptFieldType::Vector2 },
+		{ "Donut.Vector3", ScriptFieldType::Vector3 },
+		{ "Donut.Vector4", ScriptFieldType::Vector4 },
 
-		{ "Hazel.Entity", ScriptFieldType::Entity },
+		{ "Donut.Entity", ScriptFieldType::Entity },
 	};
 
 	namespace Utils {
@@ -410,7 +410,7 @@ namespace Donut {
 		}
 		else
 		{
-			DN_CORE_ERROR("Could not find ScriptInstance for entity {}",entity_uuid);
+			//DN_CORE_ERROR("Could not find ScriptInstance for entity {}",entity_uuid);
 		}
 	}
 
