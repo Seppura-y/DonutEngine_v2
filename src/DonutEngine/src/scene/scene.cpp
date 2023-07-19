@@ -222,7 +222,7 @@ namespace Donut
 				for (auto entity : view)
 				{
 					auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
-					Renderer2D::drawString(text.text_string_, transform.getTransform(),text);
+					Renderer2D::drawString(text.text_string_, transform.getTransform(),text, (int)entity);
 				}
 			}
 
@@ -472,7 +472,14 @@ namespace Donut
 				auto& box_collider_2d = entity.getComponent<BoxCollider2DComponent>();
 
 				b2PolygonShape box_shape;
-				box_shape.SetAsBox(box_collider_2d.size_.x * transform.scale_.x, box_collider_2d.size_.y * transform.scale_.y);
+				//box_shape.SetAsBox(box_collider_2d.size_.x * transform.scale_.x, box_collider_2d.size_.y * transform.scale_.y);
+				
+				box_shape.SetAsBox(
+					box_collider_2d.size_.x * transform.scale_.x,
+					box_collider_2d.size_.y * transform.scale_.y,
+					b2Vec2(box_collider_2d.offset_.x, box_collider_2d.offset_.y),
+					0.0f
+				);
 
 				b2FixtureDef fixture_def;
 				fixture_def.shape = &box_shape;
@@ -549,7 +556,7 @@ namespace Donut
 			for (auto entity : view)
 			{
 				auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
-				Renderer2D::drawString(text.text_string_, transform.getTransform(), text);
+				Renderer2D::drawString(text.text_string_, transform.getTransform(), text, (int)entity);
 			}
 		}
 		//Renderer2D::drawString(str, Font::getDefaultFont(), glm::mat4(1.0f), glm::vec4(1.0f, 0.2f, 0.5f, 1.0f));

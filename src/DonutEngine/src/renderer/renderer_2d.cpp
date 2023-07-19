@@ -968,7 +968,7 @@ namespace Donut
 		drawLine(line_vertices[3], line_vertices[0], color, entity_id);
 	}
 
-	void Renderer2D::drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& text_params)
+	void Renderer2D::drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& text_params, int entity_id)
 	{
 		const auto& font_geometry = font->getMSDFData()->font_geometry_;
 		const auto& metrics = font_geometry.getMetrics();
@@ -1052,25 +1052,25 @@ namespace Donut
 			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_min, 0.0f, 1.0f);
 			s_data.text_vertex_buffer_ptr_->color_ = text_params.color_;
 			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = texcoord_min;
-			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
+			s_data.text_vertex_buffer_ptr_->entity_id_ = entity_id;
 			s_data.text_vertex_buffer_ptr_++;
 
 			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_min.x, rect_max.y, 0.0f, 1.0f);
 			s_data.text_vertex_buffer_ptr_->color_ = text_params.color_;
 			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = { texcoord_min.x, texcoord_max.y };
-			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
+			s_data.text_vertex_buffer_ptr_->entity_id_ = entity_id;
 			s_data.text_vertex_buffer_ptr_++;
 
 			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_max, 0.0f, 1.0f);
 			s_data.text_vertex_buffer_ptr_->color_ = text_params.color_;
 			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = texcoord_max;
-			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
+			s_data.text_vertex_buffer_ptr_->entity_id_ = entity_id;
 			s_data.text_vertex_buffer_ptr_++;
 
 			s_data.text_vertex_buffer_ptr_->position_ = transform * glm::vec4(rect_max.x, rect_min.y, 0.0f, 1.0f);
 			s_data.text_vertex_buffer_ptr_->color_ = text_params.color_;
 			s_data.text_vertex_buffer_ptr_->tex_coordinate_ = { texcoord_max.x, texcoord_min.y };
-			s_data.text_vertex_buffer_ptr_->entity_id_ = 0;
+			s_data.text_vertex_buffer_ptr_->entity_id_ = entity_id;
 			s_data.text_vertex_buffer_ptr_++;
 
 			s_data.text_indices_count_ += 6;
@@ -1082,15 +1082,14 @@ namespace Donut
 				char next_character = string[i + 1];
 				font_geometry.getAdvance(advance, character, next_character);
 
-
 				x += fs_scale * advance + text_params.kerning_;
 			}
 		}
 	}
 
-	void Renderer2D::drawString(const std::string& string, const glm::mat4& transform, const TextComponent& component)
+	void Renderer2D::drawString(const std::string& string, const glm::mat4& transform, const TextComponent& component, int entity_id)
 	{
-		drawString(string, component.font_, transform, { component.color_, component.kerning_, component.line_spacing_ });
+		drawString(string, component.font_, transform, { component.color_, component.kerning_, component.line_spacing_ }, entity_id);
 	}
 
 	float Renderer2D::getLineWidth()

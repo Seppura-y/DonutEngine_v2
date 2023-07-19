@@ -60,8 +60,8 @@ namespace Donut
 			float kerning_{ 0.0f };
 			float line_spacing_{ 0.0f };
 		};
-		static void drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& text_params);
-		static void drawString(const std::string& string, const glm::mat4& transform, const TextComponent& component);
+		static void drawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& text_params, int entity_id = -1);
+		static void drawString(const std::string& string, const glm::mat4& transform, const TextComponent& component, int entity_id = -1);
 		
 		static float getLineWidth();
 		static void setLineWidth(float width);

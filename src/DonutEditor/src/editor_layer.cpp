@@ -667,8 +667,13 @@ void Donut::EditorLayer::onOverlayRender()
 				glm::vec3 translation = tc.translation_ + glm::vec3(bc2d.offset_, 0.001f);
 				glm::vec3 scale = tc.scale_ * glm::vec3(bc2d.size_ * 2.0f, 1.0f);
 
-				glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+				//glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+				//	* glm::rotate(glm::mat4(1.0f), tc.rotation_.z, glm::vec3(0.0f, 0.0f, 1.0f))
+				//	* glm::scale(glm::mat4(1.0f), scale);
+
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.translation_)
 					* glm::rotate(glm::mat4(1.0f), tc.rotation_.z, glm::vec3(0.0f, 0.0f, 1.0f))
+					* glm::translate(glm::mat4(1.0f), glm::vec3(bc2d.offset_, 0.001f))
 					* glm::scale(glm::mat4(1.0f), scale);
 
 				Renderer2D::drawRectangleWithLines(transform, glm::vec4(0, 1, 0, 1));

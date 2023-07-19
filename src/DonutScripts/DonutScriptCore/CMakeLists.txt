@@ -21,6 +21,7 @@ add_library(${PROJECT_NAME} SHARED
     src/Donut/Input.cs
     src/Donut/Vector2.cs
     src/Donut/Vector3.cs
+    src/Donut/Vector4.cs
     
     src/Donut/Scene/Entity.cs
     src/Donut/Scene/Components.cs

@@ -54,4 +54,40 @@ namespace Donut
 
 
     }
+
+    public class TextComponent : Component
+    {
+        public string Text
+        {
+            get => InternalCalls.TextComponent_getText(Entity.ID);
+            set => InternalCalls.TextComponent_setText(Entity.ID, value);
+        }
+
+        public Vector4 Color
+        {
+            get
+            {
+                InternalCalls.TextComponent_getColor(Entity.ID, out Vector4 color);
+                return color;
+            }
+
+            set
+            {
+                InternalCalls.TextComponent_setColor(Entity.ID, ref value);
+            }
+        }
+
+        public float Kerning
+        {
+            get => InternalCalls.TextComponent_getKerning(Entity.ID);
+            set => InternalCalls.TextComponent_setKerning(Entity.ID, value);
+        }
+
+
+        public float LineSpacing
+        {
+            get => InternalCalls.TextComponent_getLineSpacing(Entity.ID);
+            set => InternalCalls.TextComponent_setLineSpacing(Entity.ID, value);
+        }
+    }
 }

@@ -539,6 +539,11 @@ namespace Donut {
 		return s_data->entity_instances_.at(uuid)->getManagedObject();
 	}
 
+	MonoString* ScriptEngine::createString(const char* string)
+	{
+		return mono_string_new(s_data->app_domain_, string);
+	}
+
 	ScriptClass::ScriptClass(const std::string& class_namespace, const std::string& class_name, bool is_core)
 		:class_namespace_(class_namespace), class_name_(class_name)
 	{

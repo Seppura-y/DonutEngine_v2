@@ -19,15 +19,26 @@
 
 namespace Donut
 {
+	namespace Utils 
+	{
+
+		std::string monoStringToString(MonoString* string)
+		{
+			char* c_str = mono_string_to_utf8(string);
+			std::string str(c_str);
+			mono_free(c_str);
+			return str;
+		}
+
+	}
+
 	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_entity_hasComponent_funcs;
 
 #define DN_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Donut.InternalCalls::" #Name, Name)
 
 	static void nativeLog(MonoString* string, int parameter)
 	{
-		char* cStr = mono_string_to_utf8(string);
-		std::string str(cStr);
-		mono_free(cStr);
+		std::string str = Utils::monoStringToString(string);
 		std::cout << str << ", " << parameter << std::endl;
 	}
 
@@ -163,6 +174,102 @@ namespace Donut
 		body->SetType(Utils::rigidbody2DTypeToBox2DBody(body_type));
 	}
 
+	static MonoString* TextComponent_getText(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene,"");
+		Entity entity = scene->getEntityByUUID(entityID);
+		DN_CORE_ASSERT(entity,"");
+		DN_CORE_ASSERT(entity.hasComponent<TextComponent>(), "");
+
+		auto& tc = entity.getComponent<TextComponent>();
+		return ScriptEngine::createString(tc.text_string_.c_str());
+	}
+
+	static void TextComponent_setText(UUID entityID, MonoString* textString)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene,"");
+		Entity entity = scene->getEntityByUUID(entityID);
+		DN_CORE_ASSERT(entity, "");
+		DN_CORE_ASSERT(entity.hasComponent<TextComponent>(), "");
+
+		auto& tc = entity.getComponent<TextComponent>();
+		tc.text_string_ = Utils::monoStringToString(textString);
+	}
+
+	static void TextComponent_getColor(UUID entityID, glm::vec4* color)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
+		Entity entity = scene->getEntityByUUID(entityID);
+		DN_CORE_ASSERT(entity, "");
+		DN_CORE_ASSERT(entity.hasComponent<TextComponent>(), "");
+
+		auto& tc = entity.getComponent<TextComponent>();
+		*color = tc.color_;
+	}
+
+	static void TextComponent_setColor(UUID entityID, glm::vec4* color)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
+		Entity entity = scene->getEntityByUUID(entityID);
+		DN_CORE_ASSERT(entity, "");
+		DN_CORE_ASSERT(entity.hasComponent<TextComponent>(), "");
+
+		auto& tc = entity.getComponent<TextComponent>();
+		tc.color_ = *color;
+	}
+
+	static float TextComponent_getKerning(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
+		Entity entity = scene->getEntityByUUID(entityID);
+		DN_CORE_ASSERT(entity, "");
+		DN_CORE_ASSERT(entity.hasComponent<TextComponent>(), "");
+
+		auto& tc = entity.getComponent<TextComponent>();
+		return tc.kerning_;
+	}
+
+	static void TextComponent_setKerning(UUID entityID, float kerning)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
+		Entity entity = scene->getEntityByUUID(entityID);
+		DN_CORE_ASSERT(entity, "");
+		DN_CORE_ASSERT(entity.hasComponent<TextComponent>(), "");
+
+		auto& tc = entity.getComponent<TextComponent>();
+		tc.kerning_ = kerning;
+	}
+
+	static float TextComponent_getLineSpacing(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
+		Entity entity = scene->getEntityByUUID(entityID);
+		DN_CORE_ASSERT(entity, "");
+		DN_CORE_ASSERT(entity.hasComponent<TextComponent>(), "");
+
+		auto& tc = entity.getComponent<TextComponent>();
+		return tc.line_spacing_;
+	}
+
+	static void TextComponent_setLineSpacing(UUID entityID, float lineSpacing)
+	{
+		Scene* scene = ScriptEngine::getSceneContext();
+		DN_CORE_ASSERT(scene, "");
+		Entity entity = scene->getEntityByUUID(entityID);
+		DN_CORE_ASSERT(entity, "");
+		DN_CORE_ASSERT(entity.hasComponent<TextComponent>(), "");
+
+		auto& tc = entity.getComponent<TextComponent>();
+		tc.line_spacing_ = lineSpacing;
+	}
+
 
 
 	static bool Input_isKeydown(KeyCode keycode)
@@ -190,6 +297,15 @@ namespace Donut
 		DN_ADD_INTERNAL_CALL(Rigidbody2DComponent_getLinearVelocity);
 		DN_ADD_INTERNAL_CALL(Rigidbody2DComponent_getType);
 		DN_ADD_INTERNAL_CALL(Rigidbody2DComponent_setType);
+
+		DN_ADD_INTERNAL_CALL(TextComponent_getText);
+		DN_ADD_INTERNAL_CALL(TextComponent_setText);
+		DN_ADD_INTERNAL_CALL(TextComponent_getColor);
+		DN_ADD_INTERNAL_CALL(TextComponent_getColor);
+		DN_ADD_INTERNAL_CALL(TextComponent_getKerning);
+		DN_ADD_INTERNAL_CALL(TextComponent_getKerning);
+		DN_ADD_INTERNAL_CALL(TextComponent_getLineSpacing);
+		DN_ADD_INTERNAL_CALL(TextComponent_getLineSpacing);
 
 		DN_ADD_INTERNAL_CALL(Input_isKeydown);
 	}

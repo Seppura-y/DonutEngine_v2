@@ -13,6 +13,7 @@ extern"C"
 	typedef struct _MonoAssembly MonoAssembly;
 	typedef struct _MonoImage MonoImage;
 	typedef struct _MonoClassField MonoClassField;
+	typedef struct _MonoString  MonoString;
 }
 
 namespace Donut
@@ -167,6 +168,8 @@ namespace Donut
 		static MonoImage* getCoreAssemblyImage();
 
 		static MonoObject* getManagedInstance(UUID uuid);
+
+		static MonoString* createString(const char* string);
 	private:
 		static void initMono();
 		static void shutdownMono();
