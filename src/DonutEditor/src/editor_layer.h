@@ -24,6 +24,7 @@ namespace Donut
 	private:
 		bool onKeyPressed(KeyPressedEvent& ev);
 		bool onMouseButtonPressed(MouseButtonPressedEvent& ev);
+		bool onWindowDrop(WindowDropEvent& ev);
 
 		void newScene();
 		void openScene();

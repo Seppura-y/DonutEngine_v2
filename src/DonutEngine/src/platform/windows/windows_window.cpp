@@ -161,6 +161,19 @@ namespace Donut {
 			data.event_callback(ev);
 		});
 
+		glfwSetDropCallback(glfw_window_, [](GLFWwindow* window, int path_count, const char* paths[])
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			std::vector<std::filesystem::path> filepaths(path_count);
+			for (int i = 0; i < path_count; i++)
+			{
+				filepaths[i] = paths[i];
+			}
+
+			WindowDropEvent event(std::move(filepaths));
+			data.event_callback(event);
+		});
 	}
 
 	void WindowsWindow::shutdown()

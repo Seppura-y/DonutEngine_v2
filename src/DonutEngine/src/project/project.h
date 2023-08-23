@@ -4,6 +4,9 @@
 
 #include "core/core.h"
 
+#include "asset/runtime_asset_manager.h"
+#include "asset/editor_asset_manager.h"
+
 #include <string>
 #include <filesystem>
 
@@ -50,11 +53,17 @@ namespace Donut
 		static Ref<Project> newProject();
 		static Ref<Project> loadProject(const std::filesystem::path& path);
 		static bool saveActive(const std::filesystem::path& path);
+
+		std::shared_ptr<AssetManagerBase> getAssetManager() { return asset_manager_; }
+		std::shared_ptr<EditorAssetManager> getEditorAssetManager() { return std::static_pointer_cast<EditorAssetManager>(asset_manager_); }
+		std::shared_ptr<RuntimeAssetManager> getRuntimeAssetManager() { return std::static_pointer_cast<RuntimeAssetManager>(asset_manager_); }
 	private:
 		ProjectConfig config_;
 		std::filesystem::path project_directory_;
 
 		inline static Ref<Project> active_project_;
+
+		std::shared_ptr<AssetManagerBase> asset_manager_;
 	};
 
 }

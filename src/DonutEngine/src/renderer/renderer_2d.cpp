@@ -212,7 +212,7 @@ namespace Donut
 
 		s_data.white_texture_ = Texture2D::createTexture(TextureSpecification());
 		uint32_t white_texture_data = 0xffffffff;
-		s_data.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
+		s_data.white_texture_->setData(Buffer(& white_texture_data, sizeof(uint32_t)));
 
 		int samplers[s_data.max_texture_slots_];
 		for (uint32_t i = 0; i < s_data.max_texture_slots_; i++)

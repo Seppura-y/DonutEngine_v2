@@ -41,7 +41,7 @@ namespace Donut
 		spec.generate_mips_ = false;
 
 		Ref<Texture2D> texture = Texture2D::createTexture(spec);
-		texture->setData((void*)bitmap.pixels, bitmap.width * bitmap.height * 3);
+		texture->setData(Buffer((void*)bitmap.pixels, bitmap.width * bitmap.height * 3));
 		return texture;
 
 	}

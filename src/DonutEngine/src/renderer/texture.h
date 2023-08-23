@@ -58,7 +58,7 @@ namespace Donut
 	public:
 		//static Ref<Texture2D> createTexture(const TextureSpecification& spec);
 		//static Ref<Texture2D> createTexture(const std::string& path);
-		static Ref<Texture2D> createTexture(const TextureSpecification& spec, const std::string& path);
+		static Ref<Texture2D> createTexture(const TextureSpecification& spec, Buffer data = Buffer());
 
 		static AssetType getStaticType() { return AssetType::Texture2D; }
 		virtual AssetType getType() const { return getStaticType(); }

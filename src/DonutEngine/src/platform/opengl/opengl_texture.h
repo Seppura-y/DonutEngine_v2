@@ -11,7 +11,7 @@ namespace Donut
 	{
 	public:
 		OpenGLTexture2D(const TextureSpecification& spec, Buffer data = Buffer());
-		OpenGLTexture2D(const std::string& path);
+
 		virtual ~OpenGLTexture2D();
 
 		virtual const TextureSpecification& getSpecification() const override { return texture_spec_; }
@@ -22,8 +22,6 @@ namespace Donut
 		virtual void setData(Buffer data) override;
 
 		virtual uint32_t getObjectId() const override;
-
-		virtual const std::string& getPath() const override { return file_path_; }
 
 		virtual void bind(uint32_t slot = 0) const override;
 
@@ -40,8 +38,6 @@ namespace Donut
 		uint32_t channels_;
 
 		uint32_t object_id_;
-
-		std::string file_path_;
 
 		GLenum internal_format_, data_format_;
 

@@ -36,6 +36,29 @@ namespace Donut {
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
+	class DONUT_API WindowDropEvent : public Event
+	{
+	public:
+		WindowDropEvent(const std::vector<std::filesystem::path>& paths)
+			: paths_(paths)
+		{
+
+		}
+
+		WindowDropEvent(const std::vector<std::filesystem::path>&& paths)
+			: paths_(std::move(paths))
+		{
+
+		}
+
+		const std::vector<std::filesystem::path>& getPaths() const { return paths_; }
+
+		EVENT_CLASS_TYPE(WindowDrop)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	private:
+		std::vector<std::filesystem::path> paths_;
+	};
+
 	class DONUT_API AppTickEvent : public Event
 	{
 	public:

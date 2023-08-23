@@ -403,6 +403,11 @@ bool Donut::EditorLayer::onMouseButtonPressed(MouseButtonPressedEvent& ev)
 	return false;
 }
 
+bool Donut::EditorLayer::onWindowDrop(WindowDropEvent& ev)
+{
+	return true;
+}
+
 void Donut::EditorLayer::newScene()
 {
 	active_scene_ = createRef<Scene>();
