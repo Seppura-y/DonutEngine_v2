@@ -1,10 +1,11 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
-#include <string>
-#include <filesystem>
 
 #include "core/core.h"
+
+#include <string>
+#include <filesystem>
 
 namespace Donut
 {
