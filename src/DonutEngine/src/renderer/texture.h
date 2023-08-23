@@ -2,6 +2,9 @@
 #define TEXTURE_H
 
 #include "core/core.h"
+#include "core/buffer.h"
+
+#include "asset/asset.h"
 
 #include <string>
 
@@ -24,7 +27,7 @@ namespace Donut
 		bool generate_mips_ = true;
 	};
 
-	class Texture
+	class Texture : public Asset
 	{
 	public:
 		virtual ~Texture() = default;
@@ -34,7 +37,8 @@ namespace Donut
 		virtual uint32_t getWidth() const = 0;
 		virtual uint32_t getHeight() const = 0;
 
-		virtual void setData(void* data, uint32_t size) = 0;
+		//virtual void setData(void* data, uint32_t size) = 0;
+		virtual void setData(Buffer data) = 0;
 
 		virtual uint32_t getObjectId() const = 0;
 
@@ -52,8 +56,12 @@ namespace Donut
 	class Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> createTexture(const TextureSpecification& spec);
-		static Ref<Texture2D> createTexture(const std::string& path);
+		//static Ref<Texture2D> createTexture(const TextureSpecification& spec);
+		//static Ref<Texture2D> createTexture(const std::string& path);
+		static Ref<Texture2D> createTexture(const TextureSpecification& spec, const std::string& path);
+
+		static AssetType getStaticType() { return AssetType::Texture2D; }
+		virtual AssetType getType() const { return getStaticType(); }
 	};
 }
 #endif

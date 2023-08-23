@@ -10,7 +10,7 @@ namespace Donut
 	class OpenGLTexture2D : public Texture2D
 	{
 	public:
-		OpenGLTexture2D(const TextureSpecification& spec);
+		OpenGLTexture2D(const TextureSpecification& spec, Buffer data = Buffer());
 		OpenGLTexture2D(const std::string& path);
 		virtual ~OpenGLTexture2D();
 
@@ -19,7 +19,7 @@ namespace Donut
 		virtual uint32_t getWidth() const override { return width_; }
 		virtual uint32_t getHeight() const override { return height_; }
 
-		virtual void setData(void* data, uint32_t size) override;
+		virtual void setData(Buffer data) override;
 
 		virtual uint32_t getObjectId() const override;
 

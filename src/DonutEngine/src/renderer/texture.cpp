@@ -6,23 +6,12 @@
 
 namespace Donut
 {
-	Ref<Texture2D> Texture2D::createTexture(const TextureSpecification& spec)
+	Ref<Texture2D> Texture2D::createTexture(const TextureSpecification& spec, Buffer data)
 	{
 		switch (RendererAPI::getCurrentAPIType())
 		{
 			case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
-			case RendererAPI::RendererAPIType::OpenGL: return createRef<OpenGLTexture2D>(spec);
-		}
-		DN_CORE_ASSERT(false, "unknown renderer api");
-
-		return nullptr;
-	}
-	Ref<Texture2D> Texture2D::createTexture(const std::string& path)
-	{
-		switch (RendererAPI::getCurrentAPIType())
-		{
-			case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
-			case RendererAPI::RendererAPIType::OpenGL: return createRef<OpenGLTexture2D>(path);
+			case RendererAPI::RendererAPIType::OpenGL: return createRef<OpenGLTexture2D>(spec, data);
 		}
 		DN_CORE_ASSERT(false, "unknown renderer api");
 

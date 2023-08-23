@@ -18,6 +18,12 @@ namespace Donut
 			allocate(size);
 		}
 
+		Buffer(const void* data, uint64_t size)
+			:data_((uint8_t*)data), size_(size)
+		{
+
+		}
+
 		Buffer(const Buffer&) = default;
 
 		static Buffer copy(Buffer other)
@@ -37,8 +43,8 @@ namespace Donut
 
 		void release()
 		{
-			delete[] data_;
-
+			//delete[] data_;
+			free(data_);
 			data_ = nullptr;
 			size_ = 0;
 		}
