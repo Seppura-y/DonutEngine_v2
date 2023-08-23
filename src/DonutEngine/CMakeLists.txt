@@ -233,23 +233,34 @@ FILE(GLOB ${PROJECT_NAME}_PHYSICS_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/src/physics/*.h
 )
 
+#####################################################################################################
+# AssetManager
+FILE(GLOB ${PROJECT_NAME}_ASSET_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/src/asset/*.h
+)
+
+FILE(GLOB ${PROJECT_NAME}_ASSET_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/src/asset/*.cpp
+)
+
 
 #####################################################################################################
-source_group("src\\DonutEngine\\Global" FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
-source_group("src\\DonutEngine\\Core" FILES ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC})
-source_group("src\\DonutEngine\\Events" FILES ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC})
-source_group("src\\DonutEngine\\Project" FILES ${${PROJECT_NAME}_PROJECT_HEADER} ${${PROJECT_NAME}_PROJECT_SRC})
-source_group("src\\DonutEngine\\Renderer" FILES ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC})
-source_group("src\\DonutEngine\\ImGui" FILES ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC})
-source_group("src\\DonutEngine\\Scene" FILES ${${PROJECT_NAME}_SCENE_HEADER} ${${PROJECT_NAME}_SCENE_SRC})
-source_group("src\\DonutEngine\\Utils" FILES ${${PROJECT_NAME}_UTILS_HEADER} ${${PROJECT_NAME}_UTILS_SRC})
-source_group("src\\DonutEngine\\Math" FILES ${${PROJECT_NAME}_MATH_HEADER} ${${PROJECT_NAME}_MATH_SRC})
-source_group("src\\DonutEngine\\Scripting" FILES ${${PROJECT_NAME}_SCRIPT_ENGINE_HEADER} ${${PROJECT_NAME}_SCRIPT_ENGINE_SRC})
-source_group("src\\DonutEngine\\UI" FILES ${${PROJECT_NAME}_UI_HEADER})
-source_group("src\\DonutEngine\\Physics" FILES ${${PROJECT_NAME}_PHYSICS_HEADER})
+source_group("src\\DonutEngine\\Global"     FILES ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC})
+source_group("src\\DonutEngine\\Asset"      FILES ${${PROJECT_NAME}_ASSET_HEADER} ${${PROJECT_NAME}_ASSET_SRC})
+source_group("src\\DonutEngine\\Core"       FILES ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC})
+source_group("src\\DonutEngine\\Events"     FILES ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC})
+source_group("src\\DonutEngine\\Project"    FILES ${${PROJECT_NAME}_PROJECT_HEADER} ${${PROJECT_NAME}_PROJECT_SRC})
+source_group("src\\DonutEngine\\Renderer"   FILES ${${PROJECT_NAME}_RENDERER_HEADER} ${${PROJECT_NAME}_RENDERER_SRC})
+source_group("src\\DonutEngine\\ImGui"      FILES ${${PROJECT_NAME}_IMGUI_HEADER} ${${PROJECT_NAME}_IMGUI_SRC})
+source_group("src\\DonutEngine\\Scene"      FILES ${${PROJECT_NAME}_SCENE_HEADER} ${${PROJECT_NAME}_SCENE_SRC})
+source_group("src\\DonutEngine\\Utils"      FILES ${${PROJECT_NAME}_UTILS_HEADER} ${${PROJECT_NAME}_UTILS_SRC})
+source_group("src\\DonutEngine\\Math"       FILES ${${PROJECT_NAME}_MATH_HEADER} ${${PROJECT_NAME}_MATH_SRC})
+source_group("src\\DonutEngine\\Scripting"  FILES ${${PROJECT_NAME}_SCRIPT_ENGINE_HEADER} ${${PROJECT_NAME}_SCRIPT_ENGINE_SRC})
+source_group("src\\DonutEngine\\UI"         FILES ${${PROJECT_NAME}_UI_HEADER})
+source_group("src\\DonutEngine\\Physics"    FILES ${${PROJECT_NAME}_PHYSICS_HEADER})
 
-source_group("src\\DonutEngine\\Platform\\OpenGL" FILES ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC})
-source_group("src\\DonutEngine\\Platform\\Windows" FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
+source_group("src\\DonutEngine\\Platform\\OpenGL"   FILES ${${PROJECT_NAME}_OPENGL_HEADER} ${${PROJECT_NAME}_OPENGL_SRC})
+source_group("src\\DonutEngine\\Platform\\Windows"  FILES ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC})
 
 source_group("src\\Debug" FILES ${${PROJECT_NAME}_DEBUG_HEADER} ${${PROJECT_NAME}_DEBUG_SRC})
 
@@ -286,6 +297,7 @@ if (WIN32)
         ${GLOBAL_SRC}
 
         ${${PROJECT_NAME}_GLOBAL_HEADER} ${${PROJECT_NAME}_GLOBAL_SRC}
+        ${${PROJECT_NAME}_ASSET_HEADER} ${${PROJECT_NAME}_ASSET_SRC}
         ${${PROJECT_NAME}_WINDOWS_HEADER} ${${PROJECT_NAME}_WINDOWS_SRC}
         ${${PROJECT_NAME}_CORE_HEADER} ${${PROJECT_NAME}_CORE_SRC}
         ${${PROJECT_NAME}_EVENTS_HEADER} ${${PROJECT_NAME}_EVENTS_SRC}
