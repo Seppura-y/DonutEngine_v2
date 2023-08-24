@@ -291,7 +291,7 @@ namespace Donut
 
 			if (spriteRendererComponent.texture_)
 			{
-				out << YAML::Key << "TexturePath" << YAML::Value << spriteRendererComponent.texture_->getPath();
+				out << YAML::Key << "TextureHandle" << YAML::Value << spriteRendererComponent.texture_;
 			}
 
 			out << YAML::Key << "TillingFactor" << YAML::Value << spriteRendererComponent.tiling_factor_;
@@ -540,9 +540,14 @@ namespace Donut
 
 					if (sprite_renderer_component["TexturePath"])
 					{
-						std::string texture_path = sprite_renderer_component["TexturePath"].as<std::string>();
-						auto path = Project::getAssetFileSystemPath(texture_path);
-						src.texture_ = Texture2D::createTexture(path.string());
+						//std::string texture_path = sprite_renderer_component["TexturePath"].as<std::string>();
+						//auto path = Project::getAssetFileSystemPath(texture_path);
+						//src.texture_ = Texture2D::createTexture(path.string());
+					}
+
+					if (sprite_renderer_component["TextureHandle"])
+					{
+						src.texture_ = sprite_renderer_component["TextureHandle"].as<AssetHandle>();
 					}
 
 					if (sprite_renderer_component["TillingFactor"])

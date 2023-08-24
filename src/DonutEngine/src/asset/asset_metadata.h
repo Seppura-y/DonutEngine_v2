@@ -9,10 +9,10 @@ namespace Donut
 {
 	struct AssetMetadata
 	{
-		AssetType type = AssetType::None;
+		AssetType type_ = AssetType::None;
 		std::filesystem::path file_path_;
 
-		operator bool() const { return type != AssetType::None; }
+		operator bool() const { return type_ != AssetType::None; }
 	};
 }
 

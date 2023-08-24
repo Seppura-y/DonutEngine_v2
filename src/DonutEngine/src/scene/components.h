@@ -76,7 +76,7 @@ namespace Donut
 	struct SpriteRendererComponent
 	{
 		glm::vec4 color_{ 0.8f, 0.2f, 0.3f, 1.0f };
-		Ref<Texture2D> texture_;
+		AssetHandle texture_ = 0;
 		float tiling_factor_ = 1.0f;
 
 		SpriteRendererComponent() = default;

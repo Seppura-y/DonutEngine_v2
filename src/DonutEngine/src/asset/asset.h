@@ -17,6 +17,9 @@ namespace Donut
 		Texture2D
 	};
 
+	std::string_view assetTypeToString(AssetType type);
+	AssetType assetTypeFromString(std::string_view type);
+
 	class Asset
 	{
 	public:

@@ -24,6 +24,7 @@ namespace Donut
 				out << YAML::Key << "Name" << YAML::Value << config.name_;
 				out << YAML::Key << "StartScene" << YAML::Value << config.start_scene_.string();
 				out << YAML::Key << "AssetDirectory" << YAML::Value << config.asset_directory_.string();
+				out << YAML::Key << "AssetRegistryPath" << YAML::Value << config.asset_registry_path_.string();
 				out << YAML::Key << "ScriptModulePath" << YAML::Value << config.script_module_path_.string();
 				out << YAML::EndMap; // Project
 			}
@@ -58,6 +59,10 @@ namespace Donut
 		config.name_ = project_node["Name"].as<std::string>();
 		config.start_scene_ = project_node["StartScene"].as<std::string>();
 		config.asset_directory_ = project_node["AssetDirectory"].as<std::string>();
+		if (project_node["AssetRegistryPath"])
+		{
+			config.asset_registry_path_ = project_node["AssetRegistryPath"].as<std::string>();
+		}
 		config.script_module_path_ = project_node["ScriptModulePath"].as<std::string>();
 		return true;
 	}

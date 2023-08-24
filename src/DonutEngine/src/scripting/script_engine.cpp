@@ -23,6 +23,8 @@
 
 namespace Donut {
 
+	static bool is_mono_init = false;
+
 	struct ScriptEngineData
 	{
 		MonoDomain* root_domain_ = nullptr;
@@ -182,6 +184,10 @@ namespace Donut {
 
 	void ScriptEngine::init()
 	{
+		if (is_mono_init)
+		{
+			return;
+		}
 		s_data = new ScriptEngineData();
 
 		initMono();
@@ -254,6 +260,8 @@ namespace Donut {
 
 		//HZ_CORE_ASSERT(false);
 #endif
+
+		is_mono_init = true;
 	}
 
 	void ScriptEngine::shutdown()
@@ -307,6 +315,8 @@ namespace Donut {
 
 		mono_jit_cleanup(s_data->root_domain_);
 		s_data->root_domain_ = nullptr;
+
+		is_mono_init = false;
 	}
 
 

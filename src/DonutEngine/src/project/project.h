@@ -19,6 +19,7 @@ namespace Donut
 		std::filesystem::path start_scene_;
 
 		std::filesystem::path asset_directory_;
+		std::filesystem::path asset_registry_path_;
 		std::filesystem::path script_module_path_;
 	};
 
@@ -36,6 +37,12 @@ namespace Donut
 			DN_CORE_ASSERT(active_project_, "getAssetDirectory");
 			//return getProjectDirectory() / active_project_->config_.asset_directory_;
 			return getProjectDirectory().parent_path();
+		}
+
+		static std::filesystem::path getAssetRegistryPath()
+		{
+			DN_CORE_ASSERT(active_project_, "getAssetDirectory");
+			return getAssetDirectory() / active_project_->config_.asset_registry_path_;
 		}
 
 		// TODO(Yan): move to asset manager when we have one

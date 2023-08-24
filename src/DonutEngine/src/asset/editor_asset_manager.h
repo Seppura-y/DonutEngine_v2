@@ -18,6 +18,13 @@ namespace Donut
 
 		const AssetMetadata& getMetadata(AssetHandle handle) const;
 
+		void importAsset(const std::filesystem::path& filepath);
+
+		const AssetRegistry& getAssetRegistry() const { return asset_registry_; }
+
+		void serializeAssetRegistry();
+		bool deserializeAssetRegistry();
+
 	private:
 		AssetRegistry asset_registry_;
 		AssetMap loaded_assets_;

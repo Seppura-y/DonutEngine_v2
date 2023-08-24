@@ -1,6 +1,8 @@
 #include "sandbox_2d.h"
 #include "imgui/imgui.h"
 
+#include "asset/texture_importer.h"
+
 #include "platform/opengl/opengl_shader.h"
 #include "platform/opengl/opengl_texture.h"
 
@@ -40,8 +42,8 @@ void Sandbox2D::onAttach()
 {
 	DN_PROFILE_FUNCTION();
 
-	rectangle_texture_ = Donut::Texture2D::createTexture("assets/textures/checkbox.png");
-	sprite_texture_ = Donut::Texture2D::createTexture("assets/textures/RPG Base/RPGpack_sheet_2X.png");
+	rectangle_texture_ = Donut::TextureImporter::loadTexture2D("assets/textures/checkbox.png");
+	sprite_texture_ = Donut::TextureImporter::loadTexture2D("assets/textures/RPG Base/RPGpack_sheet_2X.png");
 
 	texture_stair_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 7,6 }, { 1,1 }, { 128,128 });
 	texture_tree_ = Donut::Subtexture::createFromCoordinate(sprite_texture_, { 2,1 }, { 1,2 }, { 128,128 });

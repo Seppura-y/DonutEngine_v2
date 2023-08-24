@@ -16,6 +16,8 @@
 
 #include "renderer/font.h"
 
+#include "asset/texture_importer.h"
+
 #include "ImGuizmo.h"
 #include "math/math.h"
 
@@ -60,11 +62,18 @@ void Donut::EditorLayer::onAttach()
 {
 	DN_PROFILE_FUNCTION();
 
-	play_icon_ = Texture2D::createTexture("assets/icons/PlayButton.png");
-	stop_icon_ = Texture2D::createTexture("assets/icons/StopButton.png");
-	simulate_icon_ = Texture2D::createTexture("assets/icons/SimulateButton.png");
-	pause_icon_ = Texture2D::createTexture("assets/icons/PauseButton.png");
-	step_icon_ = Texture2D::createTexture("assets/icons/StepButton.png");
+	//play_icon_ = Texture2D::createTexture("assets/icons/PlayButton.png");
+	//stop_icon_ = Texture2D::createTexture("assets/icons/StopButton.png");
+	//simulate_icon_ = Texture2D::createTexture("assets/icons/SimulateButton.png");
+	//pause_icon_ = Texture2D::createTexture("assets/icons/PauseButton.png");
+	//step_icon_ = Texture2D::createTexture("assets/icons/StepButton.png");
+
+	play_icon_ =		TextureImporter::loadTexture2D("assets/icons/PlayButton.png");
+	stop_icon_ =		TextureImporter::loadTexture2D("assets/icons/StopButton.png");
+	simulate_icon_ =	TextureImporter::loadTexture2D("assets/icons/SimulateButton.png");
+	pause_icon_ =		TextureImporter::loadTexture2D("assets/icons/PauseButton.png");
+	step_icon_ =		TextureImporter::loadTexture2D("assets/icons/StepButton.png");
+
 	Donut::FramebufferSpecification framebuffer_spec;
 	framebuffer_spec.attachments_specifications_ = 
 	{

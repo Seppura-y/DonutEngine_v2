@@ -5,6 +5,8 @@
 
 #include "../DonutEngine/src/ui/ui.h"
 
+#include "../DonutEngine/src/asset/texture_importer.h"
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -420,17 +422,21 @@ namespace Donut
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 				{
+#if 1
 					const wchar_t* path = (const wchar_t*)payload->Data;
 					std::filesystem::path texture_path(path);
-					Ref<Texture2D> texture = Texture2D::createTexture(texture_path.string());
+
+					Ref<Texture2D> texture = TextureImporter::loadTexture2D(texture_path);
+					//Ref<Texture2D> texture = Texture2D::createTexture(texture_path.string());
 					if (texture->isLoaded())
 					{
-						component.texture_ = texture;
+						component.texture_ = texture->handle_;
 					}
 					else
 					{
 						DN_CORE_WARN("Could not load texture {0}", texture_path.filename().string());
 					}
+#endif
 				}
 				ImGui::EndDragDropTarget();
 			}

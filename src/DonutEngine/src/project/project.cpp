@@ -20,6 +20,11 @@ namespace Donut
 		{
 			project->project_directory_ = path.parent_path();
 			active_project_ = project;
+
+			std::shared_ptr<EditorAssetManager> editor_asset_manager = std::make_unique<EditorAssetManager>();
+			active_project_->asset_manager_ = editor_asset_manager;
+			editor_asset_manager->deserializeAssetRegistry();
+
 			return active_project_;
 		}
 

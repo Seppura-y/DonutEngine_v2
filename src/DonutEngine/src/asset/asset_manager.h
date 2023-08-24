@@ -12,8 +12,8 @@ namespace Donut
 		template<typename T>
 		static Ref<T> getAsset(AssetHandle handle)
 		{
-			//Ref<Asset> asset = Project::getActive()->getAssetManager()->getAsset(handle);
-			Ref<Asset> asset = Project::getActive();
+			Ref<Asset> asset = Project::getActive()->getAssetManager()->getAsset(handle);
+			//Ref<Asset> asset = Project::getActive();
 			return std::static_pointer_cast<T>(asset);
 		}
 	};

@@ -50,7 +50,8 @@ namespace Donut
 		glTextureParameteri(object_id_, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		setData(data);
+		if(data.size_)
+			setData(data);
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D()
@@ -67,6 +68,7 @@ namespace Donut
 		uint32_t bytes_per_pixel = data_format_ == GL_RGBA ? 4 : 3;
 		DN_CORE_ASSERT(data.size_ == width_ * height_ * bytes_per_pixel, "data must be entire texture!");
 		glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data.data_);
+		is_loaded_ = true;
 	}
 
 	uint32_t OpenGLTexture2D::getObjectId() const

@@ -12,6 +12,8 @@ namespace Donut
 	{
 	public:
 		static Ref<Texture2D> importTexture2D(AssetHandle handle, const AssetMetadata& metadata);
+
+		static Ref<Texture2D> loadTexture2D(const std::filesystem::path& path);
 	};
 }
 

@@ -9,6 +9,8 @@
 
 #include "renderer/msdf_data.h"
 
+#include "asset/asset_manager.h"
+
 #include "platform/opengl/opengl_shader.h"
 #include "platform/opengl/opengl_vertex_array.h"
 #include "platform/opengl/opengl_texture.h"
@@ -844,6 +846,7 @@ namespace Donut
 	void Renderer2D::drawRectangle(const glm::mat4 transform, const Ref<Texture2D>& texture, float tiling_factor, const glm::vec4& tint_color, int entity_id)
 	{
 		DN_PROFILE_FUNCTION();
+		DN_CORE_VERIFY(texture);
 
 		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
 		{
@@ -897,7 +900,8 @@ namespace Donut
 	{
 		if (component.texture_)
 		{
-			drawRectangle(transform, component.texture_, component.tiling_factor_, component.color_, entity_id);
+			Ref<Texture2D> texture = AssetManager::getAsset<Texture2D>(component.texture_);
+			drawRectangle(transform, texture, component.tiling_factor_, component.color_, entity_id);
 		}
 		else
 		{
