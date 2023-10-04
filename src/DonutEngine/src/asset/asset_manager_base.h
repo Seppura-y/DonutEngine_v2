@@ -7,7 +7,6 @@
 
 namespace Donut
 {
-	using AssetMap = std::map<AssetHandle, Ref<Asset>>;
 
 	class AssetManagerBase
 	{
@@ -16,6 +15,9 @@ namespace Donut
 
 		virtual bool isAssetHandleValid(AssetHandle handle) const = 0;
 		virtual bool isAssetLoaded(AssetHandle handle) const = 0;
+
+
+		virtual AssetHandle getAssetHandleFromFilePath(const std::string& filepath) = 0;
 	};
 }
 

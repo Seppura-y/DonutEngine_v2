@@ -51,6 +51,7 @@ namespace Donut
 			asset->handle_ = handle;
 			loaded_assets_[handle] = asset;
 			asset_registry_[handle] = metadata;
+			filepath_to_assets_[filepath.string()] = handle;
 			serializeAssetRegistry();
 		}
 	}
@@ -109,10 +110,23 @@ namespace Donut
 			AssetHandle handle = node["Handle"].as<uint64_t>();
 			auto& metadata = asset_registry_[handle];
 			metadata.file_path_ = node["FilePath"].as<std::string>();
+
+			filepath_to_assets_[node["FilePath"].as<std::string>()] = handle;
+
 			metadata.type_ = assetTypeFromString(node["Type"].as<std::string>());
+			metadata.type_ = AssetType::Texture2D;
 		}
 
 		return true;
+	}
+
+	AssetHandle EditorAssetManager::getAssetHandleFromFilePath(const std::string& filepath)
+	{
+		//std::string fixed_filepath = filepath;
+		//std::replace(fixed_filepath.begin(), fixed_filepath.end(), '\\', '/');
+
+		if (filepath_to_assets_.find(filepath) != filepath_to_assets_.end())
+			return filepath_to_assets_[filepath];
 	}
 
 	Ref<Asset> Donut::EditorAssetManager::getAsset(AssetHandle handle) const

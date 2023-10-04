@@ -6,7 +6,9 @@
 
 namespace Donut
 {
+	using AssetMap = std::map<AssetHandle, Ref<Asset>>;
 	using AssetRegistry = std::map<AssetHandle, AssetMetadata>;
+	using AssetFilepath = std::map<std::string, AssetHandle>;
 
 	class EditorAssetManager : public AssetManagerBase
 	{
@@ -25,9 +27,12 @@ namespace Donut
 		void serializeAssetRegistry();
 		bool deserializeAssetRegistry();
 
+		virtual AssetHandle getAssetHandleFromFilePath(const std::string& filepath) override;
+
 	private:
 		AssetRegistry asset_registry_;
 		AssetMap loaded_assets_;
+		AssetFilepath filepath_to_assets_;
 	};
 }
 

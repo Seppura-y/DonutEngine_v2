@@ -6,6 +6,8 @@
 #include "../DonutEngine/src/ui/ui.h"
 
 #include "../DonutEngine/src/asset/texture_importer.h"
+#include "../DonutEngine/src/asset/asset_manager_base.h"
+#include "../DonutEngine/src/asset/editor_asset_manager.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -426,8 +428,11 @@ namespace Donut
 					const wchar_t* path = (const wchar_t*)payload->Data;
 					std::filesystem::path texture_path(path);
 
-					Ref<Texture2D> texture = TextureImporter::loadTexture2D(texture_path);
-					//Ref<Texture2D> texture = Texture2D::createTexture(texture_path.string());
+					EditorAssetManager asset_manager;
+					AssetHandle handle = asset_manager.getAssetHandleFromFilePath(texture_path.string());
+
+					//Ref<Texture2D> texture = asset_manager.getAsset(handle);
+					Ref<Texture2D> texture = Texture2D::createTexture(texture_path.string());
 					if (texture->isLoaded())
 					{
 						component.texture_ = texture->handle_;

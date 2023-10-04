@@ -106,6 +106,20 @@ namespace Donut
 					ImGui::EndPopup();
 				}
 
+				if (ImGui::BeginDragDropSource())
+				{
+					//std::filesystem::path relative_path(path);
+					auto relative_path = Project::getAssetDirectory() / node->path_ / item;
+					const wchar_t* item_path = relative_path.c_str();
+
+					ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM",
+						item_path,
+						(wcslen(item_path) + 1) * sizeof(wchar_t) // NTCTS: null-terminated-character-type-string
+					);
+
+					ImGui::EndDragDropSource();
+				}
+
 				ImGui::PopStyleColor();
 
 				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
