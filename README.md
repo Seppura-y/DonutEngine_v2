@@ -2,24 +2,24 @@
 
 **日本語** | [简体中文](README.zh-CN.md)
 
-**The Chernoのゲームエンジン開発シリーズを参考に、C++・OpenGLで取り組んだ、2Dレンダラーとシーンエディターの学習プロジェクトです。**
+**C++17・OpenGLによる2DバッチレンダラーおよびDear ImGuiベースのシーンエディター実装です。**
 
-[Hazel](https://github.com/TheCherno/Hazel)の設計・実装を追いながら、アプリケーションの基盤、描画リソース、シーン、エディターの関係を学び、ビルド構成をCMakeに整理しました。
+モジュラーなゲームエンジン構成をベースに、アプリケーション基盤、描画リソースの抽象化、ECSシーン管理、エディターUIを統合し、CMakeによるマルチターゲット構成として構築しています。
 
-さらに、このプロジェクトで学んだ描画層を整理・簡略化し、[DonutQMLPlayer](https://github.com/Seppura-y/DonutQMLPlayer)の動画レンダラーへ応用しました。**エンジンの構造を理解し、用途に合わせて別のアプリケーションへ組み込むこと**まで取り組んでいます。
+さらに、本プロジェクトで実装した描画レイヤーを切り出し、[DonutQMLPlayer](https://github.com/Seppura-y/DonutQMLPlayer)のカスタム動画レンダラーへと移植・応用しました。**描画基盤の抽象化から、異なるUIフレームワーク（Qt Quick）への組み込みまで**を一貫して実装・検証しています。
 
 ![DonutEngine_v2のエディター画面例](https://github.com/user-attachments/assets/358653e5-fc40-4ecc-9fe5-f72d8e3eb465)
 
-## 開発の位置付け
+## 設計の主眼と応用展開
 
-エンジンの基本設計と多くの機能は、The ChernoのチュートリアルとHazelを参考にしています。このリポジトリーでは、その学習実装に加えて、CMakeによるプロジェクトの整理と、後続のQtアプリケーションで使うための描画構造の理解に取り組みました。
+本リポジトリーでは、[Hazel](https://github.com/TheCherno/Hazel)等のエンジンアーキテクチャを参照しつつ、CMakeによるビルド構成の体系化と、他アプリケーションへ再利用しやすいOpenGL描画レイヤーの設計に取り組んでいます。
 
 | 取り組み | 内容 |
 |---|---|
-| エンジンの学習 | ウィンドウ、イベント、レイヤー、レンダラー、シーン、エディターの役割を理解する |
+| エンジン基盤の分離設計 | ウィンドウ抽象、イベント、レイヤー、レンダラー、ECSシーン、エディターの責務を分離する |
 | ビルド構成の整理 | エンジン、エディター、C#スクリプトのターゲットと依存関係をCMakeでまとめる |
-| 描画層の応用 | シェーダー、テクスチャー、バッファー、描画コマンドの構成を動画表示向けに整理する |
-| Qtへの適用 | DonutQMLPlayerでQtのOpenGL APIと描画ライフサイクルに合わせて組み込む |
+| 描画レイヤーの汎用化 | シェーダー、テクスチャー、バッファー、描画コマンドの構成を他用途へ切り出しやすく整理する |
+| Qtへの移植・適用 | DonutQMLPlayerにおいてQtのOpenGL APIと描画ライフサイクルに合わせて組み込む |
 
 ## 主な実装内容
 
@@ -27,7 +27,7 @@
 |---|---|
 | アプリケーション基盤 | Application、Window、Layer／LayerStack、入力・イベント処理 |
 | OpenGL描画 | 頂点・インデックス・Uniform Buffer、Vertex Array、シェーダー、テクスチャー、Framebuffer |
-| 2Dレンダラー | 矩形、スプライト、円、線、テキストの描画、バッチ処理、描画統計 |
+| 2Dレンダラー | 矩形、スプライト、円、線、テキストの描画、バッチレンダリング、描画統計 |
 | シーン | EnTTを使ったEntity／Component管理、カメラ、Transform、描画用Component |
 | エディター | Dear ImGuiによるビューポート、シーン階層、プロパティ編集、コンテンツブラウザー |
 | 編集操作 | ImGuizmoによる移動・回転・拡大縮小、Entity IDを用いた画面上の選択 |
@@ -53,32 +53,31 @@ flowchart TD
 
 `Renderer2D`から描画コマンドを発行し、`RenderCommand`と`RendererAPI`を通してOpenGL実装へつなぐ構成です。バッファー、テクスチャー、シェーダーなどもクラスに分け、生成・更新・使用・解放の役割を整理しています。
 
-この分離を理解したことが、後にウィンドウ基盤をQtへ変えて描画層を利用する際の土台になりました。
+ウィンドウ管理とOpenGL呼び出しを分離したこの構成が、後にウィンドウ基盤をGLFWからQtへ置き換えて描画層を再利用する際の土台となっています。
 
-### バッチ処理と描画統計
+### バッチレンダリングと描画統計
 
-矩形などの頂点情報をCPU側のバッファーへ蓄積し、描画時にGPU側へ転送する構成です。テクスチャースロットやバッファーの上限に応じてバッチを区切り、Draw Call数や矩形数を記録します。
+矩形などの頂点情報をCPU側のバッファーへ蓄積し、描画時にGPU側へ一括転送する構成です。テクスチャースロットやバッファーの上限に応じてバッチを区切り、Draw Call数や矩形数を記録します。
 
-描画を一件ずつ呼び出す処理と、まとめて送る処理の違いを、データの持ち方と実行順序から学びました。
+オブジェクト単位の個別描画ではなく、頂点配列へ集約してバッチ送信することで、描画呼び出しのオーバーヘッドを抑える構成としています。
 
 ### オフスクリーン描画とシーン操作
 
 シーンをFramebufferへ描画し、その結果をエディターのビューポートに表示します。色の出力に加えてEntity IDを扱い、マウス位置に対応するIDを読み取って選択へつなげています。
 
-選択したEntityは、シーン階層パネルやImGuizmoから操作します。表示、選択、Componentの変更がどのようにつながるかを確認できる構成です。
+選択したEntityは、シーン階層パネルやImGuizmoから操作します。表示、選択、Componentの変更が連動して動作する構成です。
 
 ## DonutQMLPlayerへの応用
 
-このプロジェクトの描画構造を基に、動画表示に必要な部分を整理し、[DonutQMLPlayer](https://github.com/Seppura-y/DonutQMLPlayer)へ組み込みました。
+本プロジェクトの描画構造を基に、動画表示に必要な部分を抽出し、[DonutQMLPlayer](https://github.com/Seppura-y/DonutQMLPlayer)へ組み込みました。
 
 ```mermaid
 flowchart LR
-    Hazel[The Cherno / Hazel] --> Engine[DonutEngine_v2 / CMake]
-    Engine --> Adapt[Rendering structure / Qt adaptation]
-    Adapt --> Player[DonutQMLPlayer / Video renderer]
+    Engine[DonutEngine_v2 / Core 2D Renderer] --> Adapt[Rendering Abstraction / Qt Adaptation]
+    Adapt --> Player[DonutQMLPlayer / Video Renderer]
 ```
 
-| エンジンで扱った構造 | プレーヤーでの適用 |
+| エンジンで構築した構造 | プレーヤーでの適用 |
 |---|---|
 | GLFWとGLADを使うウィンドウ・OpenGL環境 | Qt Quickの`QQuickItem`と`QOpenGLFunctions`系APIへ適合 |
 | `RenderCommand`／`RendererAPI` | `DonutRenderCommand`／`DonutGLRendererApi`として描画呼び出しを整理 |
@@ -89,7 +88,7 @@ flowchart LR
 
 動画側では、継続的に届くフレームの更新と、Qt Quickの描画タイミングへの接続が必要になります。`DonutScene`を`QQuickItem`として構成し、動画データと描画層をつなぎました。
 
-移した対象は動画用途に整理した描画層です。シーンエディター、物理演算、C#スクリプト等は、DonutQMLPlayerの構成には含めていません。
+移植した対象は動画用途に整理した描画レイヤーであり、シーンエディター、物理演算、C#スクリプト等はDonutQMLPlayerの構成から分離しています。
 
 ### 対応するコード
 
@@ -165,9 +164,7 @@ Pop-Location
 
 ![DonutEngine_v2の画面例2](https://github.com/user-attachments/assets/7c119890-5afd-4c1b-b173-9f152a3a9425)
 
-## 参考・関連プロジェクト
+## 関連プロジェクト・参考アーキテクチャ
 
-- **The Chernoのゲームエンジン開発シリーズ／[Hazel](https://github.com/TheCherno/Hazel)**：エンジンとエディターの設計・実装の学習元。
-- **[DonutQMLPlayer](https://github.com/Seppura-y/DonutQMLPlayer)**：本プロジェクトの描画構造を整理し、Qtベースの動画レンダラーへ応用したプロジェクト。
-
-学習元への参照を明確にしたうえで、ビルドの整理と、学んだ構造を別の用途に適用する過程を紹介しています。
+- **[DonutQMLPlayer](https://github.com/Seppura-y/DonutQMLPlayer)**：本プロジェクトのOpenGL描画レイヤーを切り出し、Qt Quickベースの動画レンダラーへ移植・応用したプロジェクト。
+- **[Hazel](https://github.com/TheCherno/Hazel)**：エンジン基盤およびエディターの基本設計において参照したアーキテクチャ。
